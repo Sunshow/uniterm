@@ -300,7 +300,7 @@ function openStandaloneSftp() {
 // navigates.
 const followActive = computed(() => {
   const pid = companionStore.activeFilesPanelId
-  return !!pid && companionStore.followPathByPanel[pid] !== false
+  return !!pid && companionStore.followPathByPanel[pid] === true
 })
 // Following requires an SSH or WSL terminal panel (the only panels that emit
 // terminal:cwd with POSIX paths).
@@ -330,7 +330,7 @@ function onTerminalCwd(ev: { data?: unknown }) {
   if (!p?.sessionId || !p.cwd) return
   // Only the active SSH/WSL panel's own terminal session drives navigation.
   const pid = companionStore.activeFilesPanelId
-  if (!pid || companionStore.followPathByPanel[pid] === false) return
+  if (!pid || companionStore.followPathByPanel[pid] !== true) return
   const panel = panelStore.getPanel(pid)
   if (!panel || panel.sessionId !== p.sessionId) return
   if (!p.cwd.startsWith('/')) return // Windows local terminals are out of scope
