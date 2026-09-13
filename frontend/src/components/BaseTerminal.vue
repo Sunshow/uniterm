@@ -338,7 +338,32 @@ let isZmodemStarting = false
 let zmodemStartTimer: ReturnType<typeof setTimeout> | null = null
 let zmodemDirection: 'upload' | 'download' | undefined = undefined
 let zmodemCancellingUntil = 0
+let zmodemRestoringOutput = false
+const zmodemDeferredOutput: string[] = []
 let exporting = false
+
+function renderTerminalData(rawData: string, countChunk = true) {
+  if (!terminal) return
+  let data = stripCursorBlink(rawData, settingsStore.settings.terminal.cursorBlink ?? true).replace(/\x1b\[3J/g, '')
+  if (data.includes('\x1b[2J') && terminal.buffer.active.type !== 'alternate') {
+    const scrollClear = '\n'.repeat(terminal.rows) + '\x1b[H'
+    data = data.replace(/\x1b\[H\x1b\[2J/g, scrollClear)
+    data = data.replace(/\x1b\[2J/g, scrollClear)
+  }
+  data = sanitizeLiveTerminalOutput(data)
+  if (props.mode === 'sftp') {
+    const cleaned = data.replace(/\x1b\]633;S[^\x07]*\x07/g, '')
+    if (cleaned) writeStamped(cleaned)
+  } else {
+    if (props.mode === 'ssh' && terminalInput) {
+      terminalInput.handleSessionData(data)
+      if (terminalInput.isInAlternateScreen()) suggestions.close()
+    }
+    const hlOn = (settingsStore.settings.terminal.highlightEnabled ?? true) && props.mode !== 'local'
+    writeStamped(hlOn ? highlight(data) : data)
+  }
+  if (countChunk) writtenChunks++
+}
 
 function initZmodemService(sessionId: string) {
   if (!sessionId || props.mode !== 'ssh') return
@@ -349,8 +374,18 @@ function initZmodemService(sessionId: string) {
   zmodemService = startZmodemService({
     // Register abort so any BaseTerminal component can cancel the transfer
     onRegister: (abort) => zmodemStore.registerAbort(sessionId, abort),
+    onUnregister: () => zmodemStore.unregisterAbort(sessionId),
     sessionId,
     direction: zmodemDirection,
+    onTerminalRestoreState: restoring => {
+      zmodemRestoringOutput = restoring
+      if (!restoring) {
+        for (const data of zmodemDeferredOutput.splice(0)) renderTerminalData(data)
+      }
+    },
+    onWarning: warning => {
+      terminal?.write(`\r\n\x1b[33mZmodem: ${warning}\x1b[0m\r\n`)
+    },
     onComplete: (files, hint) => {
       if (files.length > 0) {
         terminal?.write(`\r\n\x1b[32mZmodem: ${files.length} file(s) transferred\x1b[0m\r\n`)
@@ -370,21 +405,22 @@ function initZmodemService(sessionId: string) {
       }
       zmodemStore.clearTransfers(sessionId)
       zmodemDirection = undefined
-      disposeZmodemService(sessionId)
+      void disposeZmodemService(sessionId, true, false)
       initZmodemService(sessionId)
     },
     onError: (err) => {
       terminal?.write(`\r\n\x1b[31mZmodem error: ${err}\x1b[0m\r\n`)
       zmodemStore.clearTransfers(sessionId)
       zmodemDirection = undefined
-      disposeZmodemService(sessionId)
+      void disposeZmodemService(sessionId, true, false)
       initZmodemService(sessionId)
     },
   })
 }
 
 async function disposeZmodemService(sessionId: string, resetDirection = true, endSession = true) {
-  zmodemService?.dispose()
+  const service = zmodemService
+  const serviceDisposed = service?.dispose()
   zmodemService = null
   isZmodemStarting = false
   if (resetDirection) {
@@ -394,9 +430,12 @@ async function disposeZmodemService(sessionId: string, resetDirection = true, en
     clearTimeout(zmodemStartTimer)
     zmodemStartTimer = null
   }
-  if (sessionId && endSession) {
+  // A service that started binary mode also ends it, ordered after its pending
+  // start. Only use the direct fallback when no service owns that lifecycle.
+  if (!service && sessionId && endSession) {
     await SessionEndZmodem(sessionId).catch(() => {})
   }
+  await serviceDisposed
 }
 
 // OS file drops (resource manager) are delivered by Wails via the native
@@ -1255,6 +1294,12 @@ onMounted(() => {
       return
     }
 
+    // Keep output arriving after EndZmodem behind the restored prompt.
+    if (zmodemRestoringOutput) {
+      zmodemDeferredOutput.push(payload.data)
+      return
+    }
+
     // tab 切换后服务还没重建，但 store 里还有活跃传输（旧的 handleReceive 还在跑），先吞数据
     const hasStoreTransfer = zmodemStore.getActiveTransfer(props.sessionId || '')
     if (!zmodemService && hasStoreTransfer) {
@@ -1290,10 +1335,7 @@ onMounted(() => {
         const sid = props.sessionId
         if (sid) {
           // Consume immediately to avoid losing data during async handoff
-          zmodemService.consume(payload.data)
-          import('../../bindings/github.com/ys-ll/uniterm/app').then(({ SessionStartZmodem }) => {
-            SessionStartZmodem(sid).catch(() => {})
-          })
+          zmodemService.start(payload.data)
         }
         // Hide zmodem data from terminal
         return
@@ -1306,43 +1348,7 @@ onMounted(() => {
       return
     }
 
-    // Filter ED3 (erase scrollback).
-    let data = stripCursorBlink(payload.data, settingsStore.settings.terminal.cursorBlink ?? true).replace(/\x1b\[3J/g, '')
-    // For ED2 (clear screen) in the main buffer, replace with scrolling
-    // to preserve scrollback history. In alternate screen (vim, less,
-    // k9s), pass through unchanged — the app manages its own screen.
-    if (data.includes('\x1b[2J') && terminal.buffer.active.type !== 'alternate') {
-      const rows = terminal.rows
-      const scrollClear = '\n'.repeat(rows) + '\x1b[H'
-      data = data.replace(/\x1b\[H\x1b\[2J/g, scrollClear)
-      data = data.replace(/\x1b\[2J/g, scrollClear)
-    }
-// Drop U+FFFD + binary garbage. See utils/terminalSanitize for the
-    // full filter chain (box-drawing / braille preservation, control-char
-    // stripping, etc.). Live path skips the blank-line collapse step.
-    data = sanitizeLiveTerminalOutput(data)
-    if (props.mode === 'sftp') {
-      const cleaned = data.replace(/\x1b\]633;S[^\x07]*\x07/g, '')
-      if (cleaned) {
-        writeStamped(cleaned)
-      }
-      writtenChunks++
-    } else {
-      // Extract history commands from SSH output
-      if (props.mode === 'ssh' && terminalInput) {
-        terminalInput.handleSessionData(data)
-        // Close suggestions if we entered an alternate screen app (vim, k9s, etc.)
-        if (terminalInput.isInAlternateScreen()) {
-          suggestions.close()
-        }
-      }
-      const hlOn = (settingsStore.settings.terminal.highlightEnabled ?? true) && props.mode !== 'local'
-      writeStamped(hlOn ? highlight(data) : data)
-      writtenChunks++
-      if (props.mode === 'ssh' && props.onSessionStatus) {
-        // onSessionData is handled by the consumer via EventsOn if needed
-      }
-    }
+    renderTerminalData(payload.data)
   })
 
   // SSH/Local: session status events

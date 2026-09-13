@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"path/filepath"
 	goruntime "runtime"
 	"runtime/debug"
 	"strconv"
@@ -554,7 +555,26 @@ func (a *App) SessionEndZmodem(sessionID string) error {
 	if !ok {
 		return fmt.Errorf("session not found: %s", sessionID)
 	}
-	s.SetZmodemMode(false)
+	s.EndZmodem(nil)
+	return nil
+}
+
+// SessionEndZmodemWithTrailing leaves binary mode and emits terminal output
+// that zmodem.js found after the final handshake through the normal text path,
+// decoded as UTF-8 according to the session's configured character encoding.
+func (a *App) SessionEndZmodemWithTrailing(sessionID, base64Data string) error {
+	if a.sessionManager == nil {
+		return fmt.Errorf("session manager not initialized")
+	}
+	s, ok := a.sessionManager.Get(sessionID)
+	if !ok {
+		return fmt.Errorf("session not found: %s", sessionID)
+	}
+	data, err := base64.StdEncoding.DecodeString(base64Data)
+	if err != nil {
+		return fmt.Errorf("decode zmodem trailing data: %w", err)
+	}
+	s.EndZmodem(data)
 	return nil
 }
 
@@ -648,8 +668,20 @@ func (a *App) AppendFileBase64(path string, base64Data string, offset int64) err
 	} else {
 		flag |= os.O_APPEND
 	}
-
-	f, err := os.OpenFile(path, flag, 0644)
+	// Resolve the final component through os.Root. Root.OpenFile guarantees
+	// that a symlink swapped in after Lstat cannot escape the parent directory.
+	dir, name := filepath.Split(path)
+	root, err := os.OpenRoot(dir)
+	if err != nil {
+		return fmt.Errorf("open download directory: %w", err)
+	}
+	defer root.Close()
+	if info, statErr := root.Lstat(name); statErr == nil && info.Mode()&os.ModeSymlink != 0 {
+		return fmt.Errorf("refusing to write symbolic link: %s", path)
+	} else if statErr != nil && !os.IsNotExist(statErr) {
+		return fmt.Errorf("inspect file: %w", statErr)
+	}
+	f, err := root.OpenFile(name, flag, 0644)
 	if err != nil {
 		return fmt.Errorf("open file: %w", err)
 	}
