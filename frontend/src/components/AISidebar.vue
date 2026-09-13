@@ -277,6 +277,7 @@ import Menu from './Menu.vue'
 import MenuItem from './MenuItem.vue'
 import { Clipboard } from '@wailsio/runtime'
 import MenuDivider from './MenuDivider.vue'
+import { writeClipboard } from '../composables/useClipboardWrite'
 
 const aiStore = useAIStore()
 const settingsStore = useSettingsStore()
@@ -582,9 +583,15 @@ const msgCtxMenuRef = ref<InstanceType<typeof Menu> | null>(null)
 const msgCtxMenuVisible = ref(false)
 const msgCtxId = ref('')
 const msgCtxHasSelection = ref(false)
+const aiSelectionText = ref('')
+
+function captureAISelection() {
+  aiSelectionText.value = window.getSelection()?.toString() || ''
+}
 
 function onMessageContextMenu(e: MouseEvent, id: string) {
   e.preventDefault()
+  captureAISelection()
   msgCtxId.value = id
   msgCtxHasSelection.value = !!(window.getSelection()?.toString())
   msgCtxMenuRef.value?.openAt(e.clientX, e.clientY, id)
@@ -1180,24 +1187,21 @@ function closeMenus() {
 
 function onAIContextMenu(e: MouseEvent) {
   e.preventDefault()
+  captureAISelection()
   // Position at the pointer; Menu.openAt is viewport-clamped + single-open.
   aiMenuRef.value?.openAt(e.clientX, e.clientY)
 }
 
 function aiCopySelection() {
-  const selection = window.getSelection()
-  if (selection && selection.toString()) {
-    navigator.clipboard.writeText(selection.toString())
-  }
+  if (aiSelectionText.value) void writeClipboard(aiSelectionText.value)
   aiMenuVisible.value = false
   msgCtxMenuVisible.value = false
 }
 
 function aiAskSelection() {
-  const selection = window.getSelection()
-  if (selection && selection.toString()) {
+  if (aiSelectionText.value) {
     const el = editableRef.value
-    if (el) el.textContent = selection.toString()
+    if (el) el.textContent = aiSelectionText.value
     syncInputText(); refreshHashDropdown()
     if (!aiStore.visible) {
       aiStore.visible = true

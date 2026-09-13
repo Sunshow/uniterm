@@ -847,14 +847,10 @@ function updateContentWidth() {
   const w = CARD_WIDTH()
   const g = CARD_GAP()
   const available = el.clientWidth - PADDING() * 2
-  // 0.5px safety margin on both sides: clientWidth rounds to integers and
-  // sub-pixel rounding can let the CSS auto-fill grid disagree with this
-  // math at an exact column boundary — fitting one MORE track than computed
-  // leaves a visible empty slot, one FEWER leaves cards overflowing the
-  // centered wrapper. Bias conservative so the grid always matches.
-  const cols = Math.max(2, Math.min(6, Math.floor((available + g - 0.5) / (w + g))))
+  const cols = Math.max(2, Math.min(6, Math.floor((available + g) / (w + g))))
   contentCols.value = cols
   contentWidth.value = cols * w + (cols - 1) * g
+  el.style.setProperty('--start-cols', String(cols))
 }
 
 const contentStyle = computed(() => ({
@@ -1482,7 +1478,7 @@ async function doDelete(config: ConnectionConfig | null) {
 
 .start-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 15rem);
+  grid-template-columns: repeat(var(--start-cols, auto-fill), 15rem);
   gap: 0.75rem;
 }
 
