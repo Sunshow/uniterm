@@ -1,7 +1,7 @@
 import { reactive, ref, watch, h } from 'vue'
 import { ElMessage } from 'element-plus'
 import { msg } from '../services/message'
-import { CheckForUpdate, GetAppInfo, DownloadUpdate, ApplyUpdate, GetUpdateChannel } from '../../bindings/github.com/ys-ll/uniterm/app'
+import { CheckForUpdate, GetAppInfo, DownloadUpdate, ApplyUpdate } from '../../bindings/github.com/ys-ll/uniterm/app'
 import { useI18n, locale } from '../i18n'
 import { useSettingsStore } from '../stores/settingsStore'
 import { Events } from '@wailsio/runtime'
@@ -22,9 +22,6 @@ const updateDialogVisible = ref(false)
 const updatePhase = ref<UpdatePhase>('idle')
 const downloadProgress = ref({ received: 0, total: -1, percent: 0 })
 const updateError = ref('')
-// How this install updates itself: "portable" (in-app), "installer" (Windows
-// NSIS, in-app) or "package" (package manager — self-update disabled).
-const channel = ref<'portable' | 'installer' | 'package'>('portable')
 
 let unsubProgress: (() => void) | null = null
 
@@ -86,7 +83,6 @@ function openUpdateDialog() {
   updatePhase.value = 'idle'
   updateError.value = ''
   updateDialogVisible.value = true
-  refreshChannel()
 }
 
 function closeUpdateDialog() {
@@ -97,15 +93,9 @@ function closeUpdateDialog() {
   updatePhase.value = 'idle'
 }
 
-function refreshChannel() {
-  GetUpdateChannel().then(c => {
-    channel.value = (c?.channel === 'installer' || c?.channel === 'package') ? c.channel : 'portable'
-  }).catch(() => { /* keep previous value */ })
-}
-
 function showUpdateNotification(info: UpdateInfo) {
   const { t } = useI18n()
-  const canInstall = channel.value !== 'package' && info.assets.length > 0
+  const canInstall = info.assets.length > 0
   const linkStyle = { color: 'inherit', textDecoration: 'underline', cursor: 'pointer' }
   ElMessage({
     message: h('div', null, [
@@ -119,7 +109,6 @@ function showUpdateNotification(info: UpdateInfo) {
           openUpdateDialog()
         },
       }, t('settings.updateInstall')) : null,
-      channel.value === 'package' ? h('div', { style: 'margin-top:0.375rem;' }, t('settings.updatePackageManager')) : null,
     ]),
     type: 'success',
     duration: 0,
@@ -221,7 +210,6 @@ function initAutoCheck() {
       updateInfo.value = { hasUpdate: false, current: info.version, latest: '', releaseUrl: '', changelog: '', assets: [] }
     }
   }).catch(() => {})
-  refreshChannel()
   // Wait for persisted settings before scheduling network requests. Reading
   // the temporary default here would ignore a stored `false`.
   const settings = useSettingsStore()
@@ -265,7 +253,6 @@ const state = reactive({
   updatePhase,
   downloadProgress,
   updateError,
-  channel,
   startUpdate,
   openUpdateDialog,
   closeUpdateDialog,

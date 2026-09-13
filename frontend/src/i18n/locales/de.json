@@ -374,7 +374,7 @@
   "settings.updateApplying": "Update wird installiert...",
   "settings.updateFailed": "Update fehlgeschlagen",
   "settings.updateRestarting": "Neustart...",
-  "settings.updatePackageManager": "Diese Installation wird von einem Paketmanager verwaltet. Bitte nutzen Sie ihn zum Aktualisieren von uniTerm.",
+  "settings.updatePackageManager": "Falls diese App über einen Paketmanager (z. B. Homebrew, apt) installiert wurde, aktualisieren Sie sie bevorzugt damit.",
   "settings.openRelease": "Details anzeigen",
   "settings.checkUpdateFailed": "Update-Prüfung fehlgeschlagen",
   "settings.homepage": "Webseite",

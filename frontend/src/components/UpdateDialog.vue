@@ -13,7 +13,7 @@
         {{ t('settings.version') }} {{ updateCheck.updateInfo?.current || '...' }} → {{ updateCheck.updateInfo?.latest || '...' }}
       </div>
 
-      <div v-if="updateCheck.channel === 'package'" class="update-dialog-hint">
+      <div class="update-dialog-hint">
         {{ t('settings.updatePackageManager') }}
       </div>
 
@@ -53,7 +53,7 @@
         {{ t('settings.updateLater') }}
       </el-button>
       <el-button
-        v-if="(updateCheck.updatePhase === 'idle' || updateCheck.updatePhase === 'error') && updateCheck.channel !== 'package'"
+        v-if="updateCheck.updatePhase === 'idle' || updateCheck.updatePhase === 'error'"
         type="primary"
         @click="updateCheck.startUpdate()"
       >

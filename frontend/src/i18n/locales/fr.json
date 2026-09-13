@@ -374,7 +374,7 @@
   "settings.updateApplying": "Installation de la mise à jour...",
   "settings.updateFailed": "Échec de la mise à jour",
   "settings.updateRestarting": "Redémarrage...",
-  "settings.updatePackageManager": "Cette installation est gérée par un gestionnaire de paquets. Utilisez-le pour mettre à jour uniTerm.",
+  "settings.updatePackageManager": "Si cette application a été installée via un gestionnaire de paquets (par ex. Homebrew, apt), privilégiez la mise à jour via celui-ci.",
   "settings.openRelease": "Voir les détails",
   "settings.checkUpdateFailed": "Échec de la recherche de mises à jour",
   "settings.homepage": "Page d'accueil",

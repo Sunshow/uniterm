@@ -1652,17 +1652,6 @@ func (a *App) CheckForUpdate(source string) (*update.UpdateInfo, error) {
 // updateManager holds the in-progress update state (download → apply).
 var updateManager = update.NewManager()
 
-// UpdateChannelInfo tells the frontend how this install updates itself.
-type UpdateChannelInfo struct {
-	Channel string `json:"channel"` // "portable" | "installer" | "package"
-}
-
-// GetUpdateChannel reports how the running install should be updated.
-// "package" means a package manager owns updates and self-update is disabled.
-func (a *App) GetUpdateChannel() UpdateChannelInfo {
-	return UpdateChannelInfo{Channel: string(update.DetectChannel())}
-}
-
 // emitUpdateProgress forwards update progress payloads to the frontend.
 func (a *App) emitUpdateProgress(p update.Progress) {
 	a.app.Event.Emit("update:progress", p)

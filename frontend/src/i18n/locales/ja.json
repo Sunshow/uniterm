@@ -374,7 +374,7 @@
   "settings.updateApplying": "更新をインストール中...",
   "settings.updateFailed": "更新に失敗しました",
   "settings.updateRestarting": "再起動中...",
-  "settings.updatePackageManager": "このインストールはパッケージマネージャーで管理されています。それを使用して uniTerm を更新してください。",
+  "settings.updatePackageManager": "このアプリをパッケージマネージャー（Homebrew、apt など）でインストールした場合は、そちらでの更新を推奨します。",
   "settings.openRelease": "詳細を見る",
   "settings.checkUpdateFailed": "更新確認に失敗しました",
   "settings.homepage": "ホームページ",

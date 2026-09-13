@@ -64,10 +64,11 @@ func TestClassifyAsset(t *testing.T) {
 	}{
 		{"uniterm-windows-amd64-installer-v1.9.2.exe", "installer"},
 		{"uniterm-windows-arm64-portable-v1.9.2.zip", "portable"},
+		{"uniterm-darwin-arm64-v1.9.2.zip", "portable"},
 		{"uniterm-linux-amd64-v1.9.2.tar.gz", "binary-tar.gz"},
-		{"uniterm-darwin-arm64-v1.9.2-update.tar.gz", "binary-tar.gz"},
 		{"uniterm-darwin-arm64-v1.9.2.dmg", "other"},
 		{"uniterm-linux-amd64-v1.9.2.deb", "other"},
+		{"uniterm-linux-amd64-v1.9.2.rpm", "other"},
 	}
 	for _, c := range cases {
 		if got := classifyAsset(c.name); got != c.want {
@@ -81,13 +82,17 @@ func TestAssetMatchesPlatform(t *testing.T) {
 		os, arch, name string
 		want           bool
 	}{
-		{"darwin", "arm64", "uniterm-darwin-arm64-v1.9.2-update.tar.gz", true},
-		{"darwin", "arm64", "uniterm-darwin-amd64-v1.9.2-update.tar.gz", false},
+		{"darwin", "arm64", "uniterm-darwin-arm64-v1.9.2.zip", true},
+		{"darwin", "arm64", "uniterm-darwin-amd64-v1.9.2.zip", false},
 		{"linux", "amd64", "uniterm-linux-amd64-v1.9.2.tar.gz", true},
 		{"linux", "arm64", "uniterm-linux-amd64-v1.9.2.tar.gz", false},
 		{"windows", "amd64", "uniterm-windows-amd64-portable-v1.9.2.zip", true},
 		{"windows", "arm64", "uniterm-windows-amd64-portable-v1.9.2.zip", false},
 		{"freebsd", "amd64", "uniterm-linux-amd64-v1.9.2.tar.gz", false},
+		// The uniterm- prefix anchors the match; a name that merely contains
+		// "<os>-<arch>-" must not match.
+		{"windows", "amd64", "other-uniterm-windows-amd64-portable-v1.9.2.zip", false},
+		{"windows", "amd64", "checksums.txt", false},
 	}
 	for _, c := range cases {
 		if got := assetMatchesPlatform(c.os, c.arch, c.name); got != c.want {
@@ -137,16 +142,20 @@ func TestCandidatesForOrdering(t *testing.T) {
 	if got[0].Source != "gitee" || got[1].Source != "github" {
 		t.Errorf("gitee primary should come first, got %+v", got)
 	}
-	// Package channel: nothing is downloadable in-app.
-	if got := candidatesFor("linux", "amd64", ChannelPackage, "github", rels, sums); len(got) != 0 {
-		t.Errorf("package channel should return no candidates, got %+v", got)
-	}
-	// darwin: only the -update.tar.gz asset (dmg is "other").
+	// darwin: the .zip is the update payload (dmg is "other").
 	rels["github"].Assets = append(rels["github"].Assets,
-		releaseAsset{Name: "uniterm-darwin-amd64-v1.9.2-update.tar.gz", BrowserDownloadURL: "https://github.com/update.tar.gz"})
+		releaseAsset{Name: "uniterm-darwin-amd64-v1.9.2.zip", BrowserDownloadURL: "https://github.com/darwin.zip"})
 	got = candidatesFor("darwin", "amd64", ChannelPortable, "github", rels, sums)
-	if len(got) != 1 || got[0].Name != "uniterm-darwin-amd64-v1.9.2-update.tar.gz" {
-		t.Errorf("darwin portable should match only the -update.tar.gz asset, got %+v", got)
+	if len(got) != 1 || got[0].Name != "uniterm-darwin-amd64-v1.9.2.zip" {
+		t.Errorf("darwin portable should match only the .zip asset, got %+v", got)
+	}
+	// linux: the bare-binary tar.gz is the update payload (deb/rpm are "other").
+	rels["github"].Assets = append(rels["github"].Assets,
+		releaseAsset{Name: "uniterm-linux-amd64-v1.9.2.tar.gz", BrowserDownloadURL: "https://github.com/linux.tar.gz"},
+		releaseAsset{Name: "uniterm-linux-amd64-v1.9.2.deb", BrowserDownloadURL: "https://github.com/linux.deb"})
+	got = candidatesFor("linux", "amd64", ChannelPortable, "github", rels, sums)
+	if len(got) != 1 || got[0].Name != "uniterm-linux-amd64-v1.9.2.tar.gz" {
+		t.Errorf("linux portable should match only the .tar.gz asset, got %+v", got)
 	}
 }
 
