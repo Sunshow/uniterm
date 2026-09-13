@@ -56,6 +56,7 @@ type App struct {
 	tunnelStore          *store.TunnelStore
 	terminalHistoryStore *store.TerminalHistoryStore
 	recentStore          *store.RecentStore
+	favoriteStore        *store.FavoriteStore
 	syncService          *sync.SyncService
 	tunnelService        *session.TunnelService
 	mainHwnd             uintptr
@@ -298,6 +299,10 @@ func (a *App) initStores(dataDir string, upgrade bool) {
 	a.recentStore = store.NewRecentStore(dataDir)
 	if _, err := a.recentStore.Load(); err != nil {
 		log.Writef("recentStore.Load: %v", err)
+	}
+	a.favoriteStore = store.NewFavoriteStore(dataDir)
+	if _, err := a.favoriteStore.Load(); err != nil {
+		log.Writef("favoriteStore.Load: %v", err)
 	}
 
 	// Push tunnel runtime state to the frontend, and bring up auto-start tunnels.
@@ -680,6 +685,30 @@ func (a *App) shutdown() {
 		_ = a.terminalHistoryStore.Close()
 	}
 	os.RemoveAll(a.webviewDataPath)
+}
+
+// FavoriteStore methods
+
+func (a *App) GetFavoriteConnections() []string {
+	if a.favoriteStore == nil {
+		return []string{}
+	}
+	return a.favoriteStore.GetAll()
+}
+
+func (a *App) SaveFavoriteConnections(ids []string) error {
+	if a.favoriteStore == nil {
+		return fmt.Errorf("favorite store not initialized")
+	}
+	if _, err := a.favoriteStore.Load(); err != nil {
+		log.Writef("favoriteStore.Load: %v", err)
+	}
+	err := a.favoriteStore.Save(ids)
+	if err == nil {
+		a.emit("store:favorites:changed", a.favoriteStore.GetAll())
+		a.triggerAutoSync()
+	}
+	return err
 }
 
 // ConnectionStore methods

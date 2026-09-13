@@ -76,6 +76,61 @@
 
     <!-- Home view sections -->
     <template v-if="tab.viewMode === 'home'">
+      <!-- Favorites -->
+      <template v-if="favoriteConfigs.length > 0">
+        <div class="start-section-label">{{ t('startTab.favorites') }}</div>
+        <div class="start-cards-grid">
+          <div
+            v-for="config in favoriteConfigs"
+            :key="'fav:' + config.id"
+            class="start-card"
+            :class="{ focused: isCardFocused('fav:' + config.id), selected: selectedIds.has('fav:' + config.id) }"
+            @click="onCardClick(config, $event, 'fav:')"
+            @dblclick="onCardDblClick(config, $event)"
+            @contextmenu.prevent="onContextMenu($event, config, 'fav:')"
+          >
+            <div class="start-card-top">
+              <div class="start-card-icon" :class="config.type">
+                <el-icon v-if="config.type === 'ssh'"><SquareTerminal :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'telnet'"><Terminal :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'mosh'"><Zap :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'local'"><Laptop :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'wsl'"><LaptopMinimal :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'serial'"><Cable :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'tcp'"><ArrowLeftRight :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'sftp'"><Folders :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'scp'"><FileUp :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'ftp'"><FolderUp :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'smb'"><HardDrive :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 's3'"><Cloud :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'webdav'"><Globe :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'rdp'"><Monitor :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'vnc'"><MonitorSmartphone :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'spice'"><MonitorCloud :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'x11-desktop'"><AppWindow :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'database'">
+                  <DatabaseZap v-if="config.dbType === 'redis'" :size="'1.75rem'" />
+                  <Layers v-else-if="config.dbType === 'mongodb'" :size="'1.75rem'" />
+                  <DatabaseSearch v-else-if="config.dbType === 'elasticsearch'" :size="'1.75rem'" />
+                  <Database v-else :size="'1.75rem'" />
+                </el-icon>
+                <el-icon v-else-if="config.type === 'k8s'"><ShipWheel :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'container'"><Boxes :size="'1.75rem'" /></el-icon>
+                <el-icon v-else><Server :size="'1.75rem'" /></el-icon>
+              </div>
+              <div>
+                <div class="start-card-name">{{ config.name }}</div>
+                <div class="start-card-meta">{{ getCardSubtitle(config) }}</div>
+              </div>
+            </div>
+            <!-- Inside the favorites section the star is hover-only (everything
+                 here is favorited; a lit star would be redundant noise) -->
+            <button class="card-fav-btn lit" :title="t('sidebar.removeFromFavorites')" @click.stop="favoriteStore.toggle(config.id)"><Star :size="'0.875rem'" /></button>
+            <button class="card-more-btn" @click.stop="onCardMoreClick($event, config, 'fav:')" :title="t('terminal.more')"><MoreHorizontal :size="'1rem'" /></button>
+          </div>
+        </div>
+      </template>
+
       <!-- Recent connections -->
       <template v-if="recentConfigs.length > 0">
         <div class="start-section-label">{{ t('startTab.recentConnections') }}</div>
@@ -123,6 +178,7 @@
                 <div class="start-card-meta">{{ getCardSubtitle(config) }}</div>
               </div>
             </div>
+            <button class="card-fav-btn" :class="{ on: favoriteStore.isFavorite(config.id) }" :title="favoriteStore.isFavorite(config.id) ? t('sidebar.removeFromFavorites') : t('sidebar.addToFavorites')" @click.stop="favoriteStore.toggle(config.id)"><Star :size="'0.875rem'" /></button>
             <button class="card-more-btn" @click.stop="onCardMoreClick($event, config, 'recent:')" :title="t('terminal.more')"><MoreHorizontal :size="'1rem'" /></button>
           </div>
         </div>
@@ -215,6 +271,7 @@
                 <div class="start-card-meta">{{ getCardSubtitle(config) }}</div>
               </div>
             </div>
+            <button class="card-fav-btn" :class="{ on: favoriteStore.isFavorite(config.id) }" :title="favoriteStore.isFavorite(config.id) ? t('sidebar.removeFromFavorites') : t('sidebar.addToFavorites')" @click.stop="favoriteStore.toggle(config.id)"><Star :size="'0.875rem'" /></button>
             <button class="card-more-btn" @click.stop="onCardMoreClick($event, config)" :title="t('terminal.more')"><MoreHorizontal :size="'1rem'" /></button>
           </div>
         </div>
@@ -356,6 +413,7 @@
       <MenuItem :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doEditConnection(contextMenuConfig)">{{ t('sidebar.edit') }}</MenuItem>
       <MenuItem @click="doChangeGroupBulk">{{ t('conn.moveTo') }}</MenuItem>
       <MenuItem :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doDuplicate(contextMenuConfig)">{{ t('sidebar.duplicate') }}</MenuItem>
+      <MenuItem v-if="contextMenuConfig" @click="doToggleFavorite(contextMenuConfig)">{{ favoriteStore.isFavorite(contextMenuConfig.id) ? t('sidebar.removeFromFavorites') : t('sidebar.addToFavorites') }}</MenuItem>
       <MenuDivider />
       <MenuItem class="danger" @click="doDeleteBulk">{{ t('sidebar.delete') }}</MenuItem>
     </Menu>
@@ -437,6 +495,7 @@ import { msg } from '../services/message'
 import type { StartTab } from '../types/workspace'
 import type { ConnectionConfig, ConnectionGroup } from '../types/session'
 import { useConnectionStore } from '../stores/connectionStore'
+import { useFavoriteStore } from '../stores/favoriteStore'
 import { useTabStore } from '../stores/tabStore'
 import { useSettingsStore } from '../stores/settingsStore'
 import { useI18n } from '../i18n'
@@ -448,7 +507,7 @@ import Menu from './Menu.vue'
 import MenuItem from './MenuItem.vue'
 import MenuSubmenu from './MenuSubmenu.vue'
 import MenuDivider from './MenuDivider.vue'
-import { Filter, Plus, Laptop, LaptopMinimal, Cable, SquareTerminal, Terminal, Database, DatabaseZap, Layers, DatabaseSearch, Monitor, MonitorSmartphone, MonitorCloud, FolderUp, Folders, FileUp, HardDrive, Cloud, Globe, Server, Folder, FolderOpen, Zap, MoreHorizontal, ChevronDown, ShipWheel, Boxes, AppWindow, ArrowLeftRight } from '@lucide/vue'
+import { Filter, Plus, Laptop, LaptopMinimal, Cable, SquareTerminal, Terminal, Database, DatabaseZap, Layers, DatabaseSearch, Monitor, MonitorSmartphone, MonitorCloud, FolderUp, Folders, FileUp, HardDrive, Cloud, Globe, Server, Folder, FolderOpen, Zap, MoreHorizontal, ChevronDown, ShipWheel, Boxes, AppWindow, ArrowLeftRight, Star } from '@lucide/vue'
 
 const props = defineProps<{
   tab: StartTab
@@ -466,6 +525,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const connectionStore = useConnectionStore()
+const favoriteStore = useFavoriteStore()
 const tabStore = useTabStore()
 const settingsStore = useSettingsStore()
 
@@ -505,6 +565,7 @@ const lastClickId = ref<string | null>(null)
 function getAllVisibleIds(): string[] {
   const ids: string[] = []
   if (props.tab.viewMode === 'home') {
+    for (const c of favoriteConfigs.value) ids.push('fav:' + c.id)
     for (const c of recentConfigs.value) ids.push('recent:' + c.id)
   }
   for (const { config } of filteredConnections.value) ids.push('conn:' + config.id)
@@ -636,6 +697,20 @@ const recentConfigs = computed(() => {
       (c.host || '').toLowerCase().includes(query) ||
       c.type.toLowerCase().includes(query))
     .slice(0, 12)
+})
+
+// ── Favorite connections (favorites.json, ordered) ──
+// Mirrors recentConfigs' filtering; ids of deleted connections are dropped.
+const favoriteConfigs = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase()
+  return favoriteStore.favoriteIds
+    .map(id => connectionStore.connections.find(c => c.id === id))
+    .filter((c): c is ConnectionConfig => !!c)
+    .filter(c => matchTypeFilter(c, selectedTypeFilter.value))
+    .filter(c => !query ||
+      c.name.toLowerCase().includes(query) ||
+      (c.host || '').toLowerCase().includes(query) ||
+      c.type.toLowerCase().includes(query))
 })
 
 // ── Filtered connections ──
@@ -869,6 +944,7 @@ const focusedCardIndex = ref(-1)
 const focusInGrid = ref(false)
 
 type FocusableItem =
+  | { kind: 'favorite'; config: ConnectionConfig }
   | { kind: 'recent'; config: ConnectionConfig }
   | { kind: 'group'; groupId: string; name: string }
   | { kind: 'connection'; config: ConnectionConfig }
@@ -883,6 +959,7 @@ const focusableItems = computed<FocusableItem[]>(() => {
     return items
   }
   const items: FocusableItem[] = []
+  for (const config of favoriteConfigs.value) items.push({ kind: 'favorite', config })
   for (const config of recentConfigs.value) items.push({ kind: 'recent', config })
   for (const group of groupCards.value.groups) items.push({ kind: 'group', groupId: group.id, name: group.name })
   if (groupCards.value.ungroupedCount > 0) items.push({ kind: 'group', groupId: '__ungrouped__', name: t('conn.noGroup') })
@@ -894,7 +971,8 @@ const focusableItems = computed<FocusableItem[]>(() => {
 const focusableIndexMap = computed(() => {
   const map = new Map<string, number>()
   focusableItems.value.forEach((item, idx) => {
-    if (item.kind === 'recent') map.set('recent:' + item.config.id, idx)
+    if (item.kind === 'favorite') map.set('fav:' + item.config.id, idx)
+    else if (item.kind === 'recent') map.set('recent:' + item.config.id, idx)
     else if (item.kind === 'connection') map.set('conn:' + item.config.id, idx)
     else if (item.kind === 'group') map.set('group:' + item.groupId, idx)
     else if (item.kind === 'quick') map.set('quick', idx)
@@ -1030,7 +1108,7 @@ function onKeydown(e: KeyboardEvent) {
     } else {
       const item = focusableItems.value[focusedCardIndex.value]
       if (!item) return
-      if (item.kind === 'recent' || item.kind === 'connection') {
+      if (item.kind === 'recent' || item.kind === 'favorite' || item.kind === 'connection') {
         onCardDblClick(item.config, e)
       } else if (item.kind === 'group') {
         enterGroup(item.groupId)
@@ -1270,6 +1348,12 @@ function doChangeGroup(config: ConnectionConfig | null) {
   if (!config) return
   closeContextMenu()
   emit('change-group', config)
+}
+
+function doToggleFavorite(config: ConnectionConfig | null) {
+  if (!config) return
+  closeContextMenu()
+  favoriteStore.toggle(config.id)
 }
 
 function doDuplicate(config: ConnectionConfig | null) {
@@ -1521,6 +1605,51 @@ async function doDelete(config: ConnectionConfig | null) {
   display: flex;
 }
 .card-more-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+/* Favorite toggle on cards: rests at the card's right edge; when the card is
+   hovered the more button takes the edge and pushes the star left. Revealed
+   on hover and stays visible (amber) while favorited. */
+.card-fav-btn {
+  display: flex;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 0.375rem;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: none;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 0;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  transition: right 0.12s ease, opacity 0.12s ease;
+}
+.start-card:hover .card-fav-btn {
+  right: 2.25rem;
+  opacity: 1;
+  pointer-events: auto;
+}
+.card-fav-btn.on {
+  opacity: 1;
+  pointer-events: auto;
+}
+.card-fav-btn.on {
+  color: var(--warning);
+}
+/* Inside the favorites section: hover reveals the star already lit */
+.card-fav-btn.lit,
+.card-fav-btn.lit:hover {
+  color: var(--warning);
+}
+.card-fav-btn:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
 }

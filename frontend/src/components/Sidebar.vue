@@ -57,6 +57,52 @@
       </div>
 
     <div class="connection-list" tabindex="0" @keydown="onListKeydown" @contextmenu.prevent="onEmptyAreaContextMenu">
+      <!-- Virtual favorites group — persisted in favorites.json, rendered above all groups -->
+      <template v-if="favoriteConns.length > 0">
+        <div class="group-header" @click="favoritesExpanded = !favoritesExpanded" @contextmenu.prevent>
+          <span class="group-arrow">
+            <el-icon v-if="favoritesExpanded"><ChevronDown :size="'0.875rem'" /></el-icon>
+            <el-icon v-else><ChevronRight :size="'0.875rem'" /></el-icon>
+          </span>
+          <span class="group-name">{{ t('sidebar.favorites') }}</span>
+          <span class="group-count">{{ favoriteConns.length }}</span>
+        </div>
+        <template v-if="favoritesExpanded">
+          <div
+            v-for="conn in favoriteConns"
+            :key="conn.id"
+            class="connection-item indented"
+            :data-conn-id="conn.id"
+            :class="{
+              active: selectedIds.has(conn.id),
+              'has-session': openPanelConnIds.has(conn.id),
+              'drop-before': dropIndicator?.id === conn.id && dropIndicator?.position === 'before',
+              'drop-after': dropIndicator?.id === conn.id && dropIndicator?.position === 'after',
+            }"
+            draggable="true"
+            @dragstart="onDragStart($event, conn)"
+            @dragend="onDragEnd"
+            @dragover.prevent="onFavDragOver($event, conn)"
+            @drop.prevent="onFavDrop($event, conn)"
+            @click="onItemClick($event, conn)"
+            @dblclick="onItemDblClick(conn)"
+            @contextmenu.prevent="onContextMenu($event, conn)"
+          >
+            <span class="conn-icon"><component :is="connIcon(conn)" :size="'0.875rem'" /></span>
+            <div class="conn-details">
+              <span class="name">{{ conn.name }}</span>
+              <span class="conn-meta">
+                <span class="host">{{ getSubtitle(conn) }}</span>
+              </span>
+            </div>
+            <!-- Inside the favorites group the star is hover-only (everything
+                 here is favorited; a lit star would be redundant noise) -->
+            <button class="conn-fav-btn lit" :title="t('sidebar.removeFromFavorites')" @click.stop="favoriteStore.toggle(conn.id)"><Star :size="'0.75rem'" /></button>
+            <button class="conn-more-btn" @click.stop="onConnMoreClick($event, conn)" :title="t('terminal.more')"><MoreHorizontal :size="'0.875rem'" /></button>
+          </div>
+        </template>
+      </template>
+
       <!-- Nested group tree -->
       <GroupTreeItem
         v-for="root in filteredGrouped.roots"
@@ -111,6 +157,7 @@
                 <span class="host">{{ getSubtitle(conn) }}</span>
               </span>
             </div>
+            <button class="conn-fav-btn" :class="{ on: favoriteStore.isFavorite(conn.id) }" :title="favoriteStore.isFavorite(conn.id) ? t('sidebar.removeFromFavorites') : t('sidebar.addToFavorites')" @click.stop="favoriteStore.toggle(conn.id)"><Star :size="'0.75rem'" /></button>
             <button class="conn-more-btn" @click.stop="onConnMoreClick($event, conn)" :title="t('terminal.more')"><MoreHorizontal :size="'0.875rem'" /></button>
           </div>
         </template>
@@ -345,6 +392,7 @@
       <MenuDivider />
       <MenuItem :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doEdit()">{{ t('sidebar.edit') }}</MenuItem>
       <MenuItem @click="doDuplicate">{{ t('sidebar.duplicate') }}</MenuItem>
+      <MenuItem v-if="selectedConn" @click="doToggleFavorite">{{ favoriteStore.isFavorite(selectedConn.id) ? t('sidebar.removeFromFavorites') : t('sidebar.addToFavorites') }}</MenuItem>
       <MenuDivider />
       <MenuItem @click="doChangeGroup">{{ t('conn.moveTo') }}</MenuItem>
       <MenuItem @click="doNewGroup(selectedGroupParentId())">{{ t('conn.newGroupTitle') }}</MenuItem>
@@ -474,11 +522,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, watch, nextTick, provide } from 'vue'
-import { X, ChevronRight, ChevronDown, Filter, Check, Network, Zap, Clock, Plus, Palette, SquareTerminal, Terminal, FolderUp, Folders, FileUp, HardDrive, Cloud, Globe, Monitor, MonitorCloud, MonitorSmartphone, Database, DatabaseZap, Layers, DatabaseSearch, Activity, Laptop, LaptopMinimal, Cable, Pencil, MoreHorizontal, FolderTree, ShipWheel, Boxes, AppWindow, ArrowLeftRight, ArrowRightLeft } from '@lucide/vue'
+import { X, ChevronRight, ChevronDown, Filter, Check, Network, Zap, Clock, Plus, Palette, SquareTerminal, Terminal, FolderUp, Folders, FileUp, HardDrive, Cloud, Globe, Monitor, MonitorCloud, MonitorSmartphone, Database, DatabaseZap, Layers, DatabaseSearch, Activity, Laptop, LaptopMinimal, Cable, Pencil, MoreHorizontal, FolderTree, ShipWheel, Boxes, AppWindow, ArrowLeftRight, ArrowRightLeft, Star } from '@lucide/vue'
 import { ElMessageBox } from 'element-plus'
 import { msg } from '../services/message'
 import { getShellLabel as getShellLabelBase } from '../utils/shellLabel'
 import { useConnectionStore } from '../stores/connectionStore'
+import { useFavoriteStore } from '../stores/favoriteStore'
 import type { GroupTreeNode } from '../stores/connectionStore'
 import { usePanelStore } from '../stores/panelStore'
 import { useTabStore } from '../stores/tabStore'
@@ -514,6 +563,7 @@ defineProps<{
 }>()
 const emit = defineEmits(['connect', 'connectToWorkspace', 'connectOnly', 'connectSftp', 'connectWslFile', 'connectFtp', 'connectSmb', 'connectWebdav', 'connectS3', 'connectRdp', 'connectVnc', 'connectSpice', 'connectX11Desktop', 'connectDB', 'connectMonitor', 'connectSerial', 'connectK8s', 'toggle'])
 const connectionStore = useConnectionStore()
+const favoriteStore = useFavoriteStore()
 const settingsStore = useSettingsStore()
 const panelStore = usePanelStore()
 const tabStore = useTabStore()
@@ -781,14 +831,9 @@ function filterTreeNode(node: GroupTreeNode, q: string, matchConn: (c: Connectio
 
 const filteredGrouped = computed(() => {
   const q = searchQuery.value.trim().toLowerCase()
-  const typeFilter = selectedTypeFilter.value
   const data = connectionStore.groupedConnections
 
-  const matchConn = (c: ConnectionConfig) => {
-    const textMatch = !q || c.name.toLowerCase().includes(q) || c.host.toLowerCase().includes(q)
-    const typeMatch = matchTypeFilter(c, typeFilter)
-    return textMatch && typeMatch
-  }
+  const matchConn = matchesConnFilters
 
   const filteredRoots: GroupTreeNode[] = []
   for (const root of data.roots) {
@@ -800,6 +845,63 @@ const filteredGrouped = computed(() => {
 
   return { roots: filteredRoots, ungrouped: filteredUngrouped }
 })
+
+// Shared search-text + type-filter predicate used by the group tree and the
+// favorites list so both sections filter identically.
+function matchesConnFilters(c: ConnectionConfig): boolean {
+  const q = searchQuery.value.trim().toLowerCase()
+  const textMatch = !q || c.name.toLowerCase().includes(q) || c.host.toLowerCase().includes(q)
+  return textMatch && matchTypeFilter(c, selectedTypeFilter.value)
+}
+
+// ── Favorites (virtual group above all groups) ──
+// Favorites keep their own expand state — they are not a real group, so they
+// are neither persisted to collapsedGroupIds nor touched by the search-mode
+// expand/restore logic.
+const favoritesExpanded = ref(true)
+
+// Resolved favorite connections in saved order; ids of deleted connections
+// are silently dropped (same tolerate-missing policy as recent connections).
+const favoriteConns = computed<ConnectionConfig[]>(() => {
+  return favoriteStore.favoriteIds
+    .map(id => connectionStore.connections.find(c => c.id === id))
+    .filter((c): c is ConnectionConfig => !!c)
+    .filter(matchesConnFilters)
+})
+
+// ── Favorites drag & drop: reorder within the favorites list only ──
+function onFavDragOver(e: DragEvent, conn: ConnectionConfig) {
+  if (!reorderEnabled.value) return
+  const el = e.currentTarget as HTMLElement
+  const rect = el.getBoundingClientRect()
+  const position = (e.clientY - rect.top) < rect.height / 2 ? 'before' : 'after'
+  dropIndicator.value = { id: conn.id, position }
+  dragOverGroupId.value = null
+}
+
+async function onFavDrop(e: DragEvent, conn: ConnectionConfig) {
+  if (!reorderEnabled.value) return
+  const indicator = dropIndicator.value
+  dropIndicator.value = null
+  const raw = e.dataTransfer?.getData('text/plain')
+  if (!raw || !indicator) return
+  try {
+    const data = JSON.parse(raw)
+    if (!Array.isArray(data) || data.length === 0) return
+    let beforeId: string | undefined
+    if (indicator.position === 'before') {
+      beforeId = conn.id
+    } else {
+      // After: insert before the favorite that follows the target
+      const ids = favoriteStore.favoriteIds
+      const idx = ids.indexOf(conn.id)
+      beforeId = idx >= 0 ? ids[idx + 1] : undefined
+    }
+    await favoriteStore.reorder(data, beforeId)
+  } catch {
+    // ignore parse errors
+  }
+}
 
 function countTreeNodes(nodes: GroupTreeNode[]): number {
   let count = 0
@@ -827,6 +929,10 @@ function collectTreeConnIds(nodes: GroupTreeNode[]): string[] {
 watch(filteredGrouped, () => {
   const allIds = collectTreeConnIds(filteredGrouped.value.roots)
   for (const c of filteredGrouped.value.ungrouped) allIds.push(c.id)
+  // Favorites rows are also selectable; they render above the tree
+  if (favoritesExpanded.value) {
+    allIds.unshift(...favoriteConns.value.map(c => c.id))
+  }
 
   if (allIds.length === 0) {
     focusedId.value = searchQuery.value.trim() ? '__new_connection__' : null
@@ -961,6 +1067,9 @@ function onResizeStart(e: MouseEvent) {
 // ── Keyboard navigation ──
 function getAllVisibleIds(): string[] {
   const ids: string[] = []
+  if (favoritesExpanded.value) {
+    for (const c of favoriteConns.value) ids.push(c.id)
+  }
   function collectVisible(nodes: GroupTreeNode[]) {
     for (const node of nodes) {
       if (expandedGroups.value.has(node.group.id)) {
@@ -1521,6 +1630,13 @@ function doEdit() {
     showForm.value = true
   }
   closeMenu()
+}
+
+function doToggleFavorite() {
+  const id = selectedConn.value?.id
+  closeMenu()
+  if (!id) return
+  favoriteStore.toggle(id)
 }
 
 function doDuplicate() {
@@ -2293,13 +2409,50 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
   cursor: pointer;
   border-radius: var(--radius-sm);
   flex-shrink: 0;
-  margin-left: auto;
+  margin-left: 0;
   padding: 0;
 }
 .connection-item:hover .conn-more-btn {
   display: flex;
 }
 .conn-more-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Favorite toggle: always reserves its slot and sits at the right edge so
+   rows align; revealed on hover and while favorited */
+.conn-fav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.connection-item:hover .conn-fav-btn,
+.conn-fav-btn.on {
+  opacity: 1;
+  pointer-events: auto;
+}
+.conn-fav-btn.on {
+  color: var(--warning);
+}
+/* Inside the favorites group: hover reveals the star already lit */
+.conn-fav-btn.lit,
+.conn-fav-btn.lit:hover {
+  color: var(--warning);
+}
+.conn-fav-btn:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
 }

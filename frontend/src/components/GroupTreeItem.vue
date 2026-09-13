@@ -63,6 +63,14 @@
           <span class="host">{{ getSubtitle(conn) }}</span>
         </span>
       </div>
+      <button
+        class="conn-fav-btn"
+        :class="{ on: favoriteStore.isFavorite(conn.id) }"
+        :title="favoriteStore.isFavorite(conn.id) ? t('sidebar.removeFromFavorites') : t('sidebar.addToFavorites')"
+        @click.stop="favoriteStore.toggle(conn.id)"
+      >
+        <Star :size="'0.75rem'" />
+      </button>
       <button class="conn-more-btn" @click.stop="onMoreClick($event, conn)" :title="t('terminal.more')">
         <MoreHorizontal :size="'0.875rem'" />
       </button>
@@ -72,8 +80,9 @@
 
 <script setup lang="ts">
 import { inject, computed } from 'vue'
-import { ChevronDown, ChevronRight, MoreHorizontal } from '@lucide/vue'
+import { ChevronDown, ChevronRight, MoreHorizontal, Star } from '@lucide/vue'
 import type { GroupTreeNode, ConnectionConfig, ConnectionGroup } from '../types/session'
+import { useFavoriteStore } from '../stores/favoriteStore'
 
 const props = defineProps<{
   node: GroupTreeNode
@@ -100,6 +109,8 @@ const handlers = inject<any>('groupHandlers')!
 const utils = inject<any>('utils')!
 
 const { connIcon, getSubtitle, t } = utils
+
+const favoriteStore = useFavoriteStore()
 
 function onToggle() {
   handlers.onToggleGroup(props.node.group.id)
@@ -274,13 +285,45 @@ function onMoreClick(e: MouseEvent, conn: ConnectionConfig) {
   cursor: pointer;
   border-radius: var(--radius-sm);
   flex-shrink: 0;
-  margin-left: auto;
+  margin-left: 0;
   padding: 0;
 }
 .connection-item:hover .conn-more-btn {
   display: flex;
 }
 .conn-more-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Favorite toggle: always reserves its slot and sits at the right edge so
+   rows align; revealed on hover and while favorited */
+.conn-fav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.connection-item:hover .conn-fav-btn,
+.conn-fav-btn.on {
+  opacity: 1;
+  pointer-events: auto;
+}
+.conn-fav-btn.on {
+  color: var(--warning);
+}
+.conn-fav-btn:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
 }
