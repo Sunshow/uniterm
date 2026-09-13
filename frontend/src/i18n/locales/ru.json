@@ -374,7 +374,7 @@
   "settings.updateApplying": "Установка обновления...",
   "settings.updateFailed": "Ошибка обновления",
   "settings.updateRestarting": "Перезапуск...",
-  "settings.updatePackageManager": "Эта установка управляется менеджером пакетов. Используйте его для обновления uniTerm.",
+  "settings.updatePackageManager": "Если приложение установлено через менеджер пакетов (например, Homebrew, apt), обновляйте его с помощью этого менеджера.",
   "settings.openRelease": "Подробнее",
   "settings.checkUpdateFailed": "Не удалось проверить обновления",
   "settings.homepage": "Веб-сайт",

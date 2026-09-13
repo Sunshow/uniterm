@@ -324,12 +324,14 @@ func fetchChecksums(rel *release) map[string]string {
 	return map[string]string{}
 }
 
-// classifyAsset buckets an asset name by its update payload kind.
+// classifyAsset buckets an asset name by its update payload kind. Any .zip is
+// treated as portable (Windows portable zip and the macOS bare-binary zip);
+// .dmg/.deb/.rpm are manual-install artifacts and land in "other".
 func classifyAsset(name string) string {
 	switch {
 	case strings.Contains(name, "-installer-") && strings.HasSuffix(name, ".exe"):
 		return "installer"
-	case strings.Contains(name, "-portable-") && strings.HasSuffix(name, ".zip"):
+	case strings.HasSuffix(name, ".zip"):
 		return "portable"
 	case strings.HasSuffix(name, ".tar.gz"):
 		return "binary-tar.gz"
@@ -338,19 +340,14 @@ func classifyAsset(name string) string {
 }
 
 // assetMatchesPlatform reports whether the asset targets the given OS/arch.
+// Asset names are anchored to the uniterm-<os>-<arch>- prefix.
 func assetMatchesPlatform(osName, arch, name string) bool {
-	var prefix string
 	switch osName {
-	case "windows":
-		prefix = "windows-" + arch + "-"
-	case "linux":
-		prefix = "linux-" + arch + "-"
-	case "darwin":
-		prefix = "darwin-" + arch + "-"
+	case "windows", "linux", "darwin":
 	default:
 		return false
 	}
-	return strings.Contains(name, prefix)
+	return strings.HasPrefix(name, "uniterm-"+osName+"-"+arch+"-")
 }
 
 // kindPreference returns the asset kinds usable for a channel, best first.

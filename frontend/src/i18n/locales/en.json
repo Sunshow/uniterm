@@ -379,7 +379,7 @@
   "settings.updateApplying": "Installing update...",
   "settings.updateFailed": "Update failed",
   "settings.updateRestarting": "Restarting...",
-  "settings.updatePackageManager": "This installation is managed by a package manager. Use it to update uniTerm.",
+  "settings.updatePackageManager": "If this app was installed via a package manager (e.g. Homebrew, apt), prefer updating it with the package manager.",
   "settings.openRelease": "View details",
   "settings.checkUpdateFailed": "Update check failed",
   "settings.homepage": "Homepage",

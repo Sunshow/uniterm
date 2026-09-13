@@ -293,7 +293,9 @@ func extractPortableZip(stage, zipPath string) (string, error) {
 		if strings.Contains(f.Name, "..") {
 			continue
 		}
-		if strings.EqualFold(base, "uniterm.exe") {
+		// "uniterm.exe" is the Windows payload; a bare "uniterm" covers the
+		// macOS zip and the executable inside a fallback .app-bundle zip.
+		if strings.EqualFold(base, "uniterm.exe") || strings.EqualFold(base, "uniterm") {
 			binaryPath = dest
 		}
 		if err := os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
@@ -316,7 +318,7 @@ func extractPortableZip(stage, zipPath string) (string, error) {
 		}
 	}
 	if binaryPath == "" {
-		return "", fmt.Errorf("uniTerm.exe not found in %s", zipPath)
+		return "", fmt.Errorf("uniterm executable not found in %s", zipPath)
 	}
 	return binaryPath, nil
 }

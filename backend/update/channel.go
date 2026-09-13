@@ -10,9 +10,6 @@ const (
 	// ChannelInstaller means a Windows NSIS install: updates run the new
 	// installer silently after the app exits.
 	ChannelInstaller Channel = "installer"
-	// ChannelPackage means the install is managed by a package manager
-	// (deb/rpm/Homebrew/Scoop). Self-update is disabled for those.
-	ChannelPackage Channel = "package"
 )
 
 // DetectChannel reports how the running install should be updated. The

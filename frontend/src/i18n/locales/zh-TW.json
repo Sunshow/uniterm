@@ -379,7 +379,7 @@
   "settings.updateApplying": "正在安裝更新...",
   "settings.updateFailed": "更新失敗",
   "settings.updateRestarting": "正在重新啟動...",
-  "settings.updatePackageManager": "此安裝由套件管理員管理，請使用它更新 uniTerm。",
+  "settings.updatePackageManager": "若本應用透過套件管理員（如 Homebrew、apt）安裝，建議使用套件管理員更新。",
   "settings.openRelease": "檢視詳情",
   "settings.checkUpdateFailed": "檢查更新失敗",
   "settings.homepage": "專案主頁",
