@@ -1130,14 +1130,6 @@ function onModelChange(modelId: string) {
     return
   }
   settingsStore.setActiveModel(modelId)
-  const model = settingsStore.settings.ai.models.find(m => m.id === modelId)
-  if (model) {
-    aiStore.setConfig({
-      apiKey: model.apiKey,
-      baseURL: model.baseURL,
-      model: model.model,
-    })
-  }
 }
 
 function formatRelativeTime(timestamp: number): string {

@@ -24,7 +24,7 @@ type SyncService struct {
 	// independent of the migratable data directory.
 	configDir string
 	// dataDir is the resolved config data directory whose config files
-	// (connections.json, settings.json, …) are encrypted to / decrypted
+	// (connections.json, ai.json, …) are encrypted to / decrypted
 	// from the sync repo.
 	dataDir     string
 	repoPath    string

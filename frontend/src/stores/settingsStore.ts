@@ -5,11 +5,13 @@ import { DEFAULT_SETTINGS, normalizeKeyBindings } from '../types/settings'
 import { SaveSettings, LoadSettings, GetAvailableShells, SetDefaultSessionLogDir } from '../../bindings/github.com/ys-ll/uniterm/app'
 import { Events } from '@wailsio/runtime'
 import { setLocale } from '../i18n'
+import { useAIConfigStore } from './aiConfigStore'
 
 // Module-level un-subscriber for the cross-window store:settings:changed listener.
 // Tracked at module scope so re-imports under HMR can detach the previous
 // listener before re-subscribing (FE-03).
 let unsubSettingsChanged: (() => void) | null = null
+let unsubAiChanged: (() => void) | null = null
 
 export const useSettingsStore = defineStore('settings', () => {
   const settings = ref<AppSettings>({ ...DEFAULT_SETTINGS })
@@ -42,6 +44,34 @@ export const useSettingsStore = defineStore('settings', () => {
   // For navigating to a specific settings category from other components
   const openCategory = ref<string | null>(null)
 
+  // Tracks the last ai.json payload pushed from this store so unrelated
+  // settings saves don't rewrite the AI config file needlessly.
+  let lastSavedAiJson = ''
+
+  // Overlay the syncable AI slice (ai.json) onto the settings blob and
+  // validate the device-local activeModelId against the synced catalog.
+  function recomposeAi() {
+    const aiCfg = useAIConfigStore()
+    const models = aiCfg.models.length ? aiCfg.models : settings.value.ai.models
+    settings.value.ai = {
+      maxTurns: aiCfg.maxTurns,
+      models,
+      activeModelId: models.some(m => m.id === settings.value.ai.activeModelId)
+        ? settings.value.ai.activeModelId
+        : (models[0]?.id ?? DEFAULT_SETTINGS.ai.activeModelId)
+    }
+  }
+
+  function syncAiConfigFromSettings() {
+    const aiJson = JSON.stringify({ maxTurns: settings.value.ai.maxTurns, models: settings.value.ai.models })
+    if (aiJson === lastSavedAiJson) return
+    lastSavedAiJson = aiJson
+    const aiCfg = useAIConfigStore()
+    aiCfg.maxTurns = settings.value.ai.maxTurns
+    aiCfg.models = settings.value.ai.models
+    aiCfg.save()
+  }
+
   function applyTheme() {
     let theme = settings.value.theme
     if (theme === 'system') {
@@ -63,6 +93,9 @@ export const useSettingsStore = defineStore('settings', () => {
     } finally {
       loaded.value = true
     }
+    await useAIConfigStore().load()
+    recomposeAi()
+    lastSavedAiJson = JSON.stringify({ maxTurns: settings.value.ai.maxTurns, models: settings.value.ai.models })
     try {
       availableShells.value = await GetAvailableShells()
     } catch {
@@ -90,6 +123,8 @@ export const useSettingsStore = defineStore('settings', () => {
     } catch {
       // use defaults
     }
+    await useAIConfigStore().load()
+    recomposeAi()
     applyTheme()
     setLocale(settings.value.language)
   }
@@ -97,6 +132,8 @@ export const useSettingsStore = defineStore('settings', () => {
   async function save() {
     try {
       await SaveSettings(settings.value)
+      // Mirror the syncable AI slice into ai.json (skipped when unchanged).
+      syncAiConfigFromSettings()
       // Keep the backend override in sync on every save. Cheap and
       // avoids the need for a dedicated watcher on this single field.
       SetDefaultSessionLogDir(settings.value.terminal.sessionLogDir || '').catch(() => {})
@@ -231,9 +268,24 @@ export const useSettingsStore = defineStore('settings', () => {
     }
   })
 
+  // AI config changed via a sync pull — refresh the local composition.
+  unsubAiChanged?.()
+  unsubAiChanged = Events.On('store:ai:changed', (ev) => {
+    const data = ev.data as { maxTurns?: number; models?: AIModelConfig[] } | null
+    if (data) {
+      const aiCfg = useAIConfigStore()
+      aiCfg.maxTurns = data.maxTurns ?? DEFAULT_SETTINGS.ai.maxTurns
+      aiCfg.models = data.models?.length ? data.models : aiCfg.models
+      recomposeAi()
+      lastSavedAiJson = JSON.stringify({ maxTurns: settings.value.ai.maxTurns, models: settings.value.ai.models })
+    }
+  })
+
   function dispose() {
     unsubSettingsChanged?.()
     unsubSettingsChanged = null
+    unsubAiChanged?.()
+    unsubAiChanged = null
   }
 
   return {

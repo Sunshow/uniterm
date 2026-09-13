@@ -46,6 +46,7 @@ type App struct {
 	connectionStore      *store.ConnectionStore
 	aiSessionStore       *store.AISessionStore
 	settingsStore        *store.SettingsStore
+	aiConfigStore        *store.AIConfigStore
 	identityStore        *store.IdentityStore
 	proxyStore           *store.ProxyStore
 	localStateStore      *store.LocalStateStore
@@ -264,6 +265,14 @@ func (a *App) initStores(dataDir string, upgrade bool) {
 		}
 	}
 
+	acs, err := store.NewAIConfigStore(dataDir)
+	if err != nil {
+		log.Writef("Failed to init AI config store: %v", err)
+		a.sendStartupErr(fmt.Errorf("ai config store: %w", err))
+	} else {
+		a.aiConfigStore = acs
+	}
+
 	is, err := store.NewIdentityStore(dataDir)
 	if err != nil {
 		log.Writef("Failed to init identity store: %v", err)
@@ -422,6 +431,19 @@ func (a *App) initCredentials(dataDir string, upgrade bool) {
 	}
 	if a.settingsStore != nil {
 		a.settingsStore.SetPasswordStore(cred)
+	}
+	if a.aiConfigStore != nil {
+		a.aiConfigStore.SetPasswordStore(cred)
+		// One-shot settings->ai.json migration. Runs after the password store
+		// is wired so model apiKeys land encrypted; the settings.json copy is
+		// left intact so a rollback to a pre-split build still finds them.
+		if a.settingsStore != nil {
+			if settings, err := a.settingsStore.Load(); err == nil {
+				if err := a.aiConfigStore.MigrateFromSettingsIfNeeded(settings); err != nil {
+					log.Writef("ai.json migration failed: %v", err)
+				}
+			}
+		}
 	}
 	if a.identityStore != nil {
 		a.identityStore.SetPasswordStore(cred)
@@ -1150,6 +1172,11 @@ func (a *App) reloadStoresAfterSync() {
 			a.emit("store:settings:changed", settings)
 		}
 	}
+	if a.aiConfigStore != nil {
+		if cfg, err := a.aiConfigStore.Load(); err == nil {
+			a.emit("store:ai:changed", cfg)
+		}
+	}
 	if a.quickCommandsStore != nil {
 		if data, err := a.quickCommandsStore.Load(); err == nil {
 			a.emit("store:quickCommands:changed", data)
@@ -1328,27 +1355,6 @@ func (a *App) SyncDeleteRepo() error {
 	return a.syncService.DeleteRepo()
 }
 
-func (a *App) LoadAIConfig() (store.AIConfig, error) {
-	if a.settingsStore == nil {
-		return store.AIConfig{}, fmt.Errorf("settings store not initialized")
-	}
-	settings, err := a.settingsStore.Load()
-	if err != nil {
-		return store.AIConfig{}, err
-	}
-	// Return the active model's config
-	for _, m := range settings.AI.Models {
-		if m.ID == settings.AI.ActiveModelID {
-			return store.AIConfig{
-				APIKey:  m.APIKey,
-				BaseURL: m.BaseURL,
-				Model:   m.Model,
-			}, nil
-		}
-	}
-	return store.AIConfig{}, nil
-}
-
 // AI Session Store methods
 
 func (a *App) SaveAISessions(data store.AISessionData) error {
@@ -1385,6 +1391,26 @@ func (a *App) LoadSettings() (store.AppSettings, error) {
 		return store.AppSettings{}, fmt.Errorf("settings store not initialized")
 	}
 	return a.settingsStore.Load()
+}
+
+// AIConfigStore methods
+
+func (a *App) LoadAIModels() (store.AIStoreData, error) {
+	if a.aiConfigStore == nil {
+		return store.AIStoreData{}, fmt.Errorf("ai config store not initialized")
+	}
+	return a.aiConfigStore.Load()
+}
+
+func (a *App) SaveAIModels(cfg store.AIStoreData) error {
+	if a.aiConfigStore == nil {
+		return fmt.Errorf("ai config store not initialized")
+	}
+	err := a.aiConfigStore.Save(cfg)
+	if err == nil {
+		a.triggerAutoSync()
+	}
+	return err
 }
 
 // QuickCommandsStore methods

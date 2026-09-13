@@ -108,14 +108,6 @@ type CustomTerminalTheme struct {
 	Colors TerminalThemeColors `json:"colors"`
 }
 
-// AIConfig is the legacy flat AI config type, kept for Wails binding compatibility.
-// New code should use AppSettings.AI (active model from AISettings).
-type AIConfig struct {
-	APIKey  string `json:"apiKey"`
-	BaseURL string `json:"baseURL"`
-	Model   string `json:"model"`
-}
-
 type AIModelConfig struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
@@ -292,6 +284,13 @@ func (s *SettingsStore) Load() (AppSettings, error) {
 		settings.UpdateSource = strPtr("auto")
 		needsSave = true
 	}
+	// Default maxTurns when missing (older settings.json files predating the
+	// multi-model AI block, or hand-edited files). Pointer + backfill so the
+	// stored copy always carries an explicit value.
+	if settings.AI.MaxTurns == nil {
+		settings.AI.MaxTurns = intPtr(defaultMaxTurns)
+		needsSave = true
+	}
 	if settings.CloseTabPrompt == nil {
 		settings.CloseTabPrompt = boolPtr(true)
 		needsSave = true
@@ -320,20 +319,7 @@ func defaultSettings() AppSettings {
 			RightClickAction: "menu",
 			MaxHistoryLines:  5000,
 		},
-		AI: AISettings{
-			MaxTurns: intPtr(20),
-			Models: []AIModelConfig{
-				{
-					ID:       "model-default",
-					Name:     "Default",
-					APIKey:   "",
-					BaseURL:  "https://api.openai.com/v1",
-					Model:    "gpt-4o",
-					Protocol: "anthropic",
-				},
-			},
-			ActiveModelID: "model-default",
-		},
+		AI:             defaultAISettings(),
 		Keyboard:        defaultKeyboard(),
 		AutoCheckUpdate: boolPtr(true),
 		UpdateSource:    strPtr("auto"),
@@ -345,6 +331,33 @@ func defaultSettings() AppSettings {
 		},
 		CustomTerminalThemes: []CustomTerminalTheme{},
 	}
+}
+
+const defaultMaxTurns = 20
+
+// defaultAISettings is the seed AI block for a fresh settings.json. Shared
+// with AIConfigStore so the settings and ai.json defaults can never drift.
+func defaultAISettings() AISettings {
+	return AISettings{
+		MaxTurns: intPtr(defaultMaxTurns),
+		Models: []AIModelConfig{
+			{
+				ID:       "model-default",
+				Name:     "Default",
+				APIKey:   "",
+				BaseURL:  "https://api.openai.com/v1",
+				Model:    "gpt-4o",
+				Protocol: "anthropic",
+			},
+		},
+		ActiveModelID: "model-default",
+	}
+}
+
+// defaultAIConfig mirrors defaultAISettings for the standalone ai.json file.
+func defaultAIConfig() AIStoreData {
+	ai := defaultAISettings()
+	return AIStoreData{MaxTurns: ai.MaxTurns, Models: ai.Models}
 }
 
 func defaultKeyboard() map[string]KeyBinding {
