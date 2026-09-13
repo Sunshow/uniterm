@@ -379,6 +379,8 @@
   "settings.checkUpdateFailed": "Échec de la recherche de mises à jour",
   "settings.homepage": "Page d'accueil",
   "settings.userManual": "Manuel utilisateur",
+  "settings.uiFontSize": "Taille de police de l’interface",
+  "settings.uiFontSizeDesc": "Ajuste la taille de base du texte de l’interface.",
   "settings.theme": "Thème",
   "settings.themeDark": "Sombre",
   "settings.themeDeepBlue": "Bleu profond",

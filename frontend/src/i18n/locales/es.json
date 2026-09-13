@@ -379,6 +379,8 @@
   "settings.checkUpdateFailed": "Error al buscar actualizaciones",
   "settings.homepage": "Página web",
   "settings.userManual": "Manual de usuario",
+  "settings.uiFontSize": "Tamaño de fuente de la interfaz",
+  "settings.uiFontSizeDesc": "Ajusta el tamaño base del texto de la interfaz.",
   "settings.theme": "Tema",
   "settings.themeDark": "Oscuro",
   "settings.themeDeepBlue": "Azul Profundo",

@@ -379,6 +379,8 @@
   "settings.checkUpdateFailed": "Не удалось проверить обновления",
   "settings.homepage": "Веб-сайт",
   "settings.userManual": "Руководство пользователя",
+  "settings.uiFontSize": "Размер шрифта интерфейса",
+  "settings.uiFontSizeDesc": "Настройка базового размера текста интерфейса.",
   "settings.theme": "Тема",
   "settings.themeDark": "Темная",
   "settings.themeDeepBlue": "Глубокий синий",

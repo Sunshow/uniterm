@@ -384,6 +384,8 @@
   "settings.checkUpdateFailed": "檢查更新失敗",
   "settings.homepage": "專案主頁",
   "settings.userManual": "用戶手冊",
+  "settings.uiFontSize": "介面字體大小",
+  "settings.uiFontSizeDesc": "調整應用介面文字的基準大小",
   "settings.theme": "主題",
   "settings.themeDark": "深色",
   "settings.themeDeepBlue": "深藍",

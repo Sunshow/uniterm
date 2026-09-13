@@ -379,6 +379,8 @@
   "settings.checkUpdateFailed": "업데이트 확인 실패",
   "settings.homepage": "홈페이지",
   "settings.userManual": "사용자 매뉴얼",
+  "settings.uiFontSize": "UI 글꼴 크기",
+  "settings.uiFontSizeDesc": "UI 텍스트 기준 크기를 조정합니다.",
   "settings.theme": "테마",
   "settings.themeDark": "다크",
   "settings.themeDeepBlue": "딥블루",

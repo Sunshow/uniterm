@@ -837,12 +837,24 @@ const CARD_WIDTH = () => 15 * remPx()
 const CARD_GAP = () => 0.75 * remPx()
 const PADDING = () => 4 * remPx() // .start-tab padding on each side
 
+// Column count derived from the same math as the wrapper width; kept as
+// state so keyboard navigation and the CSS grid can never disagree.
+const contentCols = ref(3)
+
 function updateContentWidth() {
   const el = startTabRef.value
   if (!el) return
+  const w = CARD_WIDTH()
+  const g = CARD_GAP()
   const available = el.clientWidth - PADDING() * 2
-  const cols = Math.max(2, Math.min(6, Math.floor((available + CARD_GAP()) / (CARD_WIDTH() + CARD_GAP()))))
-  contentWidth.value = cols * CARD_WIDTH() + (cols - 1) * CARD_GAP()
+  // 0.5px safety margin on both sides: clientWidth rounds to integers and
+  // sub-pixel rounding can let the CSS auto-fill grid disagree with this
+  // math at an exact column boundary — fitting one MORE track than computed
+  // leaves a visible empty slot, one FEWER leaves cards overflowing the
+  // centered wrapper. Bias conservative so the grid always matches.
+  const cols = Math.max(2, Math.min(6, Math.floor((available + g - 0.5) / (w + g))))
+  contentCols.value = cols
+  contentWidth.value = cols * w + (cols - 1) * g
 }
 
 const contentStyle = computed(() => ({
@@ -898,7 +910,7 @@ function isCardFocused(key: string): boolean {
 
 function getGridColumns(): number {
   if (contentWidth.value === 0) return 3
-  return Math.max(1, Math.floor((contentWidth.value + CARD_GAP()) / (CARD_WIDTH() + CARD_GAP())))
+  return contentCols.value
 }
 
 function onSearchKeydown(e: KeyboardEvent) {

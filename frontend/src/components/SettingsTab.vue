@@ -53,6 +53,22 @@
 
           <div class="setting-card">
             <div class="setting-info">
+              <div class="setting-title">{{ t('settings.uiFontSize') }}</div>
+              <div class="setting-desc">{{ t('settings.uiFontSizeDesc') }}</div>
+            </div>
+            <div class="setting-control">
+              <el-input-number
+                v-model="settingsStore.settings.uiFontSize"
+                :min="10"
+                :max="18"
+                :step="1"
+                @change="settingsStore.save()"
+              />
+            </div>
+          </div>
+
+          <div class="setting-card">
+            <div class="setting-info">
               <div class="setting-title">{{ t('settings.systemTitleBar') }}</div>
               <div class="setting-desc">{{ t('settings.systemTitleBarDesc') }}</div>
             </div>

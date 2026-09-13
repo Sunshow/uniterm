@@ -254,6 +254,8 @@ export interface SFTPBookmarks {
 export interface AppSettings {
   theme: Theme
   language: Language
+  /** UI design baseline in px; the rem root derives from it (uiFontSize/12*16). */
+  uiFontSize: number
   terminal: TerminalSettings
   ai: AISettings
   keyboard: KeyboardSettings
@@ -303,9 +305,14 @@ export const SIDEBAR_TAB_ORDER: { key: string; labelKey: string }[] = [
   { key: 'personalization', labelKey: 'sidebar.personalization' },
 ]
 
+// Platform UI text baseline: macOS native text runs larger than the
+// Windows 12px design size. Mirrors index.html's pre-paint detection.
+export const DEFAULT_UI_FONT_SIZE = /Mac|iPhone|iPad|iPod/.test(navigator.platform) ? 14 : 12
+
 export const DEFAULT_SETTINGS: AppSettings = {
   theme: 'dark',
   language: 'system',
+  uiFontSize: DEFAULT_UI_FONT_SIZE,
   terminal: {
     theme: FOLLOW_APP_THEME,
     fontFamily: 'JetBrains Mono Variable',
