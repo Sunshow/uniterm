@@ -379,6 +379,8 @@
   "settings.checkUpdateFailed": "Update-Prüfung fehlgeschlagen",
   "settings.homepage": "Webseite",
   "settings.userManual": "Benutzerhandbuch",
+  "settings.uiFontSize": "UI-Schriftgröße",
+  "settings.uiFontSizeDesc": "Basisgröße des UI-Texts anpassen.",
   "settings.theme": "Design",
   "settings.themeDark": "Dunkel",
   "settings.themeDeepBlue": "Tiefblau",

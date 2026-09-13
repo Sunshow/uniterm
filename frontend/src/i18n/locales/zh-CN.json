@@ -384,6 +384,8 @@
   "settings.checkUpdateFailed": "检查更新失败",
   "settings.homepage": "项目主页",
   "settings.userManual": "用户手册",
+  "settings.uiFontSize": "界面字体大小",
+  "settings.uiFontSizeDesc": "调整应用界面文字的基准大小",
   "settings.theme": "主题",
   "settings.themeDark": "暗色",
   "settings.themeDeepBlue": "深蓝",

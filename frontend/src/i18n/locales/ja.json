@@ -379,6 +379,8 @@
   "settings.checkUpdateFailed": "更新確認に失敗しました",
   "settings.homepage": "ホームページ",
   "settings.userManual": "ユーザーマニュアル",
+  "settings.uiFontSize": "UI フォントサイズ",
+  "settings.uiFontSizeDesc": "UI テキストの基準サイズを調整します。",
   "settings.theme": "テーマ",
   "settings.themeDark": "ダーク",
   "settings.themeDeepBlue": "ディープブルー",

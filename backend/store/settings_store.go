@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sync"
 
 	"github.com/ys-ll/uniterm/backend/credentials"
@@ -138,8 +139,14 @@ type KeyBinding struct {
 }
 
 type AppSettings struct {
-	Theme           string                `json:"theme"`
-	Language        string                `json:"language"`
+	Theme    string `json:"theme"`
+	Language string `json:"language"`
+	// UiFontSize is the UI design baseline in px (how large "normal" text
+	// renders): the rem root derives from it as uiFontSize/12*16. Pointer +
+	// omitempty so settings.json written by older builds still loads; nil
+	// means "use the platform default" (14 on macOS, 12 elsewhere). Stored
+	// per device on purpose — settings.json is not synced.
+	UiFontSize      *int                  `json:"uiFontSize,omitempty"`
 	Terminal        TerminalSettings      `json:"terminal"`
 	AI              AISettings            `json:"ai"`
 	Keyboard        map[string]KeyBinding `json:"keyboard"`
@@ -291,6 +298,11 @@ func (s *SettingsStore) Load() (AppSettings, error) {
 		settings.AI.MaxTurns = intPtr(defaultMaxTurns)
 		needsSave = true
 	}
+	if settings.UiFontSize == nil {
+		n := defaultUiFontSize()
+		settings.UiFontSize = &n
+		needsSave = true
+	}
 	if settings.CloseTabPrompt == nil {
 		settings.CloseTabPrompt = boolPtr(true)
 		needsSave = true
@@ -308,9 +320,11 @@ func (s *SettingsStore) Load() (AppSettings, error) {
 }
 
 func defaultSettings() AppSettings {
+	n := defaultUiFontSize()
 	return AppSettings{
-		Theme:    "dark",
-		Language: "system",
+		Theme:      "dark",
+		Language:   "system",
+		UiFontSize: &n,
 		Terminal: TerminalSettings{
 			Theme:            "uniterm-dark",
 			FontFamily:       "Consolas, \"Courier New\", monospace",
@@ -319,7 +333,7 @@ func defaultSettings() AppSettings {
 			RightClickAction: "menu",
 			MaxHistoryLines:  5000,
 		},
-		AI:             defaultAISettings(),
+		AI:              defaultAISettings(),
 		Keyboard:        defaultKeyboard(),
 		AutoCheckUpdate: boolPtr(true),
 		UpdateSource:    strPtr("auto"),
@@ -331,6 +345,16 @@ func defaultSettings() AppSettings {
 		},
 		CustomTerminalThemes: []CustomTerminalTheme{},
 	}
+}
+
+// defaultUiFontSize returns the platform UI text baseline in px: macOS
+// native text runs larger (HIG 13pt+) than the Windows 12px design size,
+// and users sit further from laptop Retina screens.
+func defaultUiFontSize() int {
+	if runtime.GOOS == "darwin" {
+		return 14
+	}
+	return 12
 }
 
 const defaultMaxTurns = 20

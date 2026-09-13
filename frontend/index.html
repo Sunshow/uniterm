@@ -12,6 +12,18 @@
       if (/Mac|iPhone|iPad|iPod/.test(navigator.platform)) {
         document.documentElement.classList.add('mac')
       }
+      // Apply the persisted UI font baseline before first paint (falls back
+      // to the platform default); the settings store re-applies the loaded
+      // value once settings are in.
+      try {
+        const cached = parseInt(localStorage.getItem('uiFontSize') || '', 10)
+        const base = Number.isFinite(cached) && cached >= 10 && cached <= 18
+          ? cached
+          : (/Mac|iPhone|iPad|iPod/.test(navigator.platform) ? 14 : 12)
+        document.documentElement.style.fontSize = (base / 12) * 16 + 'px'
+      } catch {
+        // storage unavailable — html.mac CSS default still applies
+      }
     </script>
 </head>
 <body>

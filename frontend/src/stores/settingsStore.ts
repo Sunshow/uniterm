@@ -72,6 +72,18 @@ export const useSettingsStore = defineStore('settings', () => {
     aiCfg.save()
   }
 
+  // Apply the UI font baseline to the rem root and cache it for the
+  // pre-paint script in index.html (avoids a wrong-size flash on reload).
+  function applyUiFontSize() {
+    const px = (settings.value.uiFontSize / 12) * 16
+    document.documentElement.style.fontSize = px + 'px'
+    try {
+      localStorage.setItem('uiFontSize', String(settings.value.uiFontSize))
+    } catch {
+      // private mode etc. — the loaded value still applies this session
+    }
+  }
+
   function applyTheme() {
     let theme = settings.value.theme
     if (theme === 'system') {
@@ -96,6 +108,7 @@ export const useSettingsStore = defineStore('settings', () => {
     await useAIConfigStore().load()
     recomposeAi()
     lastSavedAiJson = JSON.stringify({ maxTurns: settings.value.ai.maxTurns, models: settings.value.ai.models })
+    applyUiFontSize()
     try {
       availableShells.value = await GetAvailableShells()
     } catch {
@@ -125,6 +138,7 @@ export const useSettingsStore = defineStore('settings', () => {
     }
     await useAIConfigStore().load()
     recomposeAi()
+    applyUiFontSize()
     applyTheme()
     setLocale(settings.value.language)
   }
@@ -250,6 +264,9 @@ export const useSettingsStore = defineStore('settings', () => {
   // Apply theme when it changes
   watch(() => settings.value.theme, applyTheme)
 
+  // Apply the UI font baseline as soon as it changes (no restart needed)
+  watch(() => settings.value.uiFontSize, applyUiFontSize)
+
   // Listen for system color scheme changes
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
     systemPrefersDark.value = e.matches
@@ -264,6 +281,7 @@ export const useSettingsStore = defineStore('settings', () => {
     if (data) {
       settings.value = mergeSettings(data)
       loaded.value = true
+      applyUiFontSize()
       applyTheme()
     }
   })
@@ -326,6 +344,7 @@ function mergeSettings(loaded: AppSettings): AppSettings {
   return {
     theme: loaded.theme || DEFAULT_SETTINGS.theme,
     language: loaded.language || DEFAULT_SETTINGS.language,
+    uiFontSize: loaded.uiFontSize ?? DEFAULT_SETTINGS.uiFontSize,
     terminal: {
       ...DEFAULT_SETTINGS.terminal,
       ...loaded.terminal,

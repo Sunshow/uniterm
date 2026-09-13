@@ -384,6 +384,8 @@
   "settings.checkUpdateFailed": "Update check failed",
   "settings.homepage": "Homepage",
   "settings.userManual": "User Manual",
+  "settings.uiFontSize": "UI Font Size",
+  "settings.uiFontSizeDesc": "Adjust the baseline size of UI text.",
   "settings.theme": "Theme",
   "settings.themeDark": "Dark",
   "settings.themeDeepBlue": "Deep Blue",
