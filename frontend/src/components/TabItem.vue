@@ -680,6 +680,9 @@ onMounted(async () => {
   color: var(--text-muted);
   font-size: 0.625rem;
   font-weight: 500;
+  /* UI font so macOS modifier symbols (⌘⌥⇧) render with their native
+     system-font shapes instead of a mono fallback. */
+  font-family: var(--font-ui);
 }
 .tab-disconnected {
   opacity: 0.5;

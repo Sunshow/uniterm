@@ -1720,11 +1720,13 @@ function digitModifierBindingDisplay(key: DigitModifierKey, defaultMods: string)
 }
 
 function tabSwitchBindingDisplay(): string {
-  return digitModifierBindingDisplay('tabSwitchModifier', isMac.value ? 'Cmd' : 'Ctrl')
+  // Mac default shows the ⌘ symbol (not the word "Cmd") so the row matches
+  // the symbol style of formatKeyBinding and every other binding row.
+  return digitModifierBindingDisplay('tabSwitchModifier', isMac.value ? '⌘' : 'Ctrl')
 }
 
 function panelSwitchBindingDisplay(): string {
-  return digitModifierBindingDisplay('panelSwitchModifier', isMac.value ? 'Option' : 'Alt')
+  return digitModifierBindingDisplay('panelSwitchModifier', isMac.value ? '⌥' : 'Alt')
 }
 
 function isTabSwitchModifierUnset(): boolean {
@@ -2636,7 +2638,9 @@ async function onToggleSystemTitleBar(v: boolean) {
   background: var(--bg-overlay);
   border: 1px solid var(--border-subtle);
   border-radius: 0.25rem;
-  font-family: var(--font-mono);
+  /* UI font so macOS modifier symbols (⌘⌥⇧) render with their native
+     system-font shapes instead of the thin mono fallback glyphs. */
+  font-family: var(--font-ui);
   font-size: 0.75rem;
   color: var(--text-primary);
 }
