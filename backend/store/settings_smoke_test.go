@@ -100,7 +100,7 @@ func TestSettingsStore_DefaultsMissingAutoCheckUpdateToTrue(t *testing.T) {
 	}
 }
 
-func TestSettingsStore_DefaultsMissingAIFontSize(t *testing.T) {
+func TestSettingsStore_DefaultsMissingAIMaxTurns(t *testing.T) {
 	dir := t.TempDir()
 	if err := os.WriteFile(filepath.Join(dir, "settings.json"), []byte(`{"theme":"dark","ai":{}}`), 0600); err != nil {
 		t.Fatalf("seed settings: %v", err)
@@ -111,8 +111,8 @@ func TestSettingsStore_DefaultsMissingAIFontSize(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Load: %v", err)
 	}
-	if got.AI.FontSize == nil || *got.AI.FontSize != 15 {
-		t.Errorf("AI.FontSize: got %v, want 15 for a missing field", got.AI.FontSize)
+	if got.AI.MaxTurns == nil || *got.AI.MaxTurns != defaultMaxTurns {
+		t.Errorf("AI.MaxTurns: got %v, want %d for a missing field", got.AI.MaxTurns, defaultMaxTurns)
 	}
 }
 
