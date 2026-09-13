@@ -17,6 +17,7 @@ package sync
 // ai.json instead; see AIConfigStore.
 var syncedFiles = []string{
 	"connections.json",
+	"favorites.json",
 	"ai.json",
 	"quickCommands.json",
 	"tunnels.json",
