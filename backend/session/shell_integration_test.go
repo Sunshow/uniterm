@@ -120,8 +120,11 @@ func TestZshBootstrapZDOTDIR(t *testing.T) {
 	if !ok {
 		t.Fatal("zsh must be supported")
 	}
-	if files[".zshrc"] == "" || files[".zshenv"] == "" {
-		t.Fatalf("zsh needs .zshrc + .zshenv in the redirected ZDOTDIR: %v", files)
+	if files[".zshrc"] == "" || files[".zshenv"] == "" || files[".zprofile"] == "" {
+		t.Fatalf("zsh needs .zshrc + .zshenv + .zprofile in the redirected ZDOTDIR: %v", files)
+	}
+	if !strings.Contains(files[".zprofile"], "$HOME/.zprofile") {
+		t.Fatalf("redirected .zprofile must chain the user's ~/.zprofile: %s", files[".zprofile"])
 	}
 	if !strings.Contains(files[".zshrc"], "precmd_functions+=(__uniterm_osc7)") {
 		t.Fatal("zsh must append to precmd_functions, not replace")

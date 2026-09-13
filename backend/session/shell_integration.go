@@ -161,7 +161,11 @@ func buildShellBootstrap(shell string) (files map[string]string, startArgs []str
 		// zsh always sources $ZDOTDIR/.zshenv; ours chains the user's own
 		// ~/.zshenv so nothing the user relies on is lost.
 		env := "[ -f \"$HOME/.zshenv\" ] && . \"$HOME/.zshenv\"\n"
-		return map[string]string{".zshrc": rc, ".zshenv": env}, []string{"ZDOTDIR=<dir>"}, true
+		// Login shell (-l) reads .zprofile; ZDOTDIR override means we must
+		// supply one that chains the user's original so Homebrew PATH and
+		// other login-time setup is not lost.
+		profile := "[ -f \"$HOME/.zprofile\" ] && . \"$HOME/.zprofile\"\n"
+		return map[string]string{".zshrc": rc, ".zshenv": env, ".zprofile": profile}, []string{"ZDOTDIR=<dir>"}, true
 	case base == "fish":
 		cmd := "functions -c fish_prompt __uniterm_orig_prompt; " +
 			"function fish_prompt; __uniterm_osc7; __uniterm_orig_prompt; end; " +
@@ -214,12 +218,12 @@ func injectShellIntegration(client *ssh.Client) string {
 		}
 		return "exec bash --rcfile " + path
 	case "zsh":
-		dir, err := sshWriteRemoteFiles(client, files, []string{".zshrc", ".zshenv"})
+		dir, err := sshWriteRemoteFiles(client, files, []string{".zshrc", ".zshenv", ".zprofile"})
 		if err != nil {
 			log.Writef("ssh: shell integration skipped (write zsh dir: %v)", err)
 			return ""
 		}
-		return "exec env ZDOTDIR=" + dir + " zsh"
+		return "exec env ZDOTDIR=" + dir + " zsh -l"
 	case "fish":
 		// The exec request is parsed by the user's login shell, which for a
 		// fish user is fish itself — quote the -C argument with fish rules.
