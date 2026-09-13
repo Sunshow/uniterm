@@ -350,7 +350,7 @@ defineExpose({ open })
 .editor-host {
   height: 60vh;
   border: 1px solid var(--border-subtle);
-  border-radius: 4px;
+  border-radius: 0.25rem;
   overflow: hidden;
   background: #282c34;
 }
@@ -358,22 +358,22 @@ defineExpose({ open })
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 0.75rem;
   width: 100%;
 }
 .editor-buttons {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
 }
-/* el-button adds a default 12px left margin between siblings; drop it so the
-   buttons sit at the flex gap instead of 8px+12px. */
+/* el-button adds a default 0.75rem left margin between siblings; drop it so the
+   buttons sit at the flex gap instead of 0.5rem+0.75rem. */
 .editor-buttons .el-button + .el-button {
   margin-left: 0;
 }
 .editor-opts {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
 }
 </style>

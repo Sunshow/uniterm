@@ -631,7 +631,7 @@ watch(() => props.panel.outputLog, (val) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 8px;
+  padding: 0.25rem 0.5rem;
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border-subtle);
   flex-shrink: 0;
@@ -650,11 +650,11 @@ watch(() => props.panel.outputLog, (val) => {
   border-bottom-color: var(--accent);
 }
 .panel-header.ai-locked {
-  border-left: 3px solid var(--warning);
-  box-shadow: inset 0 0 12px var(--warning-subtle);
+  border-left: 0.1875rem solid var(--warning);
+  box-shadow: inset 0 0 0.75rem var(--warning-subtle);
 }
 .panel-title {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -663,24 +663,24 @@ watch(() => props.panel.outputLog, (val) => {
 }
 .panel-shortcut {
   flex-shrink: 0;
-  margin-left: 6px;
+  margin-left: 0.375rem;
   color: var(--text-muted);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 500;
 }
 .panel-icon-wrapper {
   position: relative;
   display: inline-flex;
   flex-shrink: 0;
-  margin-right: 6px;
+  margin-right: 0.375rem;
 }
 .panel-type-icon {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  height: 14px;
+  width: 0.875rem;
+  height: 0.875rem;
   color: var(--text-muted);
 }
 .panel-active .panel-type-icon {
@@ -688,10 +688,10 @@ watch(() => props.panel.outputLog, (val) => {
 }
 .panel-log-dot {
   position: absolute;
-  right: -2px;
-  bottom: -2px;
-  width: 6px;
-  height: 6px;
+  right: -0.125rem;
+  bottom: -0.125rem;
+  width: 0.375rem;
+  height: 0.375rem;
   background: #e5484d;
   border-radius: 50%;
   pointer-events: auto;
@@ -700,20 +700,20 @@ watch(() => props.panel.outputLog, (val) => {
   color: var(--text-primary);
 }
 .panel-title-input {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-family: inherit;
   color: var(--text-primary);
   background: var(--bg-base);
   border: 1px solid var(--accent);
   border-radius: var(--radius-sm);
-  padding: 2px 6px;
-  width: 120px;
+  padding: 0.125rem 0.375rem;
+  width: 7.5rem;
   outline: none;
 }
 .panel-header-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.25rem;
   flex-shrink: 0;
 }
 .panel-broadcast,
@@ -722,9 +722,9 @@ watch(() => props.panel.outputLog, (val) => {
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 12px;
-  padding: 2px 4px;
-  border-radius: 3px;
+  font-size: 0.75rem;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.1875rem;
   line-height: 1;
 }
 .panel-broadcast:hover,
@@ -744,8 +744,8 @@ watch(() => props.panel.outputLog, (val) => {
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 2px 4px;
-  border-radius: 3px;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.1875rem;
   display: inline-flex;
   align-items: center;
 }
@@ -764,8 +764,8 @@ watch(() => props.panel.outputLog, (val) => {
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 2px 4px;
-  border-radius: 3px;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.1875rem;
   display: inline-flex;
   align-items: center;
 }
@@ -777,15 +777,15 @@ watch(() => props.panel.outputLog, (val) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 1.375rem;
+  height: 1.375rem;
   padding: 0;
   background: transparent;
   border: none;
   border-radius: var(--radius-sm);
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 14px;
+  font-size: 0.875rem;
   transition: all 0.12s ease;
 }
 .panel-close:hover {
@@ -801,8 +801,8 @@ watch(() => props.panel.outputLog, (val) => {
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 2px 4px;
-  border-radius: 3px;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.1875rem;
   display: inline-flex;
   align-items: center;
 }

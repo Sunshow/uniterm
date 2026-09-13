@@ -1533,7 +1533,7 @@ defineExpose({ focusInput })
   left: 0;
   top: 0;
   bottom: 0;
-  width: 6px;
+  width: 0.375rem;
   cursor: col-resize;
   z-index: 10;
   background: transparent;
@@ -1564,9 +1564,9 @@ defineExpose({ focusInput })
   top: 0;
   bottom: 0;
   left: 0;
-  width: 3px;
+  width: 0.1875rem;
   background: var(--accent);
-  box-shadow: 0 0 6px var(--accent-glow);
+  box-shadow: 0 0 0.375rem var(--accent-glow);
 }
 
 .resize-handle:hover::before {
@@ -1576,8 +1576,8 @@ defineExpose({ focusInput })
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  font-size: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
   font-family: var(--font-ui);
   font-weight: 600;
   color: var(--text-primary);
@@ -1585,14 +1585,14 @@ defineExpose({ focusInput })
 }
 .ai-actions {
   display: flex;
-  gap: 2px;
+  gap: 0.125rem;
 }
 .ai-action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 1.625rem;
+  height: 1.625rem;
   padding: 0;
   background: transparent;
   border: none;
@@ -1606,7 +1606,7 @@ defineExpose({ focusInput })
   color: var(--text-primary);
 }
 .ai-session-bar {
-  padding: 6px 12px;
+  padding: 0.375rem 0.75rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1615,13 +1615,13 @@ defineExpose({ focusInput })
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 28px;
-  padding: 0 10px;
+  height: 1.75rem;
+  padding: 0 0.625rem;
   box-sizing: border-box;
   background: var(--bg-surface);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-family: var(--font-ui);
   color: var(--text-primary);
   box-shadow: inset 0 0 0 1px var(--border-subtle);
@@ -1644,14 +1644,14 @@ defineExpose({ focusInput })
   white-space: nowrap;
 }
 .session-time {
-  margin-left: 8px;
-  font-size: 10px;
+  margin-left: 0.5rem;
+  font-size: 0.625rem;
   font-family: var(--font-mono);
   color: var(--text-muted);
   white-space: nowrap;
 }
 .session-delete {
-  margin-left: 8px;
+  margin-left: 0.5rem;
   color: var(--text-muted);
 }
 .session-delete:hover {
@@ -1662,8 +1662,8 @@ defineExpose({ focusInput })
 .ai-search-bar {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
+  gap: 0.375rem;
+  padding: 0.375rem 0.625rem;
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border-subtle);
 }
@@ -1672,17 +1672,17 @@ defineExpose({ focusInput })
   background: var(--bg-base);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  padding: 4px 8px;
+  padding: 0.25rem 0.5rem;
   color: var(--text-primary);
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 0.75rem;
   outline: none;
 }
 .ai-search-bar .search-input:focus {
   border-color: var(--accent);
 }
 .ai-search-bar .search-count {
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--text-muted);
   white-space: nowrap;
 }
@@ -1694,7 +1694,7 @@ defineExpose({ focusInput })
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 2px;
+  padding: 0.125rem;
 }
 .ai-search-bar .search-btn:hover {
   color: var(--text-primary);
@@ -1702,17 +1702,17 @@ defineExpose({ focusInput })
 .ai-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 8px 0;
+  padding: 0.5rem 0;
   user-select: text;
   -webkit-user-select: text;
 }
 .ai-thinking {
   display: flex;
   align-items: center;
-  padding: 10px 14px;
+  padding: 0.625rem 0.875rem;
 }
 .thinking-text {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-family: var(--font-ui);
   color: var(--text-muted);
   font-style: italic;
@@ -1724,7 +1724,7 @@ defineExpose({ focusInput })
   50% { opacity: 0.5; }
 }
 .ai-input {
-  padding: 10px 16px;
+  padding: 0.625rem 1rem;
   flex-shrink: 0;
   position: relative;
 }
@@ -1744,15 +1744,15 @@ defineExpose({ focusInput })
   position: relative;
 }
 .ai-editable {
-  padding: 12px 16px;
-  font-size: var(--ai-font-size, 15px);
+  padding: 0.75rem 1rem;
+  font-size: var(--ai-font-size, 0.9375rem);
   font-family: var(--font-ui);
   color: var(--text-primary);
   background: transparent;
   border: none;
   outline: none;
-  min-height: 60px;
-  max-height: 220px;
+  min-height: 3.75rem;
+  max-height: 13.75rem;
   overflow-y: auto;
   white-space: pre-wrap;
   word-break: break-word;
@@ -1767,44 +1767,44 @@ defineExpose({ focusInput })
   display: inline;
   background: var(--accent);
   color: var(--on-accent);
-  border-radius: 3px;
-  padding: 1px 5px;
-  font-size: 12px;
+  border-radius: 0.1875rem;
+  padding: 1px 0.3125rem;
+  font-size: 0.75rem;
   font-weight: 500;
   white-space: nowrap;
   user-select: none;
-  margin: 0 2px;
+  margin: 0 0.125rem;
 }
 .input-actions {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
+  gap: 0.5rem;
   align-items: center;
-  padding: 0 8px 8px 8px;
+  padding: 0 0.5rem 0.5rem 0.5rem;
 }
 .input-actions-left {
   display: flex;
-  gap: 2px;
+  gap: 0.125rem;
   align-items: center;
 }
 .input-actions-right {
   display: flex;
-  gap: 6px;
+  gap: 0.375rem;
   align-items: center;
 }
 /* Ghost buttons: no border/background by default, reveal on hover */
 .ghost-btn {
   display: inline-block;
   box-sizing: border-box;
-  height: 24px;
-  line-height: 24px;
-  padding: 0 6px;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  padding: 0 0.375rem;
   background: transparent;
   border: none;
   border-radius: var(--radius-sm);
   color: var(--text-muted);
   font-family: var(--font-ui);
-  font-size: 11px;
+  font-size: 0.6875rem;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
@@ -1817,24 +1817,24 @@ defineExpose({ focusInput })
   color: var(--text-primary);
 }
 .model-btn {
-  max-width: 96px;
+  max-width: 6rem;
 }
 .add-model-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.25rem;
   max-width: none;
 }
 .mode-btn {
-  max-width: 108px;
+  max-width: 6.75rem;
 }
 /* Send / Stop icon button */
 .send-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 1.875rem;
+  height: 1.875rem;
   padding: 0;
   border: none;
   border-radius: var(--radius-sm);
@@ -1860,7 +1860,7 @@ defineExpose({ focusInput })
   opacity: 0.85;
 }
 .mode-option {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
   font-family: var(--font-ui);
 }
@@ -1878,23 +1878,23 @@ defineExpose({ focusInput })
 }
 
 .ai-panel-tags {
-  padding: 4px 12px;
+  padding: 0.25rem 0.75rem;
   background: var(--bg-overlay);
   border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 .panel-tags-list {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.25rem;
   flex-wrap: wrap;
-  min-height: 22px;
+  min-height: 1.375rem;
 }
 .panel-tag {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  padding: 1px 6px;
-  font-size: 11px;
+  gap: 0.1875rem;
+  padding: 1px 0.375rem;
+  font-size: 0.6875rem;
   background: var(--accent-subtle);
   color: var(--accent);
   border: 1px solid var(--accent-glow);
@@ -1914,7 +1914,7 @@ defineExpose({ focusInput })
   border: none;
   cursor: pointer;
   padding: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1;
   color: var(--text-muted);
   transition: color 0.15s;
@@ -1928,12 +1928,12 @@ defineExpose({ focusInput })
   border-radius: var(--radius-sm);
   color: var(--text-muted);
   cursor: pointer;
-  width: 20px;
-  height: 20px;
+  width: 1.25rem;
+  height: 1.25rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1;
   padding: 0;
   transition: border-color 0.15s, color 0.15s;
@@ -1943,12 +1943,12 @@ defineExpose({ focusInput })
   color: var(--accent);
 }
 .no-terminal-hint {
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--text-muted);
 }
 .panel-shell-hint {
-  margin-left: 8px;
-  font-size: 10px;
+  margin-left: 0.5rem;
+  font-size: 0.625rem;
   color: var(--text-muted);
 }
 .hash-dropdown {
@@ -1956,22 +1956,22 @@ defineExpose({ focusInput })
   bottom: 100%;
   left: -1px;
   right: -1px;
-  max-height: 180px;
+  max-height: 11.25rem;
   overflow-y: auto;
   background: var(--bg-surface);
   border: 1px solid var(--accent-glow);
   border-radius: var(--radius-sm);
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 -0.25rem 0.75rem rgba(0, 0, 0, 0.4);
   z-index: 100;
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
 }
 .hash-dropdown-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 10px;
+  padding: 0.375rem 0.625rem;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 0.75rem;
   transition: background 0.1s;
 }
 .hash-dropdown-item:hover,
@@ -1983,22 +1983,22 @@ defineExpose({ focusInput })
   font-weight: 500;
 }
 .hash-panel-hint {
-  font-size: 10px;
+  font-size: 0.625rem;
   color: var(--text-muted);
   margin-left: auto;
 }
 .hash-associated-badge {
-  font-size: 9px;
+  font-size: 0.5625rem;
   color: var(--accent);
   background: var(--accent-subtle);
-  padding: 0 4px;
-  border-radius: 2px;
-  margin-left: 4px;
+  padding: 0 0.25rem;
+  border-radius: 0.125rem;
+  margin-left: 0.25rem;
   flex-shrink: 0;
 }
 .hash-btn-icon {
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
 }
 
@@ -2008,22 +2008,22 @@ defineExpose({ focusInput })
   bottom: 100%;
   left: -1px;
   right: -1px;
-  max-height: 220px;
+  max-height: 13.75rem;
   overflow-y: auto;
   background: var(--bg-surface);
   border: 1px solid var(--accent-glow);
   border-radius: var(--radius-sm);
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 -0.25rem 0.75rem rgba(0, 0, 0, 0.4);
   z-index: 100;
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
 }
 .skill-dropdown-item {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  padding: 6px 10px;
+  gap: 0.5rem;
+  padding: 0.375rem 0.625rem;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 0.75rem;
   transition: background 0.1s;
 }
 .skill-dropdown-item:hover,
@@ -2043,7 +2043,7 @@ defineExpose({ focusInput })
 }
 .skill-dropdown-args {
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-family: var(--font-mono);
   flex-shrink: 0;
 }
@@ -2051,7 +2051,7 @@ defineExpose({ focusInput })
   flex: 1;
   min-width: 0;
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: 0.6875rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2060,18 +2060,18 @@ defineExpose({ focusInput })
 .queued-area {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 8px 8px 0 8px;
+  gap: 0.25rem;
+  padding: 0.5rem 0.5rem 0 0.5rem;
 }
 .queued-chip {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
+  gap: 0.375rem;
+  padding: 0.25rem 0.5rem;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-family: var(--font-ui);
   color: var(--text-secondary);
 }

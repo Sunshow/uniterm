@@ -321,18 +321,18 @@ function onTabDrop(e: DragEvent, targetTabId: string, index: number) {
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  padding: 0 4px;
-  height: 28px;
+  padding: 0 0.25rem;
+  height: 1.75rem;
 }
 .tab-more-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 1.5rem;
+  height: 1.5rem;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--text-muted);
   letter-spacing: 1px;
@@ -346,12 +346,12 @@ function onTabDrop(e: DragEvent, targetTabId: string, index: number) {
 }
 
 .tab-drop-indicator {
-  width: 2px;
-  min-width: 2px;
+  width: 0.125rem;
+  min-width: 0.125rem;
   align-self: stretch;
   background: var(--accent);
   opacity: 0.8;
-  margin: 4px 0;
+  margin: 0.25rem 0;
   border-radius: 1px;
   flex-shrink: 0;
 }
@@ -361,10 +361,10 @@ function onTabDrop(e: DragEvent, targetTabId: string, index: number) {
 
 .tab-add-btn {
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
+  width: 1.75rem;
+  height: 1.75rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 0.375rem;
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
@@ -372,7 +372,7 @@ function onTabDrop(e: DragEvent, targetTabId: string, index: number) {
   align-items: center;
   justify-content: center;
   transition: background 0.15s, color 0.15s;
-  margin-left: 2px;
+  margin-left: 0.125rem;
   --wails-draggable: no-drag;
 }
 .tab-add-btn:hover {

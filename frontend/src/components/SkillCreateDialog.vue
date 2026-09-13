@@ -250,16 +250,16 @@ async function importDir() {
 .skill-create-body {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0.75rem;
 }
 .upload-zone {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
   border: 1px dashed var(--el-border-color);
-  border-radius: 8px;
-  padding: 24px;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
   text-align: center;
   cursor: pointer;
   transition: border-color 0.15s;
@@ -267,10 +267,10 @@ async function importDir() {
 .import-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
 }
 .import-hint {
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--el-text-color-secondary);
 }
 .upload-zone:hover {
@@ -287,11 +287,11 @@ async function importDir() {
 }
 .upload-hint {
   color: var(--el-text-color-secondary);
-  font-size: 13px;
+  font-size: 0.8125rem;
   margin: 0;
 }
 .upload-file-name {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--el-text-color-primary);
   margin: 0;
@@ -299,18 +299,18 @@ async function importDir() {
 .parse-ok {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
+  gap: 0.25rem;
+  font-size: 0.75rem;
   color: var(--el-color-success);
   margin: 0;
 }
 .parse-fail {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--el-color-danger);
   margin: 0;
 }
 .security-tip {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--el-color-warning);
   margin: 0;
 }

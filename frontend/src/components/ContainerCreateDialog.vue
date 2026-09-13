@@ -183,14 +183,14 @@ async function onSubmit() {
 .rows {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0.375rem;
   width: 100%;
 }
 
 .row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
 }
 
 .row-sep {
@@ -199,15 +199,15 @@ async function onSubmit() {
 }
 
 .port-input {
-  width: 110px;
+  width: 6.875rem;
 }
 
 .proto-select {
-  width: 90px;
+  width: 5.625rem;
 }
 
 .restart-select {
-  width: 180px;
+  width: 11.25rem;
 }
 
 .row-error :deep(.el-input__wrapper) {

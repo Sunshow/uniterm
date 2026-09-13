@@ -67,21 +67,21 @@ const restoreMaskId = `rm-${Math.random().toString(36).slice(2, 9)}`
 .window-controls {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 0.125rem;
   --wails-draggable: no-drag;
 }
 
 /* ── macOS traffic lights ── */
 .window-controls.mac {
-  gap: 8px;
+  gap: 0.5rem;
   /* nudge right of the header padding so the dots sit clear of the
      window's rounded corners, matching the native macOS inset */
-  margin-left: 6px;
+  margin-left: 0.375rem;
 }
 
 .wc-btn.mac {
-  width: 12px;
-  height: 12px;
+  width: 0.75rem;
+  height: 0.75rem;
   padding: 0;
   border: none;
   border-radius: 50%;
@@ -98,8 +98,8 @@ const restoreMaskId = `rm-${Math.random().toString(36).slice(2, 9)}`
 
 /* Glyphs appear when hovering anywhere over the group (macOS behaviour) */
 .wc-btn.mac svg {
-  width: 8px;
-  height: 8px;
+  width: 0.5rem;
+  height: 0.5rem;
   color: rgba(0, 0, 0, 0.55);
   opacity: 0;
   transition: opacity 0.1s ease;
@@ -114,8 +114,8 @@ const restoreMaskId = `rm-${Math.random().toString(36).slice(2, 9)}`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 5px 8px;
-  height: 28px;
+  padding: 0.3125rem 0.5rem;
+  height: 1.75rem;
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;

@@ -113,22 +113,22 @@ function onConnect() {
 
 <style scoped>
 .credential-subtitle {
-  margin: 0 0 12px 0;
+  margin: 0 0 0.75rem 0;
   color: var(--el-text-color-secondary);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .credential-fields {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0.75rem;
 }
 .credential-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.25rem;
 }
 .credential-label {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--el-text-color-regular);
 }
 </style>

@@ -874,11 +874,11 @@ function applyBandSelection() {
 .filter-bar {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 0.125rem;
   padding-top: 0;
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-bottom: 6px;
+  padding-left: 0.625rem;
+  padding-right: 0.625rem;
+  padding-bottom: 0.375rem;
   border-bottom: 1px solid var(--border-subtle);
 }
 .filter-bar .el-input {
@@ -888,15 +888,15 @@ function applyBandSelection() {
    transfer / create). Compact (sidebar) layout has no groups and no dividers. */
 .toolbar-divider {
   width: 1px;
-  height: 16px;
-  margin: 0 3px;
+  height: 1rem;
+  margin: 0 0.1875rem;
   flex-shrink: 0;
   background: var(--border-subtle);
 }
-/* Match the sidebar's tab / close icon-button style (transparent, 26px, muted) */
+/* Match the sidebar's tab / close icon-button style (transparent, 1.625rem, muted) */
 .filter-icon-btn {
-  width: 26px;
-  height: 26px;
+  width: 1.625rem;
+  height: 1.625rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -926,10 +926,10 @@ function applyBandSelection() {
 .clipboard-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
   border-bottom: 1px solid var(--border-subtle);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .clipboard-info {
   flex: 1;
@@ -938,10 +938,10 @@ function applyBandSelection() {
 .selection-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
   border-top: 1px solid var(--border-subtle);
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-secondary);
 }
 .selection-info {
@@ -957,7 +957,7 @@ function applyBandSelection() {
 .name-cell {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
 }
 .name-info {
   display: flex;
@@ -970,7 +970,7 @@ function applyBandSelection() {
   color: var(--accent);
 }
 .file-mode {
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--text-disabled);
 }
 
@@ -998,12 +998,12 @@ function applyBandSelection() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
 }
 .loading-spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid rgba(255, 255, 255, 0.15);
+  width: 2rem;
+  height: 2rem;
+  border: 0.1875rem solid rgba(255, 255, 255, 0.15);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -1012,7 +1012,7 @@ function applyBandSelection() {
   to { transform: rotate(360deg); }
 }
 .loading-text {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-primary);
 }
 

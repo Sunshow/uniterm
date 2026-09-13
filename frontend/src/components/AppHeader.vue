@@ -381,9 +381,9 @@ onUnmounted(() => {
 .app-header {
   display: flex;
   align-items: center;
-  height: 44px;
-  padding: 0 8px;
-  gap: 2px;
+  height: 2.75rem;
+  padding: 0 0.5rem;
+  gap: 0.125rem;
   background: var(--bg-elevated);
   flex-shrink: 0;
   position: relative;
@@ -421,10 +421,10 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 28px;
-  padding: 5px 8px;
+  height: 1.75rem;
+  padding: 0.3125rem 0.5rem;
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
   color: var(--text-secondary);
   background: transparent;
@@ -458,7 +458,7 @@ onUnmounted(() => {
 }
 
 .header-btn .el-icon {
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 [data-theme="light"] .app-header::after {

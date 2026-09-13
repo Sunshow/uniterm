@@ -243,19 +243,19 @@ async function onCreateTable() {
 .object-toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
   flex-shrink: 0;
 }
 .object-search {
-  width: 240px;
-  padding: 4px 8px;
+  width: 15rem;
+  padding: 0.25rem 0.5rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   background: var(--bg-base);
   color: var(--text-primary);
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 0.75rem;
   outline: none;
   transition: border-color 0.15s ease;
 }
@@ -274,7 +274,7 @@ async function onCreateTable() {
 .object-name {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
   cursor: pointer;
   transition: color 0.15s ease;
 }
@@ -288,17 +288,17 @@ async function onCreateTable() {
 .confirm-body {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.5rem;
 }
 .confirm-text {
   font-family: var(--font-ui);
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--text-primary);
   margin: 0;
 }
 .confirm-hint {
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-muted);
   margin: 0;
 }

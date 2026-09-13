@@ -798,7 +798,7 @@ watch(() => props.sessionId, async (newId) => {
   overflow: hidden;
 }
 .redis-resizer {
-  width: 4px;
+  width: 0.25rem;
   cursor: col-resize;
   background: transparent;
   flex-shrink: 0;
@@ -815,9 +815,9 @@ watch(() => props.sessionId, async (newId) => {
 }
 .redis-toolbar {
   display: flex;
-  gap: 4px;
+  gap: 0.25rem;
   align-items: center;
-  padding: 8px;
+  padding: 0.5rem;
   border-bottom: 1px solid var(--border-subtle);
   flex-shrink: 0;
 }
@@ -828,13 +828,13 @@ watch(() => props.sessionId, async (newId) => {
 /* Rows share the DB tree's .table-item/.table-name rule set so key leaves
    match database tables exactly; folders use the shared .db-header classes.
    Flat mode (no nesting) is the same leaf row as tree mode. Indentation: the
-   30px spacer (arrow 12 + gap + icon 14 + gap) lines leaf text up with the
+   1.875rem spacer (arrow 12 + gap + icon 14 + gap) lines leaf text up with the
    folder label above. */
 .table-item {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 8px;
+  gap: 0.25rem;
+  padding: 0.375rem 0.5rem;
   cursor: pointer;
   user-select: none;
   transition: background 0.12s ease;
@@ -846,7 +846,7 @@ watch(() => props.sessionId, async (newId) => {
      the same column as its folder's arrow/icon — indentation is then purely
      the per-depth pad, and a leaf under a folder is exactly one level deeper
      (DB's table-under-db relationship) instead of two. */
-  width: 12px;
+  width: 0.75rem;
   flex-shrink: 0;
 }
 .table-icon {
@@ -855,7 +855,7 @@ watch(() => props.sessionId, async (newId) => {
 }
 .table-name {
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -864,20 +864,20 @@ watch(() => props.sessionId, async (newId) => {
 .db-header {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 8px;
+  gap: 0.25rem;
+  padding: 0.375rem 0.5rem;
   cursor: pointer;
   user-select: none;
   transition: background 0.12s ease;
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-primary);
 }
 .db-header:hover {
   background: var(--bg-hover);
 }
 .db-arrow {
-  width: 12px;
+  width: 0.75rem;
   flex-shrink: 0;
   color: var(--text-muted);
   display: flex;
@@ -893,7 +893,7 @@ watch(() => props.sessionId, async (newId) => {
 }
 .db-name {
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--text-primary);
   overflow: hidden;
@@ -903,18 +903,18 @@ watch(() => props.sessionId, async (newId) => {
 .redis-pagination {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 8px;
+  gap: 0.25rem;
+  padding: 0.375rem 0.5rem;
   border-top: 1px solid var(--border-subtle);
   flex-shrink: 0;
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-secondary);
 }
 .result-count {
   color: var(--text-muted);
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 0.75rem;
   white-space: nowrap;
 }
 .page-btn {
@@ -922,9 +922,9 @@ watch(() => props.sessionId, async (newId) => {
   background: var(--bg-base);
   color: var(--text-secondary);
   cursor: pointer;
-  padding: 2px 4px;
+  padding: 0.125rem 0.25rem;
   border-radius: var(--radius-sm);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-family: var(--font-ui);
   display: inline-flex;
   align-items: center;
@@ -933,25 +933,25 @@ watch(() => props.sessionId, async (newId) => {
 .page-btn:hover:not(:disabled) { background: var(--bg-hover); color: var(--text-primary); }
 .page-btn:disabled { opacity: 0.4; cursor: default; }
 .page-num {
-  min-width: 20px;
+  min-width: 1.25rem;
   text-align: center;
 }
 .key-meta {
-  padding: 8px 12px 12px;
+  padding: 0.5rem 0.75rem 0.75rem;
   border-bottom: 1px solid var(--border-subtle);
   flex-shrink: 0;
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .meta-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 0;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
 }
 .meta-label {
   color: var(--text-muted);
-  min-width: 32px;
+  min-width: 2rem;
 }
 .meta-value {
   color: var(--text-primary);
@@ -963,23 +963,23 @@ watch(() => props.sessionId, async (newId) => {
 .ttl-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
 }
 .redis-right-content {
   flex: 1;
   overflow-y: auto;
-  padding: 8px;
+  padding: 0.5rem;
 }
 .value-actions {
   display: flex;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
 }
 .redis-placeholder {
   color: var(--text-secondary);
   font-family: var(--font-ui);
-  font-size: 14px;
-  padding: 16px;
+  font-size: 0.875rem;
+  padding: 1rem;
 }
 .redis-placeholder.full {
   flex: 1;

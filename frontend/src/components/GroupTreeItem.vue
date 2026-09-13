@@ -163,14 +163,14 @@ function onMoreClick(e: MouseEvent, conn: ConnectionConfig) {
 .group-header {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 10px 6px 0;
+  gap: 0.25rem;
+  padding: 0.375rem 0.625rem 0.375rem 0;
   cursor: pointer;
   user-select: none;
   border-radius: var(--radius-sm);
   transition: background 0.12s ease;
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-secondary);
 }
 .group-header:hover {
@@ -191,9 +191,9 @@ function onMoreClick(e: MouseEvent, conn: ConnectionConfig) {
 .connection-item.drop-after::after {
   content: '';
   position: absolute;
-  left: 6px;
-  right: 6px;
-  height: 2px;
+  left: 0.375rem;
+  right: 0.375rem;
+  height: 0.125rem;
   background: var(--accent);
   border-radius: 1px;
   z-index: 2;
@@ -210,7 +210,7 @@ function onMoreClick(e: MouseEvent, conn: ConnectionConfig) {
 .group-arrow {
   display: inline-flex;
   align-items: center;
-  width: 16px;
+  width: 1rem;
   color: var(--text-disabled);
   flex-shrink: 0;
 }
@@ -223,11 +223,11 @@ function onMoreClick(e: MouseEvent, conn: ConnectionConfig) {
 
 .group-count {
   margin-left: auto;
-  font-size: 10px;
+  font-size: 0.625rem;
   color: var(--text-disabled);
   background: var(--bg-subtle);
-  padding: 0 5px;
-  border-radius: 8px;
+  padding: 0 0.3125rem;
+  border-radius: 0.5rem;
   flex-shrink: 0;
 }
 
@@ -235,16 +235,16 @@ function onMoreClick(e: MouseEvent, conn: ConnectionConfig) {
 .connection-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 10px;
+  gap: 0.375rem;
+  padding: 0.5rem 0.625rem;
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all 0.12s ease;
-  margin-bottom: 2px;
+  margin-bottom: 0.125rem;
   user-select: none;
 }
 .connection-item.indented {
-  padding-left: 24px;
+  padding-left: 1.5rem;
 }
 .connection-item:hover {
   background: var(--bg-hover);
@@ -266,8 +266,8 @@ function onMoreClick(e: MouseEvent, conn: ConnectionConfig) {
   display: none;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 1.5rem;
+  height: 1.5rem;
   border: none;
   background: transparent;
   color: var(--text-muted);
@@ -289,7 +289,7 @@ function onMoreClick(e: MouseEvent, conn: ConnectionConfig) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
+  width: 1rem;
   flex-shrink: 0;
   color: var(--text-muted);
 }
@@ -297,13 +297,13 @@ function onMoreClick(e: MouseEvent, conn: ConnectionConfig) {
 .conn-details {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.125rem;
   min-width: 0;
 }
 
 .name {
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
   color: var(--text-primary);
   white-space: nowrap;
@@ -314,7 +314,7 @@ function onMoreClick(e: MouseEvent, conn: ConnectionConfig) {
 
 .host {
   font-family: var(--font-ui);
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -325,7 +325,7 @@ function onMoreClick(e: MouseEvent, conn: ConnectionConfig) {
 .conn-meta {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
   min-width: 0;
 }
 </style>

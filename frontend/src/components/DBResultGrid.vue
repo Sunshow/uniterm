@@ -372,12 +372,12 @@ defineExpose({
   --el-table-header-text-color: var(--text-secondary);
   --el-table-text-color: var(--text-primary);
   --el-table-bg-color: var(--bg-surface);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .row-actions {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 0.125rem;
 }
 .row-actions :deep(svg) { pointer-events: none; }
 .cell-null {
@@ -386,39 +386,39 @@ defineExpose({
 }
 .cell-value {
   font-family: var(--font-mono, monospace);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .cell-pending {
   background-color: var(--accent-subtle, rgba(64, 128, 255, 0.12));
-  box-shadow: inset 0 -2px 0 var(--accent);
+  box-shadow: inset 0 -0.125rem 0 var(--accent);
 }
 .cell-edit-wrap {
   display: flex;
   align-items: stretch;
   width: 100%;
-  gap: 2px;
+  gap: 0.125rem;
 }
 .cell-edit-input {
   flex: 1;
   min-width: 0;
-  height: 24px;
-  padding: 0 6px;
+  height: 1.5rem;
+  padding: 0 0.375rem;
   border: 1px solid var(--accent);
-  border-radius: 2px;
+  border-radius: 0.125rem;
   background: var(--bg-base);
   color: var(--text-primary);
   font-family: var(--font-mono, monospace);
-  font-size: 12px;
+  font-size: 0.75rem;
   outline: none;
 }
 .null-btn {
   flex-shrink: 0;
-  width: 22px;
+  width: 1.375rem;
   border: 1px solid var(--border-subtle);
-  border-radius: 2px;
+  border-radius: 0.125rem;
   background: var(--bg-elevated, var(--bg-hover));
   color: var(--text-muted);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
   cursor: pointer;
   font-style: italic;

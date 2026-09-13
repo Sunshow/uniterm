@@ -161,8 +161,8 @@ function resetForm() {
 }
 .form-error {
   color: var(--error);
-  font-size: 12px;
-  margin-top: -8px;
-  margin-bottom: 8px;
+  font-size: 0.75rem;
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
 }
 </style>

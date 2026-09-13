@@ -116,19 +116,19 @@ async function handleSubmit() {
 .change-password-form {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.25rem;
 }
 
 .password-warning {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-muted);
-  margin-top: 8px;
+  margin-top: 0.5rem;
   line-height: 1.4;
 }
 
 .form-error {
   color: var(--el-color-danger);
-  font-size: 13px;
-  margin-top: 8px;
+  font-size: 0.8125rem;
+  margin-top: 0.5rem;
 }
 </style>

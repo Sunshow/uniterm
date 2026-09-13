@@ -30,5 +30,5 @@ function onCancel() { emit('update:visible', false) }
 </script>
 
 <style scoped>
-.keychain-lost-desc { margin: 0 0 12px; color: var(--text-secondary); font-size: 13px; line-height: 1.5; }
+.keychain-lost-desc { margin: 0 0 0.75rem; color: var(--text-secondary); font-size: 0.8125rem; line-height: 1.5; }
 </style>

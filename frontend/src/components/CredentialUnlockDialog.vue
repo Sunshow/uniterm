@@ -49,5 +49,5 @@ function onCancel() { emit('update:visible', false) }
 </script>
 
 <style scoped>
-.form-error { color: var(--el-color-danger); font-size: 13px; margin-top: 8px; }
+.form-error { color: var(--el-color-danger); font-size: 0.8125rem; margin-top: 0.5rem; }
 </style>

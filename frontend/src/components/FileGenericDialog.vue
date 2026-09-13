@@ -68,10 +68,10 @@ const emit = defineEmits<{
 
 <style scoped>
 .generic-dialog-input2 {
-  margin-top: 8px;
+  margin-top: 0.5rem;
 }
 .generic-dialog-error {
   color: var(--el-color-danger);
-  margin-top: 8px;
+  margin-top: 0.5rem;
 }
 </style>

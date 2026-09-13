@@ -2049,10 +2049,10 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 
 .resize-handle {
   position: absolute;
-  right: -6px;
+  right: -0.375rem;
   top: 0;
   bottom: 0;
-  width: 6px;
+  width: 0.375rem;
   cursor: col-resize;
   z-index: 10;
   background: transparent;
@@ -2076,23 +2076,23 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
   );
 }
 
-/* Hover: 3px accent bar extending into sidebar */
+/* Hover: 0.1875rem accent bar extending into sidebar */
 .resize-handle:hover::after {
   content: '';
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
-  width: 3px;
+  width: 0.1875rem;
   background: var(--accent);
-  box-shadow: 0 0 6px var(--accent-glow);
+  box-shadow: 0 0 0.375rem var(--accent-glow);
 }
 
 .sidebar-header {
   display: flex;
   align-items: center;
-  gap: 2px;
-  padding: 10px 14px;
+  gap: 0.125rem;
+  padding: 0.625rem 0.875rem;
   flex-shrink: 0;
 }
 
@@ -2102,13 +2102,13 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 
 
 .sb-icon-btn {
-  width: 26px;
-  height: 26px;
+  width: 1.625rem;
+  height: 1.625rem;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 4px;
+  border-radius: 0.25rem;
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
@@ -2124,8 +2124,8 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 1.625rem;
+  height: 1.625rem;
   padding: 0;
   background: transparent;
   border: none;
@@ -2141,8 +2141,8 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 }
 
 .sidebar-tab {
-  width: 26px;
-  height: 26px;
+  width: 1.625rem;
+  height: 1.625rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2168,15 +2168,15 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 .search-box {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 0 10px 6px;
+  gap: 0.25rem;
+  padding: 0 0.625rem 0.375rem;
   flex-shrink: 0;
 }
 
 .connection-list {
   flex: 1;
   overflow-y: auto;
-  padding: 0 8px 8px;
+  padding: 0 0.5rem 0.5rem;
   outline: none;
 }
 
@@ -2184,14 +2184,14 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 .group-header {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 10px 6px 6px;
+  gap: 0.25rem;
+  padding: 0.375rem 0.625rem 0.375rem 0.375rem;
   cursor: pointer;
   user-select: none;
   border-radius: var(--radius-sm);
   transition: background 0.12s ease;
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-secondary);
 }
 
@@ -2202,7 +2202,7 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 .group-arrow {
   display: inline-flex;
   align-items: center;
-  width: 16px;
+  width: 1rem;
   color: var(--text-disabled);
 }
 .group-arrow-icon {
@@ -2215,11 +2215,11 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 
 .group-count {
   margin-left: auto;
-  font-size: 10px;
+  font-size: 0.625rem;
   color: var(--text-disabled);
   background: var(--bg-subtle);
-  padding: 0 5px;
-  border-radius: 8px;
+  padding: 0 0.3125rem;
+  border-radius: 0.5rem;
   flex-shrink: 0;
 }
 
@@ -2232,12 +2232,12 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 .connection-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 10px;
+  gap: 0.375rem;
+  padding: 0.5rem 0.625rem;
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all 0.12s ease;
-  margin-bottom: 2px;
+  margin-bottom: 0.125rem;
   user-select: none;
   position: relative;
 }
@@ -2246,9 +2246,9 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 .connection-item.drop-after::after {
   content: '';
   position: absolute;
-  left: 6px;
-  right: 6px;
-  height: 2px;
+  left: 0.375rem;
+  right: 0.375rem;
+  height: 0.125rem;
   background: var(--accent);
   border-radius: 1px;
   z-index: 2;
@@ -2258,7 +2258,7 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 .connection-item.drop-after::after { bottom: -1px; }
 
 .connection-item.indented {
-  padding-left: 24px;
+  padding-left: 1.5rem;
 }
 
 .connection-item:hover {
@@ -2283,8 +2283,8 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
   display: none;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 1.5rem;
+  height: 1.5rem;
   border: none;
   background: transparent;
   color: var(--text-muted);
@@ -2306,7 +2306,7 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
+  width: 1rem;
   flex-shrink: 0;
   color: var(--text-muted);
 }
@@ -2314,13 +2314,13 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 .conn-details {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.125rem;
   min-width: 0;
 }
 
 .name {
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
   color: var(--text-primary);
   white-space: nowrap;
@@ -2331,7 +2331,7 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 
 .host {
   font-family: var(--font-ui);
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -2342,14 +2342,14 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 .conn-meta {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
   min-width: 0;
 }
 
 .empty-state {
-  padding: 32px 16px;
+  padding: 2rem 1rem;
   text-align: center;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-disabled);
   font-family: var(--font-ui);
 }
@@ -2365,7 +2365,7 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
   cursor: pointer;
   color: var(--text-muted);
   transition: color 0.12s ease;
-  padding: 2px;
+  padding: 0.125rem;
   border-radius: var(--radius-sm);
 }
 
@@ -2385,32 +2385,32 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 
 /* ── Personalization panel ── */
 .personalization-panel {
-  padding: 16px;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1rem;
 }
 
 .persist-section-title {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   font-family: var(--font-ui);
   color: var(--text-secondary);
-  padding: 0 0 4px 0;
-  margin-bottom: -4px;
+  padding: 0 0 0.25rem 0;
+  margin-bottom: -0.25rem;
 }
 
 .persist-section {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.25rem;
 }
 
 .persist-label {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-family: var(--font-ui);
   color: var(--text-muted);
-  padding-left: 2px;
+  padding-left: 0.125rem;
 }
 
 .persist-section .el-select,
@@ -2421,7 +2421,7 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 .theme-select-row {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.25rem;
 }
 
 .theme-select-row .el-select {
@@ -2430,10 +2430,10 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 }
 
 .tree-option {
-  padding: 6px 12px;
+  padding: 0.375rem 0.75rem;
   cursor: pointer;
-  font-size: 13px;
-  border-radius: 4px;
+  font-size: 0.8125rem;
+  border-radius: 0.25rem;
 }
 .tree-option:hover {
   background: var(--bg-hover);
@@ -2446,13 +2446,13 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 
 <style>
 .theme-select-popper .el-select-group__title {
-  font-size: 10px;
+  font-size: 0.625rem;
   color: var(--text-disabled);
   text-align: center;
-  padding: 6px 12px 2px;
+  padding: 0.375rem 0.75rem 0.125rem;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
 }
 .theme-select-popper .el-select-group__title::before,
 .theme-select-popper .el-select-group__title::after {

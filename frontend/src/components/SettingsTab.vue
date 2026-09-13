@@ -2165,28 +2165,28 @@ async function onToggleSystemTitleBar(v: boolean) {
 }
 
 .settings-sidebar {
-  width: 180px;
+  width: 11.25rem;
   flex-shrink: 0;
-  margin-left: 20px;
-  margin-right: 10px;
-  padding: 16px 0;
+  margin-left: 1.25rem;
+  margin-right: 0.625rem;
+  padding: 1rem 0;
   border-right: 1px solid var(--border-hover);
 }
 
 .settings-category {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  margin: 0 8px;
-  font-size: 13px;
+  gap: 0.625rem;
+  padding: 0.625rem 1rem;
+  margin: 0 0.5rem;
+  font-size: 0.8125rem;
   font-family: var(--font-ui);
   cursor: pointer;
   user-select: none;
   color: var(--text-secondary);
   border-radius: var(--radius-sm);
   transition: all 0.12s ease;
-  border-left: 3px solid transparent;
+  border-left: 0.1875rem solid transparent;
 }
 
 .settings-category:hover {
@@ -2198,11 +2198,11 @@ async function onToggleSystemTitleBar(v: boolean) {
   background: var(--accent-subtle);
   color: var(--accent);
   border-left-color: var(--accent);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(0.5rem);
 }
 
 .category-icon {
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .category-label {
@@ -2211,41 +2211,41 @@ async function onToggleSystemTitleBar(v: boolean) {
 
 .settings-panel {
   flex: 1;
-  padding: 24px 32px;
+  padding: 1.5rem 2rem;
   overflow-y: auto;
 }
 
 .settings-section {
-  min-width: 400px;
+  min-width: 25rem;
   max-width: 1000px;
   margin: 0 auto;
 }
 
 .section-title {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 600;
   font-family: var(--font-ui);
-  margin: 20px 0 20px 0;
+  margin: 1.25rem 0 1.25rem 0;
   color: var(--text-primary);
 }
 
 .settings-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .setting-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 14px 18px;
+  gap: 1rem;
+  padding: 0.875rem 1.125rem;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   transition: all 0.12s ease;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(0.5rem);
 }
 
 .setting-card:hover {
@@ -2258,15 +2258,15 @@ async function onToggleSystemTitleBar(v: boolean) {
 }
 
 .setting-title {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   font-family: var(--font-ui);
   color: var(--text-primary);
-  margin-bottom: 2px;
+  margin-bottom: 0.125rem;
 }
 
 .setting-desc {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-family: var(--font-ui);
   color: var(--text-muted);
   line-height: 1.4;
@@ -2274,32 +2274,32 @@ async function onToggleSystemTitleBar(v: boolean) {
 
 .setting-control {
   flex-shrink: 0;
-  min-width: 210px;
+  min-width: 13.125rem;
 }
 
 /* Keep the external-editor combobox the same width as the other select
    controls instead of the default 100% (the free-input form stretches). */
 .setting-control .editor-select.el-select {
-  width: 210px;
+  width: 13.125rem;
 }
 
 
 /* The append button's width adds to the input's, so pin the whole group to
-   the 210px the sibling selects render at instead of letting it overflow. */
+   the 13.125rem the sibling selects render at instead of letting it overflow. */
 .setting-control .dir-input {
-  width: 210px;
+  width: 13.125rem;
 }
 
 .config-value {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-secondary);
 }
 
-.settings-form { display: flex; flex-direction: column; gap: 4px; }
-.switch-mode-hint { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
-.verify-field { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+.settings-form { display: flex; flex-direction: column; gap: 0.25rem; }
+.switch-mode-hint { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; }
+.verify-field { display: flex; flex-direction: column; gap: 0.25rem; width: 100%; }
 
-.form-error { color: var(--el-color-danger); font-size: 13px; margin-top: 8px; }
+.form-error { color: var(--el-color-danger); font-size: 0.8125rem; margin-top: 0.5rem; }
 
 .setting-control .el-select,
 .setting-control .el-input-number {
@@ -2309,7 +2309,7 @@ async function onToggleSystemTitleBar(v: boolean) {
 .theme-select-row {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.25rem;
   width: 100%;
 }
 
@@ -2324,8 +2324,8 @@ async function onToggleSystemTitleBar(v: boolean) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 12px 18px;
+  gap: 1rem;
+  padding: 0.75rem 1.125rem;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
@@ -2344,62 +2344,62 @@ async function onToggleSystemTitleBar(v: boolean) {
 .model-main {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.125rem;
   flex: 1;
   min-width: 0;
 }
 
 .model-name {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-primary);
 }
 
 .model-detail {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-family: var(--font-mono);
   color: var(--text-muted);
-  margin-left: 24px;
+  margin-left: 1.5rem;
 }
 
 .model-actions {
   display: flex;
-  gap: 4px;
+  gap: 0.25rem;
   flex-shrink: 0;
 }
 
 .about-content {
   text-align: left;
-  padding: 20px 0;
+  padding: 1.25rem 0;
 }
 .about-appname {
-  font-size: 28px;
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 12px;
+  margin-bottom: 0.75rem;
 }
 .about-desc {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--text-secondary);
-  margin: 0 0 24px 0;
+  margin: 0 0 1.5rem 0;
   line-height: 1.6;
-  max-width: 400px;
+  max-width: 25rem;
 }
 .about-version {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-muted);
   font-family: var(--font-mono);
 }
 .about-links {
   display: flex;
-  gap: 16px;
-  margin-top: 12px;
+  gap: 1rem;
+  margin-top: 0.75rem;
 }
 .about-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  gap: 0.375rem;
+  font-size: 0.75rem;
   color: var(--accent);
   text-decoration: none;
   transition: opacity 0.12s ease;
@@ -2414,7 +2414,7 @@ async function onToggleSystemTitleBar(v: boolean) {
 }
 
 .section-desc {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-secondary);
   margin: 0;
   line-height: 1.5;
@@ -2424,7 +2424,7 @@ async function onToggleSystemTitleBar(v: boolean) {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
   overflow: hidden;
 }
 
@@ -2432,29 +2432,29 @@ async function onToggleSystemTitleBar(v: boolean) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   font-family: var(--font-ui);
   color: var(--text-primary);
-  padding: 8px 12px 8px 18px;
+  padding: 0.5rem 0.75rem 0.5rem 1.125rem;
   background: var(--bg-hover);
   border-bottom: 1px solid var(--border-subtle);
 }
 
 .sync-card-body {
-  padding: 16px 18px;
+  padding: 1rem 1.125rem;
 }
 
 .sync-card-body.empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 28px 18px;
+  gap: 0.75rem;
+  padding: 1.75rem 1.125rem;
 }
 
 .empty-text {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-muted);
   margin: 0;
 }
@@ -2463,19 +2463,19 @@ async function onToggleSystemTitleBar(v: boolean) {
 .repo-info {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 12px;
+  gap: 0.375rem;
+  margin-bottom: 0.75rem;
 }
 
 .repo-info-row {
   display: flex;
-  gap: 12px;
-  font-size: 13px;
+  gap: 0.75rem;
+  font-size: 0.8125rem;
 }
 
 .repo-label {
   color: var(--text-muted);
-  min-width: 70px;
+  min-width: 4.375rem;
   flex-shrink: 0;
 }
 
@@ -2488,14 +2488,14 @@ async function onToggleSystemTitleBar(v: boolean) {
 .repo-warning {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
+  gap: 0.5rem;
+  padding: 0.625rem 0.875rem;
   background: var(--el-color-warning-light-9);
   border: 1px solid var(--el-color-warning-light-5);
-  border-radius: 6px;
-  margin-bottom: 14px;
+  border-radius: 0.375rem;
+  margin-bottom: 0.875rem;
   color: var(--el-color-warning-dark-2);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.5;
 }
 
@@ -2503,32 +2503,32 @@ async function onToggleSystemTitleBar(v: boolean) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .repo-actions-left {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 /* Sync status */
 .sync-status {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 14px;
+  gap: 0.375rem;
+  margin-bottom: 0.875rem;
 }
 
 .sync-status-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
 }
 
 .sync-label {
   color: var(--text-muted);
-  min-width: 70px;
+  min-width: 4.375rem;
   flex-shrink: 0;
 }
 
@@ -2537,9 +2537,9 @@ async function onToggleSystemTitleBar(v: boolean) {
 }
 
 .sync-tag {
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 10px;
+  font-size: 0.6875rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.625rem;
   font-weight: 500;
 }
 
@@ -2562,32 +2562,32 @@ async function onToggleSystemTitleBar(v: boolean) {
 }
 
 .sync-actions-row {
-  margin-bottom: 14px;
+  margin-bottom: 0.875rem;
 }
 
 .sync-auto-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding-top: 14px;
+  gap: 0.625rem;
+  padding-top: 0.875rem;
   border-top: 1px solid var(--border-subtle);
 }
 
 .sync-auto-label {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-primary);
 }
 
 .sync-auto-desc {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-muted);
   flex: 1;
 }
 
 .model-fetch-row {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   width: 100%;
 }
 .model-autocomplete {
@@ -2598,55 +2598,55 @@ async function onToggleSystemTitleBar(v: boolean) {
 .inline-add-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
   width: 100%;
 }
 .inline-add-btn {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
 }
 
 .about-update-actions {
-  margin-top: 20px;
+  margin-top: 1.25rem;
 }
 .about-auto-check {
-  margin-top: 12px;
-  font-size: 13px;
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
   font-family: var(--font-ui);
 }
 .about-update-source {
-  margin-top: 10px;
+  margin-top: 0.625rem;
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
   font-family: var(--font-ui);
 }
 .about-update-source-select {
-  width: 190px;
+  width: 11.875rem;
 }
 
 .kb-key {
   display: inline-block;
-  padding: 2px 8px;
+  padding: 0.125rem 0.5rem;
   background: var(--bg-overlay);
   border: 1px solid var(--border-subtle);
-  border-radius: 4px;
+  border-radius: 0.25rem;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-primary);
 }
 
 .kb-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 .kb-table th, .kb-table td {
-  padding: 10px 12px;
+  padding: 0.625rem 0.75rem;
   text-align: left;
   border-bottom: 1px solid var(--border-subtle);
 }
@@ -2654,7 +2654,7 @@ async function onToggleSystemTitleBar(v: boolean) {
 .kb-table th {
   color: var(--text-muted);
   font-weight: 500;
-  font-size: 12px;
+  font-size: 0.75rem;
   text-transform: uppercase;
 }
 
@@ -2663,23 +2663,23 @@ async function onToggleSystemTitleBar(v: boolean) {
 }
 
 .kb-hint {
-  margin-top: 2px;
-  font-size: 12px;
+  margin-top: 0.125rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
 }
 
 .kb-modifier-note {
-  margin: 0 0 10px;
+  margin: 0 0 0.625rem;
 }
 
 .kb-actions {
   display: flex;
-  gap: 6px;
+  gap: 0.375rem;
 }
 
-.bg-image-row { display: flex; align-items: center; gap: 8px; }
+.bg-image-row { display: flex; align-items: center; gap: 0.5rem; }
 .bg-thumb {
-  width: 64px; height: 40px; border-radius: 4px;
+  width: 4rem; height: 2.5rem; border-radius: 0.25rem;
   background-size: cover; background-position: center;
   border: 1px solid var(--border-subtle);
 }

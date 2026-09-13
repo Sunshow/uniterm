@@ -1277,7 +1277,7 @@ async function doDelete(config: ConnectionConfig | null) {
 
 <style scoped>
 .start-tab {
-  padding: 32px 64px 32px 64px;
+  padding: 2rem 4rem 2rem 4rem;
   height: 100%;
   overflow-y: auto;
   outline: none;
@@ -1289,32 +1289,32 @@ async function doDelete(config: ConnectionConfig | null) {
 
 .start-brand {
   text-align: center;
-  font-size: 32px;
+  font-size: 2rem;
   font-weight: 700;
   color: var(--accent);
-  margin-top: 64px;
-  margin-bottom: 36px;
+  margin-top: 4rem;
+  margin-bottom: 2.25rem;
   user-select: none;
 }
 
 .start-search-row {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
 }
 
 .start-filter-btn {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 8px 12px;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   background: var(--bg-surface);
   color: var(--text-secondary);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 0.8125rem;
   white-space: nowrap;
   user-select: none;
 }
@@ -1333,7 +1333,7 @@ async function doDelete(config: ConnectionConfig | null) {
 .start-search-input .el-input__wrapper {
   background-color: var(--bg-surface) !important;
   box-shadow: 0 0 0 1px var(--border-subtle) inset !important;
-  padding: 4px 14px !important;
+  padding: 0.25rem 0.875rem !important;
   border-radius: var(--radius-md) !important;
 }
 .start-search-input .el-input__wrapper.is-focus {
@@ -1341,7 +1341,7 @@ async function doDelete(config: ConnectionConfig | null) {
 }
 .start-search-input .el-input__inner {
   font-family: inherit !important;
-  font-size: 13px !important;
+  font-size: 0.8125rem !important;
   color: var(--text-primary) !important;
 }
 .start-search-input .el-input__inner::placeholder {
@@ -1350,22 +1350,22 @@ async function doDelete(config: ConnectionConfig | null) {
 
 .start-action-btns {
   display: flex;
-  gap: 10px;
-  margin-bottom: 28px;
+  gap: 0.625rem;
+  margin-bottom: 1.75rem;
   align-items: flex-start;
 }
 
 .start-action-btn {
-  padding: 8px 20px;
+  padding: 0.5rem 1.25rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   background: var(--bg-surface);
   color: var(--text-secondary);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 0.8125rem;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
   transition: background 0.15s;
 }
 .start-action-btn:hover {
@@ -1391,7 +1391,7 @@ async function doDelete(config: ConnectionConfig | null) {
 }
 
 .start-action-btn-dropdown-arrow {
-  padding: 8px 10px;
+  padding: 0.5rem 0.625rem;
   border: 1px solid var(--border-subtle);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   background: var(--bg-surface);
@@ -1410,9 +1410,9 @@ async function doDelete(config: ConnectionConfig | null) {
 .start-breadcrumb {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 10px;
-  font-size: 12px;
+  gap: 0.375rem;
+  margin-bottom: 0.625rem;
+  font-size: 0.75rem;
   color: var(--text-disabled);
 }
 .start-breadcrumb .link {
@@ -1433,21 +1433,21 @@ async function doDelete(config: ConnectionConfig | null) {
 .start-section-label {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  gap: 0.375rem;
+  font-size: 0.75rem;
   color: var(--text-disabled);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-top: 24px;
-  margin-bottom: 10px;
+  margin-top: 1.5rem;
+  margin-bottom: 0.625rem;
 }
 .start-add-group-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 0.25rem;
   cursor: pointer;
   color: var(--text-disabled);
   transition: background 0.15s, color 0.15s;
@@ -1460,13 +1460,13 @@ async function doDelete(config: ConnectionConfig | null) {
 .start-divider {
   border: none;
   border-top: 1px solid var(--border-subtle);
-  margin: 20px 0;
+  margin: 1.25rem 0;
 }
 
 .start-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 240px);
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, 15rem);
+  gap: 0.75rem;
 }
 
 .start-card {
@@ -1474,10 +1474,10 @@ async function doDelete(config: ConnectionConfig | null) {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  padding: 8px 12px;
+  padding: 0.5rem 0.75rem;
   cursor: pointer;
   transition: border-color 0.15s;
-  width: 240px;
+  width: 15rem;
 }
 .start-card:hover {
   border-color: var(--accent);
@@ -1487,11 +1487,11 @@ async function doDelete(config: ConnectionConfig | null) {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  right: 6px;
+  right: 0.375rem;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 1.75rem;
+  height: 1.75rem;
   border: none;
   background: var(--bg-elevated);
   color: var(--text-muted);
@@ -1522,7 +1522,7 @@ async function doDelete(config: ConnectionConfig | null) {
 .start-card-top {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   min-width: 0;
 }
 .start-card-top > div:last-child {
@@ -1532,14 +1532,14 @@ async function doDelete(config: ConnectionConfig | null) {
 }
 
 .start-card-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 7px;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.4375rem;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 1.375rem;
   background: var(--bg-overlay);
   color: var(--text-secondary);
 }
@@ -1559,16 +1559,16 @@ async function doDelete(config: ConnectionConfig | null) {
 
 .start-card-name {
   font-weight: 600;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 172px;
+  max-width: 10.75rem;
 }
 .start-card-meta {
-  margin-top: 3px;
-  font-size: 10px;
+  margin-top: 0.1875rem;
+  font-size: 0.625rem;
   color: var(--text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1579,11 +1579,11 @@ async function doDelete(config: ConnectionConfig | null) {
   background: transparent;
   border: 1px dashed var(--accent);
   border-radius: var(--radius-lg);
-  padding: 8px 12px;
+  padding: 0.5rem 0.75rem;
   cursor: pointer;
   transition: background 0.15s;
-  margin-top: 12px;
-  width: 240px;
+  margin-top: 0.75rem;
+  width: 15rem;
 }
 .start-quick-card.focused {
   border-style: solid;
@@ -1601,13 +1601,13 @@ async function doDelete(config: ConnectionConfig | null) {
 .start-empty-state {
   text-align: center;
   color: var(--text-disabled);
-  font-size: 14px;
-  margin-top: 48px;
+  font-size: 0.875rem;
+  margin-top: 3rem;
 }
 .empty-icon {
-  font-size: 48px;
+  font-size: 3rem;
   display: block;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
   opacity: 0.3;
 }
 

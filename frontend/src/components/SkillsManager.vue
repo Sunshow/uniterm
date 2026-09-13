@@ -211,26 +211,26 @@ onMounted(() => {
 .skills-manager {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0.625rem;
 }
 .skills-toolbar {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   align-items: center;
 }
 .skills-empty {
   color: var(--el-text-color-secondary);
-  padding: 32px 0;
+  padding: 2rem 0;
   text-align: center;
 }
 .skill-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
+  gap: 0.75rem;
+  padding: 0.75rem 0.875rem;
   background: var(--el-fill-color-lighter);
   border: 1px solid var(--el-border-color-lighter);
-  border-radius: 8px;
+  border-radius: 0.5rem;
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
 }
@@ -248,35 +248,35 @@ onMounted(() => {
 .skill-card-title {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
 }
 .skill-card-name {
   font-weight: 600;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--el-text-color-primary);
 }
 .skill-card-desc {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--el-text-color-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  margin-top: 2px;
+  margin-top: 0.125rem;
 }
 .skill-card-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
   flex-shrink: 0;
 }
 .skill-card-path {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-top: 4px;
-  font-size: 11px;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+  font-size: 0.6875rem;
   color: var(--el-text-color-placeholder);
   cursor: pointer;
   width: fit-content;

@@ -2071,47 +2071,47 @@ defineExpose({
 /* Search bar */
 .terminal-search-bar {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 0.5rem;
+  right: 0.5rem;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.25rem;
   /* 跟应用主题走（与 Zmodem 面板、终端建议弹窗等悬浮控件一致）；
      保留 88% 不透明度，让 blur 透出一点终端内容。 */
   background: color-mix(in srgb, var(--bg-surface) 88%, transparent);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(0.5rem);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 4px 6px;
+  padding: 0.25rem 0.375rem;
   z-index: 50;
 }
 .search-input {
-  width: 160px;
+  width: 10rem;
   background: transparent;
   border: none;
   outline: none;
   color: var(--text-primary);
   font-family: var(--font-ui);
-  font-size: 12px;
-  padding: 2px 4px;
+  font-size: 0.75rem;
+  padding: 0.125rem 0.25rem;
 }
 .search-input::placeholder {
   color: var(--text-muted);
 }
 .search-count {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--text-muted);
   white-space: nowrap;
-  min-width: 32px;
+  min-width: 2rem;
   text-align: center;
 }
 .search-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 1.375rem;
+  height: 1.375rem;
   background: transparent;
   border: none;
   border-radius: var(--radius-sm);
@@ -2128,11 +2128,11 @@ defineExpose({
   height: 100%;
   display: block;
   box-sizing: border-box;
-  /* 右侧不留：那 14px 的滚动条轨道本身已把文本挡开（文本右缘与轨道间还有 2px），
+  /* 右侧不留：那 0.875rem 的滚动条轨道本身已把文本挡开（文本右缘与轨道间还有 0.125rem），
      右 padding 只会把整条滚动条往左推、在轨道外侧留一条空白。 */
-  padding: 4px 0 4px 4px;
+  padding: 0.25rem 0 0.25rem 0.25rem;
 }
-/* 4px padding 那圈用终端背景色，而不是应用主题色（--bg-base）。
+/* 0.25rem padding 那圈用终端背景色，而不是应用主题色（--bg-base）。
    v5 时 xterm 把终端色内联在 .xterm-viewport 上，而它 absolute inset:0
    盖满 padding box，边缘因此自带终端色；v6 改成内联到 .xterm-scrollable-element，
    该元素止于 padding 内侧，边缘便露出 .xterm 自身的应用主题色 ——
@@ -2160,10 +2160,10 @@ defineExpose({
   pointer-events: none;
 }
 .drop-overlay span {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--text-primary);
-  padding: 12px 24px;
-  border: 2px dashed var(--border-hover);
+  padding: 0.75rem 1.5rem;
+  border: 0.125rem dashed var(--border-hover);
   border-radius: var(--radius-md);
 }
 </style>

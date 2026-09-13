@@ -1570,13 +1570,13 @@ watch(activeTab, (tab) => {
 }
 
 .tab-item {
-  padding: 8px 20px;
-  font-size: 13px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.8125rem;
   font-family: var(--font-ui);
   color: var(--text-secondary);
   cursor: pointer;
   user-select: none;
-  border-bottom: 2px solid transparent;
+  border-bottom: 0.125rem solid transparent;
   transition: all 0.15s ease;
 }
 
@@ -1601,18 +1601,18 @@ watch(activeTab, (tab) => {
 }
 
 .perf-sidebar {
-  width: 180px;
+  width: 11.25rem;
   flex-shrink: 0;
   border-right: 1px solid var(--border-subtle);
-  padding: 8px;
+  padding: 0.5rem;
   overflow-y: auto;
 }
 
 .perf-nav-item {
-  padding: 10px 12px;
+  padding: 0.625rem 0.75rem;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
   transition: background 0.12s ease;
 }
 
@@ -1625,28 +1625,28 @@ watch(activeTab, (tab) => {
 }
 
 .perf-nav-name {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   font-family: var(--font-ui);
 }
 
 .perf-nav-value {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 600;
   font-family: var(--font-mono);
-  margin: 4px 0;
+  margin: 0.25rem 0;
 }
 
 .perf-nav-bar {
-  height: 4px;
+  height: 0.25rem;
   background: var(--bg-hover);
-  border-radius: 2px;
+  border-radius: 0.125rem;
   overflow: hidden;
 }
 
 .perf-nav-bar-inner {
   height: 100%;
-  border-radius: 2px;
+  border-radius: 0.125rem;
   transition: width 0.3s ease;
 }
 
@@ -1654,20 +1654,20 @@ watch(activeTab, (tab) => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 16px 20px;
+  padding: 1rem 1.25rem;
   overflow-y: auto;
   min-height: 0;
 }
 
 .perf-big-value {
-  font-size: 48px;
+  font-size: 3rem;
   font-weight: 700;
   font-family: var(--font-mono);
-  margin-bottom: 12px;
+  margin-bottom: 0.75rem;
 }
 
 .perf-chart {
-  height: 180px;
+  height: 11.25rem;
   width: 100%;
   border-radius: var(--radius-sm);
   flex-shrink: 0;
@@ -1675,27 +1675,27 @@ watch(activeTab, (tab) => {
 
 .perf-details {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 12px;
-  margin-top: 12px;
-  padding-top: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
   border-top: 1px solid var(--border-subtle);
 }
 
 .perf-detail-item {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.125rem;
 }
 
 .detail-label {
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--text-muted);
   font-family: var(--font-ui);
 }
 
 .detail-value {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--text-primary);
   font-family: var(--font-mono);
   user-select: text;
@@ -1703,21 +1703,21 @@ watch(activeTab, (tab) => {
 
 /* Expandable per-core / per-NIC / per-disk lists */
 .perf-extras {
-  margin-top: 18px;
-  padding-top: 12px;
+  margin-top: 1.125rem;
+  padding-top: 0.75rem;
   border-top: 1px solid var(--border-subtle);
 }
 .perf-sub-toggle {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.25rem;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
   font-family: var(--font-ui);
   user-select: none;
-  padding: 2px 0 6px;
+  padding: 0.125rem 0 0.375rem;
 }
 .perf-sub-toggle:hover { color: var(--text-primary); }
 .perf-sub-toggle .chev { transition: transform 0.15s ease; }
@@ -1725,18 +1725,18 @@ watch(activeTab, (tab) => {
 .perf-sub-list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  max-height: 220px;
+  gap: 0.25rem;
+  max-height: 13.75rem;
   overflow-y: auto;
 }
 .perf-sub-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 12px;
+  gap: 0.625rem;
+  font-size: 0.75rem;
   min-width: 0;
-  padding: 1px 4px;
-  border-radius: 4px;
+  padding: 1px 0.25rem;
+  border-radius: 0.25rem;
   transition: background 0.12s ease;
 }
 .perf-sub-row:hover {
@@ -1744,7 +1744,7 @@ watch(activeTab, (tab) => {
 }
 .sub-name {
   flex: 1;
-  min-width: 60px;
+  min-width: 3.75rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1753,20 +1753,20 @@ watch(activeTab, (tab) => {
 }
 .sub-bar {
   flex: 1;
-  height: 6px;
-  max-width: 160px;
-  border-radius: 999px;
+  height: 0.375rem;
+  max-width: 10rem;
+  border-radius: 62.4375rem;
   background: var(--bg-hover);
   overflow: hidden;
 }
 .sub-fill {
   height: 100%;
-  border-radius: 999px;
+  border-radius: 62.4375rem;
   background: linear-gradient(90deg, var(--accent), var(--accent-glow));
   transition: width 0.3s ease;
 }
 .sub-val {
-  min-width: 56px;
+  min-width: 3.5rem;
   text-align: right;
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
@@ -1774,36 +1774,36 @@ watch(activeTab, (tab) => {
 }
 .sub-val.tx { color: #f59e0b; }
 .perf-sub-row.net .sub-val {
-  width: 104px;
+  width: 6.5rem;
   min-width: 0;
   text-align: right;
   white-space: nowrap;
 }
 .perf-sub-empty {
-  padding: 8px 0;
+  padding: 0.5rem 0;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 /* Processes pane */
 .processes-pane {
   flex-direction: column;
-  padding: 12px;
+  padding: 0.75rem;
 }
 
 .process-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 8px;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
   flex-shrink: 0;
 }
 
 .process-summary {
   display: flex;
-  gap: 20px;
-  padding: 8px 12px;
+  gap: 1.25rem;
+  padding: 0.5rem 0.75rem;
   background: var(--bg-elevated);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
@@ -1814,22 +1814,22 @@ watch(activeTab, (tab) => {
 .summary-item {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  min-width: 60px;
+  gap: 0.125rem;
+  min-width: 3.75rem;
   justify-content: center;
 }
 
 .summary-label {
-  font-size: 10px;
+  font-size: 0.625rem;
   color: var(--text-muted);
   font-family: var(--font-ui);
   text-transform: uppercase;
-  height: 14px;
-  line-height: 14px;
+  height: 0.875rem;
+  line-height: 0.875rem;
 }
 
 .summary-value {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--text-primary);
   font-family: var(--font-mono);
@@ -1840,8 +1840,8 @@ watch(activeTab, (tab) => {
 }
 
 .process-search {
-  width: 280px;
-  margin-bottom: 8px;
+  width: 17.5rem;
+  margin-bottom: 0.5rem;
   flex-shrink: 0;
 }
 
@@ -1856,25 +1856,25 @@ watch(activeTab, (tab) => {
 
 /* System pane */
 .system-pane {
-  padding: 20px;
+  padding: 1.25rem;
   overflow-y: auto;
 }
 
 .system-content {
-  max-width: 600px;
+  max-width: 37.5rem;
 }
 
 .system-group {
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
 }
 
 .system-group-title {
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--text-primary);
   font-family: var(--font-ui);
-  margin-bottom: 8px;
-  padding-bottom: 6px;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.375rem;
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -1887,8 +1887,8 @@ watch(activeTab, (tab) => {
 .system-row {
   display: flex;
   align-items: baseline;
-  padding: 8px 0;
-  gap: 40px;
+  padding: 0.5rem 0;
+  gap: 2.5rem;
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -1897,16 +1897,16 @@ watch(activeTab, (tab) => {
 }
 
 .system-row-label {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-muted);
   font-family: var(--font-ui);
   flex-shrink: 0;
-  width: 120px;
-  min-width: 120px;
+  width: 7.5rem;
+  min-width: 7.5rem;
 }
 
 .system-row-value {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-primary);
   font-family: var(--font-mono);
   word-break: break-all;
@@ -1921,7 +1921,7 @@ watch(activeTab, (tab) => {
   justify-content: center;
   height: 100%;
   color: var(--text-muted);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 /* Process detail drawer */
@@ -1934,14 +1934,14 @@ watch(activeTab, (tab) => {
 .process-detail .detail-section {
   flex: 1;
   overflow-y: auto;
-  padding: 0 16px;
+  padding: 0 1rem;
 }
 
 .process-detail .detail-row {
   display: flex;
-  padding: 10px 0;
+  padding: 0.625rem 0;
   border-bottom: 1px solid var(--border-subtle);
-  gap: 12px;
+  gap: 0.75rem;
 }
 
 .process-detail .detail-row:last-child {
@@ -1949,16 +1949,16 @@ watch(activeTab, (tab) => {
 }
 
 .process-detail .detail-label {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-muted);
   font-family: var(--font-ui);
   flex-shrink: 0;
-  width: 100px;
-  min-width: 100px;
+  width: 6.25rem;
+  min-width: 6.25rem;
 }
 
 .process-detail .detail-value {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-primary);
   font-family: var(--font-mono);
   word-break: break-all;
@@ -1974,16 +1974,16 @@ watch(activeTab, (tab) => {
 .process-detail .io-stats {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.125rem;
 }
 
 .process-detail .detail-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
-  padding: 12px 16px;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
   border-top: 1px solid var(--border-subtle);
-  margin-top: 12px;
+  margin-top: 0.75rem;
 }
 
 .process-detail-empty {
@@ -1992,7 +1992,7 @@ watch(activeTab, (tab) => {
   justify-content: center;
   height: 100%;
   color: var(--text-muted);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 /* Detail drawer (inside monitor-tab) */
@@ -2016,7 +2016,7 @@ watch(activeTab, (tab) => {
   top: 0;
   right: 0;
   bottom: 0;
-  width: 420px;
+  width: 26.25rem;
   background: var(--bg-elevated);
   border-left: 1px solid var(--border-subtle);
   transform: translateX(100%);
@@ -2034,13 +2034,13 @@ watch(activeTab, (tab) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border-subtle);
   flex-shrink: 0;
 }
 
 .detail-drawer-title {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--text-primary);
   font-family: var(--font-ui);
@@ -2051,13 +2051,13 @@ watch(activeTab, (tab) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
+  padding: 0.5rem 0.75rem;
   flex-shrink: 0;
-  gap: 12px;
+  gap: 0.75rem;
 }
 
 .od-search {
-  width: 240px;
+  width: 15rem;
 }
 
 .ports-pane,
@@ -2103,8 +2103,8 @@ watch(activeTab, (tab) => {
 .health-cards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  padding: 0 12px;
+  gap: 0.75rem;
+  padding: 0 0.75rem;
 }
 
 .health-card {
@@ -2117,13 +2117,13 @@ watch(activeTab, (tab) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
   flex-shrink: 0;
 }
 
 .health-card-title {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -2131,16 +2131,16 @@ watch(activeTab, (tab) => {
 .health-card-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .health-search {
-  width: 180px;
+  width: 11.25rem;
 }
 
 .health-card-body {
-  padding: 0 12px 10px;
-  min-height: 24px;
+  padding: 0 0.75rem 0.625rem;
+  min-height: 1.5rem;
 }
 
 .health-bottom {
@@ -2151,7 +2151,7 @@ watch(activeTab, (tab) => {
 }
 
 .health-bottom-hint {
-  padding: 0 12px 12px;
+  padding: 0 0.75rem 0.75rem;
 }
 
 /* Single-column label/value grid for FRU and IPMI LAN blocks */
@@ -2168,7 +2168,7 @@ watch(activeTab, (tab) => {
 .health-hint {
   flex: 1;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 /* Service drawer: detail/logs tabs and the k8s-style log viewer */
@@ -2178,7 +2178,7 @@ watch(activeTab, (tab) => {
   top: 0;
   left: 0;
   bottom: 0;
-  width: 5px;
+  width: 0.3125rem;
   cursor: col-resize;
   z-index: 101;
   background: transparent;
@@ -2191,19 +2191,19 @@ watch(activeTab, (tab) => {
 
 .svc-drawer-tabs {
   display: flex;
-  gap: 4px;
-  padding: 0 12px;
+  gap: 0.25rem;
+  padding: 0 0.75rem;
   border-bottom: 1px solid var(--border-subtle);
   flex-shrink: 0;
 }
 
 .svc-tab {
-  padding: 8px 10px;
-  font-size: 12px;
+  padding: 0.5rem 0.625rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   cursor: pointer;
   user-select: none;
-  border-bottom: 2px solid transparent;
+  border-bottom: 0.125rem solid transparent;
 }
 
 .svc-tab.active {
@@ -2233,8 +2233,8 @@ watch(activeTab, (tab) => {
 .svc-logs-toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
   flex-shrink: 0;
   /* wrap instead of squeezing controls (same as the k8s log toolbar) */
   flex-wrap: wrap;
@@ -2249,7 +2249,7 @@ watch(activeTab, (tab) => {
 }
 
 .svc-log-lines {
-  width: 60px;
+  width: 3.75rem;
   flex-shrink: 0;
 }
 
@@ -2257,9 +2257,9 @@ watch(activeTab, (tab) => {
   flex: 1;
   min-height: 0;
   overflow: auto;
-  padding: 12px;
+  padding: 0.75rem;
   font-family: var(--font-mono, monospace);
-  font-size: 12px;
+  font-size: 0.75rem;
   background: var(--bg-base);
   user-select: text;
 }
@@ -2278,7 +2278,7 @@ watch(activeTab, (tab) => {
 
 .svc-log-viewer .log-ts {
   color: var(--text-muted);
-  margin-right: 8px;
+  margin-right: 0.5rem;
 }
 
 .svc-log-viewer .log-ts:empty {

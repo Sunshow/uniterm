@@ -171,10 +171,10 @@ async function save() {
   font-family: var(--font-mono, ui-monospace, "JetBrains Mono", monospace);
 }
 .key-content-actions {
-  margin-top: 6px;
+  margin-top: 0.375rem;
 }
 .key-content-actions .el-button + .el-button {
-  margin-left: 8px;
+  margin-left: 0.5rem;
 }
 </style>
 

@@ -75,26 +75,26 @@ function cancelTransfer(t: ReturnType<typeof store.getTransfers>[number]) {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 320px;
+  width: 20rem;
   max-width: 90%;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 12px 16px;
+  padding: 0.75rem 1rem;
   z-index: 20;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(0.5rem);
   box-shadow: var(--shadow-lg);
 }
 .transfer-item + .transfer-item {
-  margin-top: 10px;
-  padding-top: 10px;
+  margin-top: 0.625rem;
+  padding-top: 0.625rem;
   border-top: 1px solid var(--border-subtle);
 }
 .transfer-header {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  gap: 0.375rem;
+  font-size: 0.75rem;
   color: var(--text-primary);
 }
 .transfer-name {
@@ -107,35 +107,35 @@ function cancelTransfer(t: ReturnType<typeof store.getTransfers>[number]) {
 .transfer-status.error { color: var(--error); }
 .transfer-status.cancelled { color: var(--text-muted); }
 .transfer-progress {
-  margin-top: 6px;
+  margin-top: 0.375rem;
 }
 .progress-bar {
-  height: 4px;
+  height: 0.25rem;
   background: var(--bg-elevated);
-  border-radius: 2px;
+  border-radius: 0.125rem;
   overflow: hidden;
 }
 .progress-fill {
   height: 100%;
   background: var(--accent);
-  border-radius: 2px;
+  border-radius: 0.125rem;
   transition: width 0.3s ease;
 }
 .progress-info {
   display: flex;
   justify-content: space-between;
-  margin-top: 4px;
-  font-size: 11px;
+  margin-top: 0.25rem;
+  font-size: 0.6875rem;
   color: var(--text-muted);
   font-family: var(--font-mono);
 }
 .transfer-actions {
-  margin-top: 6px;
+  margin-top: 0.375rem;
   text-align: right;
 }
 .cancel-btn {
-  padding: 3px 10px;
-  font-size: 11px;
+  padding: 0.1875rem 0.625rem;
+  font-size: 0.6875rem;
   background: transparent;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
@@ -147,8 +147,8 @@ function cancelTransfer(t: ReturnType<typeof store.getTransfers>[number]) {
   color: var(--error);
 }
 .transfer-complete {
-  margin-top: 4px;
-  font-size: 11px;
+  margin-top: 0.25rem;
+  font-size: 0.6875rem;
   color: var(--success);
 }
 </style>

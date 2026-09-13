@@ -354,8 +354,8 @@ onBeforeUnmount(() => {
 .container-toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
+  gap: 0.5rem;
+  padding: 0.375rem 0.625rem;
   border-bottom: 1px solid var(--el-border-color-lighter, #333);
   flex-shrink: 0;
 }
@@ -366,12 +366,12 @@ onBeforeUnmount(() => {
 
 .container-error {
   color: var(--el-color-danger, #f56);
-  padding: 12px;
+  padding: 0.75rem;
   white-space: pre-wrap;
 }
 
 .container-loading {
-  padding: 12px;
+  padding: 0.75rem;
   opacity: 0.7;
 }
 
@@ -386,16 +386,16 @@ onBeforeUnmount(() => {
   flex: 1;
 }
 
-/* Action-column cell: tighter padding + 4px gap between .btn-icon buttons
+/* Action-column cell: tighter padding + 0.25rem gap between .btn-icon buttons
    (mirrors K8sResourceList's action-cell styling). */
 .k8s-list-table :deep(.k8s-action-cell .cell) {
-  padding: 0 4px;
+  padding: 0 0.25rem;
   white-space: nowrap;
   display: flex;
   align-items: center;
 }
 .k8s-list-table :deep(.k8s-action-cell .btn-icon + .btn-icon) {
-  margin-left: 4px;
+  margin-left: 0.25rem;
 }
 
 .k8s-list-table :deep(.el-table__row) {
@@ -412,21 +412,21 @@ onBeforeUnmount(() => {
 
 .pull-actions {
   display: flex;
-  gap: 8px;
-  padding: 6px 10px;
+  gap: 0.5rem;
+  padding: 0.375rem 0.625rem;
   flex-shrink: 0;
 }
 
 .pull-log {
-  margin: 0 10px 10px;
-  padding: 8px 12px;
-  max-height: 240px;
+  margin: 0 0.625rem 0.625rem;
+  padding: 0.5rem 0.75rem;
+  max-height: 15rem;
   overflow: auto;
   background: var(--bg-surface);
   border: 1px solid var(--el-border-color-lighter, #333);
-  border-radius: var(--radius-sm, 4px);
+  border-radius: var(--radius-sm, 0.25rem);
   font-family: var(--font-mono, monospace);
-  font-size: 12px;
+  font-size: 0.75rem;
   user-select: text;
 }
 

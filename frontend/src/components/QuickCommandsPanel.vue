@@ -589,8 +589,8 @@ watch(searchQuery, (q) => {
 .qc-toolbar {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 0 10px 6px;
+  gap: 0.25rem;
+  padding: 0 0.625rem 0.375rem;
   flex-shrink: 0;
 }
 
@@ -600,13 +600,13 @@ watch(searchQuery, (q) => {
 }
 
 .qc-icon-btn {
-  width: 30px;
-  height: 30px;
+  width: 1.875rem;
+  height: 1.875rem;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 4px;
+  border-radius: 0.25rem;
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
@@ -621,20 +621,20 @@ watch(searchQuery, (q) => {
 .qc-list {
   flex: 1;
   overflow-y: auto;
-  padding: 0 8px 8px;
+  padding: 0 0.5rem 0.5rem;
 }
 
 .qc-group-header {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 10px 6px 6px;
+  gap: 0.25rem;
+  padding: 0.375rem 0.625rem 0.375rem 0.375rem;
   cursor: pointer;
   user-select: none;
   border-radius: var(--radius-sm);
   transition: background 0.12s ease;
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-secondary);
 }
 
@@ -650,7 +650,7 @@ watch(searchQuery, (q) => {
 .qc-group-arrow {
   display: inline-flex;
   align-items: center;
-  width: 16px;
+  width: 1rem;
   color: var(--text-disabled);
 }
 
@@ -663,18 +663,18 @@ watch(searchQuery, (q) => {
 .qc-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 10px;
-  min-height: 36px;
+  gap: 0.625rem;
+  padding: 0.375rem 0.625rem;
+  min-height: 2.25rem;
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all 0.12s ease;
-  margin-bottom: 2px;
+  margin-bottom: 0.125rem;
   user-select: none;
 }
 
 .qc-item.indented {
-  padding-left: 26px;
+  padding-left: 1.625rem;
 }
 
 .qc-item:hover {
@@ -697,7 +697,7 @@ watch(searchQuery, (q) => {
 }
 
 .qc-item-name {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
@@ -705,7 +705,7 @@ watch(searchQuery, (q) => {
 }
 
 .qc-item-cmd {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   font-family: var(--font-mono, 'Consolas', 'Courier New', monospace);
   white-space: nowrap;
@@ -714,30 +714,30 @@ watch(searchQuery, (q) => {
 }
 
 .qc-item-cmd-only {
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .qc-item-actions {
   display: flex;
-  gap: 2px;
+  gap: 0.125rem;
   flex-shrink: 0;
 }
 
 .qc-action-btn {
-  width: 30px;
-  height: 30px;
+  width: 1.875rem;
+  height: 1.875rem;
 }
 
 .qc-empty {
-  padding: 24px 12px;
+  padding: 1.5rem 0.75rem;
   text-align: center;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .delete-group-actions {
   display: flex;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
 }
 </style>

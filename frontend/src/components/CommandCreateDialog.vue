@@ -86,7 +86,7 @@ async function onCreate() {
 
 <style scoped>
 .command-args-hint {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--el-text-color-secondary);
   margin: 0;
   line-height: 1.5;

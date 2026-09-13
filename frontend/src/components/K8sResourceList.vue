@@ -533,18 +533,18 @@ onBeforeUnmount(() => {
 .k8s-list-toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
+  gap: 0.5rem;
+  padding: 0.375rem 0.625rem;
   border-bottom: 1px solid var(--el-border-color-lighter, #333);
   flex-shrink: 0;
 }
 .k8s-filter {
-  width: 220px;
+  width: 13.75rem;
 }
 .k8s-list-title {
   margin-left: auto;
   color: var(--text-secondary, #888);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .k8s-list-table {
   flex: 1;
@@ -564,19 +564,19 @@ onBeforeUnmount(() => {
   background: rgba(245, 108, 108, 0.12);
   color: var(--el-color-danger, #f56c6c);
 }
-/* Action-column cell: tighter cell padding + fixed 4px gap between the
-   project-standard .btn-icon buttons (24px square, from style.css .btn). */
+/* Action-column cell: tighter cell padding + fixed 0.25rem gap between the
+   project-standard .btn-icon buttons (1.5rem square, from style.css .btn). */
 .k8s-list-table :deep(.k8s-action-cell .cell) {
-  padding: 0 4px;
+  padding: 0 0.25rem;
   white-space: nowrap;
 }
 .k8s-list-table :deep(.k8s-action-cell .btn-icon + .btn-icon) {
-  margin-left: 4px;
+  margin-left: 0.25rem;
 }
 .k8s-list-err {
   color: var(--el-color-danger, #f56);
-  padding: 8px 12px;
-  font-size: 12px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
   border-bottom: 1px solid var(--el-border-color-lighter, #333);
 }
 </style>

@@ -532,14 +532,14 @@ async function onAddIndex() {
 .db-table-structure {
   height: 100%;
   overflow: auto;
-  padding: 8px;
+  padding: 0.5rem;
   position: relative;
 }
 .placeholder {
   font-family: var(--font-ui);
   color: var(--text-secondary);
   text-align: center;
-  padding: 40px 0;
+  padding: 2.5rem 0;
 }
 .loading-overlay {
   position: absolute;
@@ -554,12 +554,12 @@ async function onAddIndex() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
 }
 .spinner {
-  width: 28px;
-  height: 28px;
-  border: 3px solid var(--border-subtle);
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 0.1875rem solid var(--border-subtle);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -569,22 +569,22 @@ async function onAddIndex() {
 }
 .loading-text {
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-primary);
 }
 .section {
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 .section-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 .section-header .btn { margin-left: auto; }
 .section-title {
   font-family: var(--font-ui);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -593,12 +593,12 @@ async function onAddIndex() {
   gap: 0;
 }
 .toggle-btn {
-  padding: 5px 14px;
+  padding: 0.3125rem 0.875rem;
   border: 1px solid var(--border-subtle);
   background: var(--bg-base);
   color: var(--text-secondary);
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 0.75rem;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -624,11 +624,11 @@ async function onAddIndex() {
   opacity: 0.4;
   cursor: not-allowed;
 }
-.exec-btn { margin-top: 4px; }
+.exec-btn { margin-top: 0.25rem; }
 .idx-type {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 600;
-  padding: 1px 6px;
+  padding: 1px 0.375rem;
   border-radius: var(--radius-sm);
 }
 .idx-type-pk { color: var(--accent); }
@@ -646,12 +646,12 @@ async function onAddIndex() {
   background: var(--bg-elevated);
 }
 .el-autocomplete-suggestion__list {
-  padding: 4px 0;
+  padding: 0.25rem 0;
 }
 .el-autocomplete-suggestion__item {
   color: var(--text-primary);
-  padding: 4px 12px;
-  font-size: 13px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8125rem;
 }
 .el-autocomplete-suggestion__item:hover {
   background: var(--bg-hover);

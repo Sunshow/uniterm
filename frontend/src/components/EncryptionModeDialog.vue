@@ -89,7 +89,7 @@ function onCancel() { emit('update:visible', false) }
 </script>
 
 <style scoped>
-.encrypt-form { display: flex; flex-direction: column; gap: 4px; }
-.encrypt-hint { margin: 0 0 12px; color: var(--text-secondary); font-size: 13px; }
-.form-error { color: var(--el-color-danger); font-size: 13px; margin-top: 8px; }
+.encrypt-form { display: flex; flex-direction: column; gap: 0.25rem; }
+.encrypt-hint { margin: 0 0 0.75rem; color: var(--text-secondary); font-size: 0.8125rem; }
+.form-error { color: var(--el-color-danger); font-size: 0.8125rem; margin-top: 0.5rem; }
 </style>

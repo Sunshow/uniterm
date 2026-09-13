@@ -786,9 +786,9 @@ async function onCreateTable() {
   overflow: hidden;
 }
 .panel-header {
-  padding: 8px 12px 4px;
+  padding: 0.5rem 0.75rem 0.25rem;
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
@@ -798,20 +798,20 @@ async function onCreateTable() {
 .search-wrap {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
   flex-shrink: 0;
 }
 .search-input {
   flex: 1;
   min-width: 0;
-  padding: 4px 8px;
+  padding: 0.25rem 0.5rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   background: var(--bg-base);
   color: var(--text-primary);
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 0.75rem;
   outline: none;
   transition: border-color 0.15s ease;
 }
@@ -826,17 +826,17 @@ async function onCreateTable() {
   overflow: auto;
 }
 .tree-loading {
-  padding: 12px;
+  padding: 0.75rem;
   color: var(--text-secondary);
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 0.75rem;
   text-align: center;
 }
 .db-header {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 8px;
+  gap: 0.25rem;
+  padding: 0.375rem 0.5rem;
   cursor: pointer;
   user-select: none;
   transition: background 0.12s ease;
@@ -848,7 +848,7 @@ async function onCreateTable() {
   background: var(--bg-hover);
 }
 .db-arrow {
-  width: 12px;
+  width: 0.75rem;
   flex-shrink: 0;
   color: var(--text-muted);
   display: flex;
@@ -864,7 +864,7 @@ async function onCreateTable() {
 }
 .db-name {
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--text-primary);
   overflow: hidden;
@@ -874,8 +874,8 @@ async function onCreateTable() {
 .table-item {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 8px;
+  gap: 0.25rem;
+  padding: 0.375rem 0.5rem;
   cursor: pointer;
   user-select: none;
   transition: background 0.12s ease;
@@ -887,7 +887,7 @@ async function onCreateTable() {
   background: var(--bg-hover);
 }
 .table-icon-spacer {
-  width: 30px;
+  width: 1.875rem;
   flex-shrink: 0;
 }
 .table-icon {
@@ -896,16 +896,16 @@ async function onCreateTable() {
 }
 .table-name {
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .empty-hint {
-  padding: 4px 8px 4px 28px;
+  padding: 0.25rem 0.5rem 0.25rem 1.75rem;
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-muted);
 }
 
@@ -913,17 +913,17 @@ async function onCreateTable() {
 .confirm-body {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.5rem;
 }
 .confirm-text {
   font-family: var(--font-ui);
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--text-primary);
   margin: 0;
 }
 .confirm-hint {
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-muted);
   margin: 0;
 }

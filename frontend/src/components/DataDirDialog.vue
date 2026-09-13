@@ -88,7 +88,7 @@ function onCancel() {
 </script>
 
 <style scoped>
-.datadir-form { display: flex; flex-direction: column; gap: 4px; }
-.datadir-custom { display: flex; gap: 8px; }
-.form-error { color: var(--el-color-danger); font-size: 13px; margin-top: 8px; }
+.datadir-form { display: flex; flex-direction: column; gap: 0.25rem; }
+.datadir-custom { display: flex; gap: 0.5rem; }
+.form-error { color: var(--el-color-danger); font-size: 0.8125rem; margin-top: 0.5rem; }
 </style>

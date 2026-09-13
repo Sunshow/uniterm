@@ -161,7 +161,7 @@ function onResizeStart(e: MouseEvent) {
   position: relative;
   display: flex;
   flex-direction: column;
-  min-height: 100px;
+  min-height: 6.25rem;
   border-top: 1px solid var(--border-subtle);
   background: var(--bg-elevated);
   flex-shrink: 0;
@@ -171,7 +171,7 @@ function onResizeStart(e: MouseEvent) {
   min-height: 0;
 }
 .transfer-panel-resize {
-  height: 4px;
+  height: 0.25rem;
   cursor: ns-resize;
   flex-shrink: 0;
   background: transparent;
@@ -184,8 +184,8 @@ function onResizeStart(e: MouseEvent) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 8px 4px;
-  font-size: 12px;
+  padding: 0.375rem 0.5rem 0.25rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
   flex-shrink: 0;
@@ -197,11 +197,11 @@ function onResizeStart(e: MouseEvent) {
 .transfer-panel-actions {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 0.125rem;
 }
 .filter-icon-btn {
-  width: 26px;
-  height: 26px;
+  width: 1.625rem;
+  height: 1.625rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -228,7 +228,7 @@ function onResizeStart(e: MouseEvent) {
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   pointer-events: none;
   z-index: 0;
 }
@@ -239,18 +239,18 @@ function onResizeStart(e: MouseEvent) {
   overflow-y: auto;
 }
 .transfer-progress-bar {
-  padding: 4px 12px;
+  padding: 0.25rem 0.75rem;
   background: var(--bg-elevated);
   border-top: 1px solid var(--border-subtle);
-  max-height: 200px;
+  max-height: 12.5rem;
   overflow-y: auto;
 }
 .transfer-task {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
   padding: 0;
-  height: 26px;
+  height: 1.625rem;
 }
 .task-type {
   display: inline-flex;
@@ -259,11 +259,11 @@ function onResizeStart(e: MouseEvent) {
   flex-shrink: 0;
 }
 .task-name {
-  font-size: 11px;
+  font-size: 0.6875rem;
   line-height: 1;
   font-family: var(--font-mono);
   color: var(--text-secondary);
-  min-width: 90px;
+  min-width: 5.625rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -275,18 +275,18 @@ function onResizeStart(e: MouseEvent) {
   color: var(--text-primary);
 }
 .task-dir-detail {
-  margin-left: 4px;
+  margin-left: 0.25rem;
   color: var(--text-disabled);
 }
 .task-files {
-  padding: 2px 0 4px 18px;
+  padding: 0.125rem 0 0.25rem 1.125rem;
 }
 .task-file {
   display: flex;
   align-items: center;
-  gap: 8px;
-  height: 16px;
-  font-size: 10px;
+  gap: 0.5rem;
+  height: 1rem;
+  font-size: 0.625rem;
   line-height: 1;
   font-family: var(--font-mono);
 }
@@ -307,35 +307,35 @@ function onResizeStart(e: MouseEvent) {
   color: var(--error);
 }
 .task-file-more {
-  font-size: 10px;
+  font-size: 0.625rem;
   color: var(--text-disabled);
 }
 .task-eta {
-  font-size: 10px;
+  font-size: 0.625rem;
   line-height: 1;
   font-family: var(--font-mono);
   color: var(--text-disabled);
-  min-width: 48px;
+  min-width: 3rem;
   flex-shrink: 0;
 }
 .task-speed {
-  font-size: 10px;
+  font-size: 0.625rem;
   line-height: 1;
   font-family: var(--font-mono);
   color: var(--text-disabled);
-  min-width: 56px;
+  min-width: 3.5rem;
   flex-shrink: 0;
 }
 .task-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.25rem;
   flex-shrink: 0;
-  min-width: 52px;
-  height: 24px;
+  min-width: 3.25rem;
+  height: 1.5rem;
 }
 .status-text {
-  font-size: 10px;
+  font-size: 0.625rem;
   line-height: 1;
   color: var(--text-disabled);
   flex-shrink: 0;
@@ -351,7 +351,7 @@ function onResizeStart(e: MouseEvent) {
 <style>
 /* Progress percentage text — not scoped so it penetrates el-progress */
 .transfer-progress-bar .el-progress__text {
-  font-size: 11px !important;
+  font-size: 0.6875rem !important;
   font-family: var(--font-mono);
 }
 </style>
