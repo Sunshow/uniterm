@@ -121,20 +121,20 @@
         </div>
       </div>
       <el-input v-model="processSearch" :placeholder="t('monitor.searchProcess')" clearable class="process-search" />
-      <el-table :data="filteredProcesses" size="small" height="calc(100% - 40px)" class="process-table" @row-click="onProcessRowClick">
-        <el-table-column prop="pid" label="PID" sortable width="80" />
+      <el-table :data="filteredProcesses" size="small" height="calc(100% - 2.5rem)" class="process-table" @row-click="onProcessRowClick">
+        <el-table-column prop="pid" label="PID" sortable width="uiPx(80)" />
         <el-table-column prop="name" :label="t('monitor.processName')" sortable />
-        <el-table-column prop="user" :label="t('monitor.user')" sortable width="100" />
-        <el-table-column prop="state" :label="t('monitor.state')" sortable width="80">
+        <el-table-column prop="user" :label="t('monitor.user')" sortable width="uiPx(100)" />
+        <el-table-column prop="state" :label="t('monitor.state')" sortable width="uiPx(80)">
           <template #default="{ row }">{{ row.state ? String(row.state)[0] : '-' }}</template>
         </el-table-column>
-        <el-table-column prop="cpu" :label="t('monitor.cpu')" sortable width="90">
+        <el-table-column prop="cpu" :label="t('monitor.cpu')" sortable width="uiPx(90)">
           <template #default="{ row }">{{ row.cpu }}%</template>
         </el-table-column>
-        <el-table-column prop="mem" :label="t('monitor.mem')" sortable width="90">
+        <el-table-column prop="mem" :label="t('monitor.mem')" sortable width="uiPx(90)">
           <template #default="{ row }">{{ row.mem }}%</template>
         </el-table-column>
-        <el-table-column :label="''" width="86" align="center" class-name="proc-act-cell">
+        <el-table-column :label="''" width="uiPx(86)" align="center" class-name="proc-act-cell">
           <template #default="{ row }">
             <el-button size="small" @click.stop="onTableSignal(row, $event)">
               {{ t('monitor.sendSignal') }}
@@ -152,9 +152,9 @@
           {{ t('monitor.refresh') }}
         </el-button>
       </div>
-      <el-table :data="filteredPorts" size="small" v-loading="loadingPorts" height="calc(100% - 36px)" class="od-table">
-        <el-table-column prop="protocol" :label="t('monitor.port.protocol')" sortable width="90" />
-        <el-table-column prop="localAddr" :label="t('monitor.port.localAddr')" sortable width="160" />
+      <el-table :data="filteredPorts" size="small" v-loading="loadingPorts" height="calc(100% - 2.25rem)" class="od-table">
+        <el-table-column prop="protocol" :label="t('monitor.port.protocol')" sortable width="uiPx(90)" />
+        <el-table-column prop="localAddr" :label="t('monitor.port.localAddr')" sortable width="uiPx(160)" />
         <el-table-column prop="process" :label="t('monitor.port.process')" sortable />
       </el-table>
     </div>
@@ -167,23 +167,23 @@
           {{ t('monitor.refresh') }}
         </el-button>
       </div>
-      <el-table :data="filteredDisks" size="small" v-loading="loadingDisks" height="calc(100% - 36px)" class="od-table">
+      <el-table :data="filteredDisks" size="small" v-loading="loadingDisks" height="calc(100% - 2.25rem)" class="od-table">
         <el-table-column prop="name" :label="t('monitor.disk.name')" sortable>
           <template #default="{ row }">
             <span :style="{ paddingLeft: (row.name.match(/^ +/)?.[0].length || 0) * 6 + 'px' }">{{ row.name.trim() }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="type" :label="t('monitor.disk.type')" sortable width="90" />
+        <el-table-column prop="type" :label="t('monitor.disk.type')" sortable width="uiPx(90)" />
         <el-table-column prop="mountPoint" :label="t('monitor.disk.mountPoint')" sortable />
-        <el-table-column prop="size" :label="t('monitor.disk.size')" sortable width="100" />
-        <el-table-column prop="used" :label="t('monitor.disk.used')" sortable width="90" />
-        <el-table-column prop="usage" :label="t('monitor.disk.usage')" sortable width="100">
+        <el-table-column prop="size" :label="t('monitor.disk.size')" sortable width="uiPx(100)" />
+        <el-table-column prop="used" :label="t('monitor.disk.used')" sortable width="uiPx(90)" />
+        <el-table-column prop="usage" :label="t('monitor.disk.usage')" sortable width="uiPx(100)">
           <template #default="{ row }">{{ row.usage ? row.usage + '%' : '-' }}</template>
         </el-table-column>
-        <el-table-column prop="media" :label="t('monitor.disk.media')" sortable width="80" />
-        <el-table-column prop="fsType" :label="t('monitor.disk.fstype')" sortable width="100" />
-        <el-table-column prop="uuid" :label="t('monitor.disk.uuid')" sortable width="180" />
-        <el-table-column prop="vendor" :label="t('monitor.disk.vendor')" sortable width="120" />
+        <el-table-column prop="media" :label="t('monitor.disk.media')" sortable width="uiPx(80)" />
+        <el-table-column prop="fsType" :label="t('monitor.disk.fstype')" sortable width="uiPx(100)" />
+        <el-table-column prop="uuid" :label="t('monitor.disk.uuid')" sortable width="uiPx(180)" />
+        <el-table-column prop="vendor" :label="t('monitor.disk.vendor')" sortable width="uiPx(120)" />
         <el-table-column prop="model" :label="t('monitor.disk.model')" sortable />
       </el-table>
     </div>
@@ -196,13 +196,13 @@
           {{ t('monitor.refresh') }}
         </el-button>
       </div>
-      <el-table :data="filteredNetCards" size="small" v-loading="loadingNetCards" height="calc(100% - 36px)" class="od-table">
-        <el-table-column prop="name" :label="t('monitor.net.name')" sortable width="120" />
-        <el-table-column prop="state" :label="t('monitor.net.state')" sortable width="90" />
-        <el-table-column prop="mac" :label="t('monitor.net.mac')" sortable width="160" />
-        <el-table-column prop="speed" :label="t('monitor.net.speed')" sortable width="120" />
-        <el-table-column prop="type" :label="t('monitor.net.type')" sortable width="100" />
-        <el-table-column prop="bondMaster" :label="t('monitor.net.bond')" sortable width="120" />
+      <el-table :data="filteredNetCards" size="small" v-loading="loadingNetCards" height="calc(100% - 2.25rem)" class="od-table">
+        <el-table-column prop="name" :label="t('monitor.net.name')" sortable width="uiPx(120)" />
+        <el-table-column prop="state" :label="t('monitor.net.state')" sortable width="uiPx(90)" />
+        <el-table-column prop="mac" :label="t('monitor.net.mac')" sortable width="uiPx(160)" />
+        <el-table-column prop="speed" :label="t('monitor.net.speed')" sortable width="uiPx(120)" />
+        <el-table-column prop="type" :label="t('monitor.net.type')" sortable width="uiPx(100)" />
+        <el-table-column prop="bondMaster" :label="t('monitor.net.bond')" sortable width="uiPx(120)" />
         <el-table-column prop="ipAddrs" :label="t('monitor.net.ipAddrs')" sortable>
           <template #default="{ row }">{{ row.ipAddrs?.join(', ') || '-' }}</template>
         </el-table-column>
@@ -233,18 +233,18 @@
           {{ t('monitor.refresh') }}
         </el-button>
       </div>
-      <el-table :data="filteredServices" size="small" v-loading="loadingServices" height="calc(100% - 36px)" class="od-table" @row-click="onServiceRowClick">
-        <el-table-column prop="name" :label="t('monitor.service.name')" sortable min-width="220" />
-        <el-table-column prop="active" :label="t('monitor.service.active')" sortable width="100">
+      <el-table :data="filteredServices" size="small" v-loading="loadingServices" height="calc(100% - 2.25rem)" class="od-table" @row-click="onServiceRowClick">
+        <el-table-column prop="name" :label="t('monitor.service.name')" sortable min-width="uiPx(220)" />
+        <el-table-column prop="active" :label="t('monitor.service.active')" sortable width="uiPx(100)">
           <template #default="{ row }">
             <span class="svc-state" :class="serviceStateClass(row)">{{ row.active }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="enabled" :label="t('monitor.service.enabled')" sortable width="110">
+        <el-table-column prop="enabled" :label="t('monitor.service.enabled')" sortable width="uiPx(110)">
           <template #default="{ row }">{{ row.enabled || '-' }}</template>
         </el-table-column>
-        <el-table-column prop="description" :label="t('monitor.service.description')" min-width="220" show-overflow-tooltip />
-        <el-table-column :label="t('monitor.service.actions')" width="120" align="center">
+        <el-table-column prop="description" :label="t('monitor.service.description')" min-width="uiPx(220)" show-overflow-tooltip />
+        <el-table-column :label="t('monitor.service.actions')" width="uiPx(120)" align="center">
           <template #default="{ row }">
             <el-button size="small" @click.stop="onServiceActionMenu(row, $event)">
               {{ t('monitor.service.actions') }}
@@ -262,20 +262,20 @@
           {{ t('monitor.refresh') }}
         </el-button>
       </div>
-      <el-table :data="deviceTreeData" row-key="rowKey" :tree-props="{ children: 'children' }" size="small" v-loading="loadingDevices" height="calc(100% - 36px)" class="od-table">
-        <el-table-column prop="id" :label="t('monitor.device.slot')" sortable width="150" show-overflow-tooltip />
-        <el-table-column prop="class" :label="t('monitor.device.class')" min-width="150" show-overflow-tooltip>
+      <el-table :data="deviceTreeData" row-key="rowKey" :tree-props="{ children: 'children' }" size="small" v-loading="loadingDevices" height="calc(100% - 2.25rem)" class="od-table">
+        <el-table-column prop="id" :label="t('monitor.device.slot')" sortable width="uiPx(150)" show-overflow-tooltip />
+        <el-table-column prop="class" :label="t('monitor.device.class')" min-width="uiPx(150)" show-overflow-tooltip>
           <template #default="{ row }">
             <span v-if="row.isGroup">{{ t('monitor.device.cat.' + row.category) }} ({{ row.count }})</span>
             <span v-else>{{ row.class }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="vendor" :label="t('monitor.device.vendor')" sortable min-width="150" show-overflow-tooltip />
-        <el-table-column prop="product" :label="t('monitor.device.device')" min-width="220" show-overflow-tooltip />
-        <el-table-column prop="driver" :label="t('monitor.device.driver')" sortable width="120" show-overflow-tooltip />
-        <el-table-column prop="serial" :label="t('monitor.device.serial')" width="140" show-overflow-tooltip />
-        <el-table-column prop="capacity" :label="t('monitor.device.capacity')" sortable width="100" />
-        <el-table-column prop="rev" :label="t('monitor.device.rev')" width="90" show-overflow-tooltip />
+        <el-table-column prop="vendor" :label="t('monitor.device.vendor')" sortable min-width="uiPx(150)" show-overflow-tooltip />
+        <el-table-column prop="product" :label="t('monitor.device.device')" min-width="uiPx(220)" show-overflow-tooltip />
+        <el-table-column prop="driver" :label="t('monitor.device.driver')" sortable width="uiPx(120)" show-overflow-tooltip />
+        <el-table-column prop="serial" :label="t('monitor.device.serial')" width="uiPx(140)" show-overflow-tooltip />
+        <el-table-column prop="capacity" :label="t('monitor.device.capacity')" sortable width="uiPx(100)" />
+        <el-table-column prop="rev" :label="t('monitor.device.rev')" width="uiPx(90)" show-overflow-tooltip />
       </el-table>
     </div>
 
@@ -343,18 +343,18 @@
         <div v-if="hardwareSensors && !hardwareSensors.hasIpmi" class="health-hint health-bottom-hint">
           {{ t('monitor.health.noIpmi') }}
         </div>
-        <el-table v-if="hardwareSensors && hardwareSensors.sensors.length" :data="filteredSensors" size="small" v-loading="loadingHardwareSensors" height="calc(100% - 36px)" class="od-table health-table">
-          <el-table-column prop="name" :label="t('monitor.health.name')" sortable min-width="160" />
-          <el-table-column prop="value" :label="t('monitor.health.value')" min-width="140" />
-          <el-table-column prop="unit" :label="t('monitor.health.unit')" width="110">
+        <el-table v-if="hardwareSensors && hardwareSensors.sensors.length" :data="filteredSensors" size="small" v-loading="loadingHardwareSensors" height="calc(100% - 2.25rem)" class="od-table health-table">
+          <el-table-column prop="name" :label="t('monitor.health.name')" sortable min-width="uiPx(160)" />
+          <el-table-column prop="value" :label="t('monitor.health.value')" min-width="uiPx(140)" />
+          <el-table-column prop="unit" :label="t('monitor.health.unit')" width="uiPx(110)">
             <template #default="{ row }">{{ row.unit || '-' }}</template>
           </el-table-column>
-          <el-table-column prop="status" :label="t('monitor.health.status')" width="110">
+          <el-table-column prop="status" :label="t('monitor.health.status')" width="uiPx(110)">
             <template #default="{ row }">
               <span class="svc-state" :class="sensorStatusClass(row.status)">{{ row.status }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="source" :label="t('monitor.health.source')" width="110" />
+          <el-table-column prop="source" :label="t('monitor.health.source')" width="uiPx(110)" />
         </el-table>
       </div>
     </div>
@@ -455,7 +455,7 @@
     </div>
 
     <!-- Kill Confirmation Dialog -->
-    <el-dialog append-to-body v-model="killDialogVisible" :title="killType === 'kill' ? t('monitor.forceKill') : t('monitor.kill')" width="360px" align-center>
+    <el-dialog append-to-body v-model="killDialogVisible" :title="killType === 'kill' ? t('monitor.forceKill') : t('monitor.kill')" width="22.5rem" align-center>
       <p>{{ killMessage }}</p>
       <template #footer>
         <el-button @click="killDialogVisible = false">{{ t('common.cancel') }}</el-button>
@@ -464,7 +464,7 @@
     </el-dialog>
 
     <!-- Service Action Confirmation Dialog -->
-    <el-dialog append-to-body v-model="serviceDialogVisible" :title="serviceActionCmd ? t('monitor.service.' + serviceActionCmd) : ''" width="360px" align-center>
+    <el-dialog append-to-body v-model="serviceDialogVisible" :title="serviceActionCmd ? t('monitor.service.' + serviceActionCmd) : ''" width="22.5rem" align-center>
       <p>{{ serviceActionMessage }}</p>
       <template #footer>
         <el-button @click="serviceDialogVisible = false">{{ t('common.cancel') }}</el-button>
@@ -521,7 +521,7 @@
           @contextmenu="showContextMenu"
         >
           <div v-for="(l, i) in serviceLogLines" :key="i" class="log-line"><span class="log-ts">{{ l.ts }}</span>{{ l.msg }}</div>
-          <div v-if="!loadingServiceLogs && serviceLogLines.length === 0" class="health-hint" style="padding: 8px 0;">{{ t('monitor.service.noLogs') }}</div>
+          <div v-if="!loadingServiceLogs && serviceLogLines.length === 0" class="health-hint" style="padding: 0.5rem 0;">{{ t('monitor.service.noLogs') }}</div>
         </div>
       </div>
     </div>
@@ -559,6 +559,7 @@ import { msg } from '../services/message'
 import { Close, RefreshRight } from '@element-plus/icons-vue'
 import { ChevronRight } from '@lucide/vue'
 import { useI18n } from '../i18n'
+import { uiPx } from '../utils/uiScale'
 
 import Menu from './Menu.vue'
 import { Events } from '@wailsio/runtime'

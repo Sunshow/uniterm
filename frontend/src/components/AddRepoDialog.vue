@@ -2,11 +2,11 @@
   <el-dialog append-to-body
     v-model="visible"
     :title="t('addRepo.title')"
-    width="520px"
+    width="32.5rem"
     :close-on-click-modal="false"
     @close="handleClose"
   >
-    <el-form label-width="100px" class="add-repo-form">
+    <el-form label-width="6.25rem" class="add-repo-form">
       <el-form-item :label="t('addRepo.url')">
         <el-input
           v-model="repoUrl"

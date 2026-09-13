@@ -2,7 +2,7 @@
   <el-dialog append-to-body
     v-model="visible"
     :title="editingId ? t('tunnels.editTunnel') : t('tunnels.addTunnel')"
-    width="500px"
+    width="31.25rem"
     class="tunnel-dialog"
     @close="resetForm"
   >
@@ -24,7 +24,7 @@
       <div class="mode-desc">{{ t(`tunnels.hint.${form.mode}`) }}</div>
     </div>
 
-    <el-form :model="form" label-width="90px">
+    <el-form :model="form" label-width="5.625rem">
       <el-form-item :label="t('tunnels.name')" required>
         <el-input v-model="form.name" :placeholder="t('tunnels.namePlaceholder')" maxlength="50" />
       </el-form-item>

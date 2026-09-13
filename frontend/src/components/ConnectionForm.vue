@@ -1,5 +1,5 @@
 <template>
-  <el-dialog append-to-body v-model="visible" :title="isEdit ? t('conn.editTitle') : t('conn.newTitle')" width="700px" class="conn-dialog" @opened="onDialogOpened">
+  <el-dialog append-to-body v-model="visible" :title="isEdit ? t('conn.editTitle') : t('conn.newTitle')" width="43.75rem" class="conn-dialog" @opened="onDialogOpened">
     <div class="conn-layout">
       <!-- Left sidebar: category icons -->
       <div class="conn-categories">
@@ -33,7 +33,7 @@
 
         <!-- Form fields -->
         <div class="conn-fields">
-          <el-form :model="form" label-width="90px" @submit.prevent="onSave">
+          <el-form :model="form" label-width="5.625rem" @submit.prevent="onSave">
             <el-form-item :label="t('conn.name')">
               <div class="name-group-row">
                 <el-input v-model="form.name" :placeholder="t('conn.namePlaceholder')" class="name-input" />
@@ -165,7 +165,7 @@
               <template v-if="!keyContentRevealed">
                 <el-button size="small" @click="keyContentRevealed = true">
                   <el-icon><Eye :size="'0.875rem'" /></el-icon>
-                  <span style="margin-left: 4px">{{ t('conn.keyTextReveal') }}</span>
+                  <span style="margin-left: 0.25rem">{{ t('conn.keyTextReveal') }}</span>
                 </el-button>
               </template>
               <template v-else>
@@ -180,11 +180,11 @@
                 <div class="key-content-actions">
                   <el-button size="small" @click="keyContentRevealed = false">
                     <el-icon><EyeOff :size="'0.875rem'" /></el-icon>
-                    <span style="margin-left: 4px">{{ t('conn.keyTextHide') }}</span>
+                    <span style="margin-left: 0.25rem">{{ t('conn.keyTextHide') }}</span>
                   </el-button>
                   <el-button size="small" @click="importKeyText">
                     <el-icon><FolderOpen :size="'0.875rem'" /></el-icon>
-                    <span style="margin-left: 4px">{{ t('conn.importFromFile') }}</span>
+                    <span style="margin-left: 0.25rem">{{ t('conn.importFromFile') }}</span>
                   </el-button>
                 </div>
               </template>
@@ -216,7 +216,7 @@
             </el-form-item>
             <template v-if="form.type === 'serial'">
               <el-form-item :label="t('serial.portLabel')" required>
-                <div style="display:flex;gap:8px;width:100%">
+                <div style="display:flex;gap:0.5rem;width:100%">
                   <el-select v-model="form.serialPort" :placeholder="portPlaceholder" :disabled="serialPorts.length === 0 || serialScanning" :loading="serialScanning" style="flex:1">
                     <el-option v-for="p in serialPorts" :key="p" :label="p" :value="p" />
                   </el-select>
@@ -305,7 +305,7 @@
               </el-form-item>
 
               <el-form-item :label="t('conn.k8sContext')">
-                <div style="display: flex; align-items: center; gap: 8px; width: 100%">
+                <div style="display: flex; align-items: center; gap: 0.5rem; width: 100%">
                   <el-select v-model="form.k8sContext" filterable :placeholder="k8sContextsError || ''" :loading="k8sContextsLoading" style="flex: 1">
                     <el-option v-for="c in k8sContexts" :key="c.name" :value="c.name" :label="c.current ? c.name + ' (current)' : c.name" />
                   </el-select>
@@ -412,7 +412,7 @@
               <el-input v-model="form.dbParams" :placeholder="defaultParamsHint" style="width:100%" />
             </el-form-item>
 <el-form-item v-if="form.type === 'database' && form.dbType === 'redis'" :label="t('conn.redisKeySeparator')">
-              <el-input v-model="form.redisKeySeparator" style="width: 160px" />
+              <el-input v-model="form.redisKeySeparator" style="width: 10.0rem" />
             </el-form-item>
             <el-form-item v-if="form.type === 'ssh' || form.type === 'telnet' || form.type === 'mosh' || form.type === 'local' || form.type === 'wsl'" :label="t('conn.postLoginScript')">
               <div class="post-login-config">
@@ -535,11 +535,11 @@
             </el-form-item>
             <el-form-item v-if="form.type === 'ssh'" :label="t('conn.x11Forwarding')">
               <el-switch v-model="form.x11Forwarding" />
-              <span v-if="x11HintKey" class="field-hint" style="margin-left: 12px;">{{ t(x11HintKey) }}</span>
+              <span v-if="x11HintKey" class="field-hint" style="margin-left: 0.75rem;">{{ t(x11HintKey) }}</span>
             </el-form-item>
             <el-form-item v-if="form.type === 'ssh'" :label="t('conn.agentForwarding')">
               <el-switch v-model="form.agentForwarding" />
-              <span class="field-hint" style="margin-left: 12px;">{{ t('conn.agentForwardingDesc') }}</span>
+              <span class="field-hint" style="margin-left: 0.75rem;">{{ t('conn.agentForwardingDesc') }}</span>
             </el-form-item>
             <template v-if="form.type === 'ftp'">
               <el-form-item :label="t('conn.ftpEncryption')">
@@ -636,8 +636,8 @@
   </el-dialog>
 
   <!-- New group dialog -->
-  <el-dialog append-to-body v-model="showNewGroupDialog" :title="t('conn.newGroupTitle')" width="400px">
-    <el-form label-width="80px" @submit.prevent="confirmNewGroup">
+  <el-dialog append-to-body v-model="showNewGroupDialog" :title="t('conn.newGroupTitle')" width="25rem">
+    <el-form label-width="5rem" @submit.prevent="confirmNewGroup">
       <el-form-item :label="t('conn.groupName')">
         <el-input
           v-model="newGroupName"

@@ -2,7 +2,7 @@
   <el-dialog append-to-body
     v-model="visible"
     :title="t('deleteRepo.title')"
-    width="440px"
+    width="27.5rem"
     :close-on-click-modal="false"
     @close="handleClose"
   >

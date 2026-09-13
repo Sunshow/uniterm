@@ -3,10 +3,10 @@
     append-to-body
     :model-value="visible"
     :title="proxy ? t('settings.editProxy') : t('settings.addProxy')"
-    width="480px"
+    width="30rem"
     @update:model-value="v => emit('update:visible', v)"
   >
-    <el-form label-width="90px">
+    <el-form label-width="5.625rem">
       <el-form-item :label="t('conn.name')">
         <el-input v-model="form.name" :placeholder="t('conn.namePlaceholder')" />
       </el-form-item>

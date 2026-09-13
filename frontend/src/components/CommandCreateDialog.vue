@@ -2,10 +2,10 @@
   <el-dialog
     :model-value="true"
     :title="t('settings.commandsCreateTitle')"
-    width="540px"
+    width="33.75rem"
     @close="$emit('close')"
   >
-    <el-form label-position="right" label-width="72px" size="small">
+    <el-form label-position="right" label-width="4.5rem" size="small">
       <el-form-item :label="t('settings.commandsName')" required>
         <el-input v-model="form.name" :placeholder="t('settings.commandsNamePlaceholder')" />
       </el-form-item>

@@ -183,7 +183,7 @@
     <el-dialog append-to-body
       v-model="deleteGroupDialogVisible"
       :title="t('quickCommands.deleteGroupTitle')"
-      width="400px"
+      width="25rem"
       :close-on-click-modal="false"
     >
       <p>{{ t('quickCommands.deleteGroupDesc') }}</p>
@@ -197,7 +197,7 @@
     <el-dialog append-to-body
       v-model="groupNameDialogVisible"
       :title="renamingGroup ? t('quickCommands.renameGroup') : t('quickCommands.addGroup')"
-      width="360px"
+      width="22.5rem"
       :close-on-click-modal="false"
     >
       <el-input v-model="groupNameInput" :placeholder="t('quickCommands.groupName')" maxlength="30" @keyup.enter="doSaveGroupName" />

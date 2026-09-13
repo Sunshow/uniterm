@@ -52,10 +52,10 @@
 
     <div v-else-if="mode === 'logs'" class="logs-pane">
       <div class="logs-toolbar">
-        <el-select v-model="logContainer" size="small" style="width: 160px" @change="restartLogs">
+        <el-select v-model="logContainer" size="small" style="width: 10.0rem" @change="restartLogs">
           <el-option v-for="c in containerNames" :key="c" :label="c" :value="c" />
         </el-select>
-        <el-select v-model="logTail" size="small" style="width: 90px" @change="restartLogs">
+        <el-select v-model="logTail" size="small" style="width: 5.625rem" @change="restartLogs">
           <el-option :value="100" label="100" />
           <el-option :value="500" label="500" />
           <el-option :value="2000" label="2000" />

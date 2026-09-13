@@ -1581,13 +1581,13 @@ defineExpose({ focusInput })
   font-family: var(--font-ui);
   font-weight: 600;
   color: var(--text-primary);
-  letter-spacing: 0.5px;
 }
 .ai-actions {
   display: flex;
   gap: 0.125rem;
 }
 .ai-action-btn {
+  font-size: 0.875rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1687,6 +1687,7 @@ defineExpose({ focusInput })
   white-space: nowrap;
 }
 .ai-search-bar .search-btn {
+  font-size: 0.875rem;
   display: flex;
   align-items: center;
   justify-content: center;

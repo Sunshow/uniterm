@@ -329,7 +329,7 @@
             <div class="setting-control">
               <el-select v-model="settingsStore.settings.terminal.fontFamily" @change="settingsStore.save()">
                 <template #header>
-                  <div style="padding:4px 12px">
+                  <div style="padding:0.25rem 0.75rem">
                     <el-checkbox v-model="firstMonoOnly" @click.stop>{{ t('settings.fontMonoOnly') }}</el-checkbox>
                   </div>
                 </template>
@@ -352,7 +352,7 @@
             <div class="setting-control">
               <el-select v-model="settingsStore.settings.terminal.fallbackFont" @change="settingsStore.save()">
                 <template #header>
-                  <div style="padding:4px 12px">
+                  <div style="padding:0.25rem 0.75rem">
                     <el-checkbox v-model="secondMonoOnly" @click.stop>{{ t('settings.fontMonoOnly') }}</el-checkbox>
                   </div>
                 </template>
@@ -745,13 +745,13 @@
         <h2 class="section-title">{{ t('settings.identities') }}</h2>
         <p class="section-desc">{{ t('settings.identitiesDesc') }}</p>
         <el-button type="primary" @click="openIdentityDialog()">{{ t('settings.addIdentity') }}</el-button>
-        <el-table :data="identityStore.identities" size="small" style="margin-top: 12px">
+        <el-table :data="identityStore.identities" size="small" style="margin-top: 0.75rem">
           <el-table-column prop="name" :label="t('conn.name')" />
           <el-table-column prop="username" :label="t('conn.user')" />
           <el-table-column :label="t('conn.authType')">
             <template #default="{ row }">{{ row.authType === 'password' ? t('conn.password') : row.authType === 'keyText' ? t('conn.keyText') : t('conn.keyPath') }}</template>
           </el-table-column>
-          <el-table-column :label="t('common.actions')" width="160">
+          <el-table-column :label="t('common.actions')" width="uiPx(160)">
             <template #default="{ row }">
               <el-button size="small" @click="openIdentityDialog(row)">{{ t('common.edit') }}</el-button>
               <el-button size="small" type="danger" @click="removeIdentity(row)">{{ t('common.delete') }}</el-button>
@@ -766,13 +766,13 @@
         <h2 class="section-title">{{ t('settings.proxies') }}</h2>
         <p class="section-desc">{{ t('settings.proxiesDesc') }}</p>
         <el-button type="primary" @click="openProxyDialog()">{{ t('settings.addProxy') }}</el-button>
-        <el-table :data="proxyStore.proxies" size="small" style="margin-top: 12px">
+        <el-table :data="proxyStore.proxies" size="small" style="margin-top: 0.75rem">
           <el-table-column prop="name" :label="t('conn.name')" />
-          <el-table-column prop="kind" :label="t('conn.proxyType')" width="100" />
+          <el-table-column prop="kind" :label="t('conn.proxyType')" width="uiPx(100)" />
           <el-table-column :label="t('settings.proxyHost')">
             <template #default="{ row }">{{ row.host }}:{{ row.port }}</template>
           </el-table-column>
-          <el-table-column :label="t('settings.enabled')" width="80">
+          <el-table-column :label="t('settings.enabled')" width="uiPx(80)">
             <template #default="{ row }">
               <el-switch
                 :model-value="row.enabled !== false"
@@ -781,7 +781,7 @@
               />
             </template>
           </el-table-column>
-          <el-table-column :label="t('common.actions')" width="160">
+          <el-table-column :label="t('common.actions')" width="uiPx(160)">
             <template #default="{ row }">
               <el-button size="small" @click="openProxyDialog(row)">{{ t('common.edit') }}</el-button>
               <el-button size="small" type="danger" @click="removeProxy(row)">{{ t('common.delete') }}</el-button>
@@ -796,15 +796,15 @@
         <h2 class="section-title">{{ t('settings.tunnels') }}</h2>
         <p class="section-desc">{{ t('settings.tunnelsDesc') }}</p>
         <el-button type="primary" @click="openTunnelDialog()">{{ t('tunnels.addTunnel') }}</el-button>
-        <el-table :data="tunnelStore.tunnels" size="small" style="margin-top: 12px">
+        <el-table :data="tunnelStore.tunnels" size="small" style="margin-top: 0.75rem">
           <el-table-column prop="name" :label="t('tunnels.name')" />
-          <el-table-column :label="t('tunnels.modeCol')" width="100">
+          <el-table-column :label="t('tunnels.modeCol')" width="uiPx(100)">
             <template #default="{ row }">{{ modeName(row.mode) }}</template>
           </el-table-column>
-          <el-table-column :label="t('tunnels.listenCol')" width="120">
+          <el-table-column :label="t('tunnels.listenCol')" width="uiPx(120)">
             <template #default="{ row }">:{{ effPort(row) }}</template>
           </el-table-column>
-          <el-table-column :label="t('tunnels.statusCol')" width="120">
+          <el-table-column :label="t('tunnels.statusCol')" width="uiPx(120)">
             <template #default="{ row }">
               <el-switch
                 :model-value="statusOf(row.id) === 'running'"
@@ -813,7 +813,7 @@
               />
             </template>
           </el-table-column>
-          <el-table-column :label="t('common.actions')" width="160">
+          <el-table-column :label="t('common.actions')" width="uiPx(160)">
             <template #default="{ row }">
               <!-- Editing a running tunnel would desync the form from what's
                    actually running; edits require a stop first. -->
@@ -898,7 +898,7 @@
               <tr>
                 <th>{{ t('shortcut.colFunction') }}</th>
                 <th>{{ t('shortcut.colBinding') }}</th>
-                <th style="width:190px;">{{ t('shortcut.colActions') }}</th>
+                <th style="width:11.875rem;">{{ t('shortcut.colActions') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -1072,8 +1072,8 @@
     </div>
 
     <!-- Model Form Dialog -->
-    <el-dialog append-to-body v-model="showModelForm" :title="editingModel ? t('settings.editModel') : t('settings.newModel')" width="400px">
-      <el-form label-width="80px">
+    <el-dialog append-to-body v-model="showModelForm" :title="editingModel ? t('settings.editModel') : t('settings.newModel')" width="25rem">
+      <el-form label-width="5rem">
         <el-form-item :label="t('settings.modelName')">
           <el-input v-model="modelForm.name" />
         </el-form-item>
@@ -1144,10 +1144,10 @@
           <el-button :loading="testingConnection" @click="testConnection">
             {{ t('settings.testConnection') }}
           </el-button>
-          <span v-if="testResult != null" :class="testResult ? 'test-ok' : 'test-fail'" style="margin-left: 8px; font-size: 13px;">
+          <span v-if="testResult != null" :class="testResult ? 'test-ok' : 'test-fail'" style="margin-left: 0.5rem; font-size: 0.8125rem;">
             {{ testResult ? t('settings.testSuccess') : t('settings.testFailed') }}
           </span>
-          <span v-if="testError" style="margin-left: 8px; font-size: 12px; color: var(--error); word-break: break-all;">{{ testError }}</span>
+          <span v-if="testError" style="margin-left: 0.5rem; font-size: 0.75rem; color: var(--error); word-break: break-all;">{{ testError }}</span>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -1170,8 +1170,8 @@
     <!-- Config dialogs -->
     <DataDirDialog v-model:visible="dataDirVisible" :first-run="false" @done="onDataDirChange" />
 
-    <el-dialog append-to-body v-model="showSetupMaster" :title="t('config.setupMasterTitle')" width="440px">
-      <el-form label-width="100px" class="settings-form" @submit.prevent="doSetupMaster">
+    <el-dialog append-to-body v-model="showSetupMaster" :title="t('config.setupMasterTitle')" width="27.5rem">
+      <el-form label-width="6.25rem" class="settings-form" @submit.prevent="doSetupMaster">
         <el-form-item :label="t('encrypt.password')">
           <el-input v-model="setupPw" type="password" show-password />
         </el-form-item>
@@ -1186,8 +1186,8 @@
       </template>
     </el-dialog>
 
-    <el-dialog append-to-body v-model="showVerifyMaster" :title="t('config.verifyMasterTitle')" width="440px">
-      <el-form label-width="100px" class="settings-form" @submit.prevent="doVerifyMaster">
+    <el-dialog append-to-body v-model="showVerifyMaster" :title="t('config.verifyMasterTitle')" width="27.5rem">
+      <el-form label-width="6.25rem" class="settings-form" @submit.prevent="doVerifyMaster">
         <el-form-item :label="t('config.verifyCurrentPassword')">
           <div class="verify-field">
             <el-input v-model="verifyPw" type="password" show-password />
@@ -1202,8 +1202,8 @@
       </template>
     </el-dialog>
 
-    <el-dialog append-to-body v-model="showChangePassword" :title="t('config.changePassword')" width="440px">
-      <el-form label-width="100px" class="settings-form" @submit.prevent="doChangePassword">
+    <el-dialog append-to-body v-model="showChangePassword" :title="t('config.changePassword')" width="27.5rem">
+      <el-form label-width="6.25rem" class="settings-form" @submit.prevent="doChangePassword">
         <el-form-item :label="t('config.oldPassword')">
           <el-input v-model="oldPw" type="password" show-password />
         </el-form-item>
@@ -1260,6 +1260,7 @@ import type { Tunnel, TunnelMode } from '../stores/tunnelStore'
 import type { Identity } from '../types/identity'
 import { Browser } from '@wailsio/runtime'
 import type { Proxy } from '../types/proxy'
+import { uiPx } from '../utils/uiScale'
 
 const settingsStore = useSettingsStore()
 const syncStore = useSyncStore()

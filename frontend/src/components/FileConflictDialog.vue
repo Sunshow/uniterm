@@ -3,7 +3,7 @@
     append-to-body
     :model-value="visible"
     :title="t('sftp.dialog.conflictTitle')"
-    width="450px"
+    width="28.125rem"
     :close-on-click-modal="false"
     @update:model-value="(v: boolean) => emit('update:visible', v)"
   >

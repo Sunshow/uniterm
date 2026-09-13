@@ -200,6 +200,7 @@ function onResizeStart(e: MouseEvent) {
   gap: 0.125rem;
 }
 .filter-icon-btn {
+  font-size: 0.875rem;
   width: 1.625rem;
   height: 1.625rem;
   display: flex;

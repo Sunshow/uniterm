@@ -2,11 +2,11 @@
   <el-dialog append-to-body
     v-model="visible"
     :title="t('changePassword.title')"
-    width="480px"
+    width="30rem"
     :close-on-click-modal="false"
     @close="handleClose"
   >
-    <el-form label-width="120px" class="change-password-form">
+    <el-form label-width="7.5rem" class="change-password-form">
       <el-form-item :label="t('changePassword.current')">
         <el-input
           v-model="currentPassword"

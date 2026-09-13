@@ -72,7 +72,7 @@
     <el-dialog
       v-model="showEdit"
       :title="editCommand ? '/' + editCommand.name : ''"
-      width="600px"
+      width="37.5rem"
     >
       <div v-if="editCommand" class="command-edit">
         <el-alert
@@ -81,9 +81,9 @@
           type="info"
           :closable="false"
           show-icon
-          style="margin-bottom: 12px"
+          style="margin-bottom: 0.75rem"
         />
-        <el-form label-position="right" label-width="60px" size="small">
+        <el-form label-position="right" label-width="3.75rem" size="small">
           <el-form-item :label="t('settings.commandsDescription')">
             <el-input
               v-model="editForm.description"

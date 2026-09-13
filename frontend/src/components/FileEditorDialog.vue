@@ -22,16 +22,16 @@
     <template #footer>
       <div class="editor-footer">
         <div class="editor-opts">
-          <el-select v-model="syntaxLang" style="width: 110px" filterable>
+          <el-select v-model="syntaxLang" style="width: 6.875rem" filterable>
             <el-option v-for="l in LANG_OPTIONS" :key="l.value" :label="l.label" :value="l.value" />
           </el-select>
-          <el-select v-model="editorEncoding" style="width: 100px">
+          <el-select v-model="editorEncoding" style="width: 6.25rem">
             <el-option label="UTF-8" value="utf-8" />
             <el-option label="UTF-16 LE" value="utf-16le" />
             <el-option label="UTF-16 BE" value="utf-16be" />
             <el-option label="GBK" value="gbk" />
           </el-select>
-          <el-select v-model="editorLineEnding" style="width: 140px">
+          <el-select v-model="editorLineEnding" style="width: 8.75rem">
             <el-option label="LF (Linux/macOS)" value="lf" />
             <el-option label="CRLF (Windows)" value="crlf" />
             <el-option label="CR (old Mac)" value="cr" />

@@ -5,10 +5,10 @@
       <div class="redis-left" :style="{ width: leftWidth + 'px' }">
         <!-- Controls row -->
         <div class="redis-toolbar">
-          <el-select v-model="currentDb" size="small" style="width: 90px; flex-shrink: 0" @change="onSwitchDB">
+          <el-select v-model="currentDb" size="small" style="width: 5.625rem; flex-shrink: 0" @change="onSwitchDB">
             <el-option v-for="n in 16" :key="n-1" :label="`${n-1} (${dbSizes[n-1] ?? '?'})`" :value="n-1" />
           </el-select>
-          <el-input v-model="scanPattern" size="small" placeholder="*" style="flex: 1; min-width: 80px" @keyup.enter="onScan" />
+          <el-input v-model="scanPattern" size="small" placeholder="*" style="flex: 1; min-width: 5.0rem" @keyup.enter="onScan" />
           <button class="btn btn-ghost btn-icon btn-sm" :title="t('redis.refresh')" @click="onScan" style="flex-shrink: 0"><RefreshCw :size="'0.875rem'" /></button>
           <button class="btn btn-ghost btn-icon btn-sm" :title="treeMode ? t('redis.flatView') : t('redis.treeView')" @click="treeMode = !treeMode" style="flex-shrink: 0">
             <FolderTree :size="'0.875rem'" v-if="!treeMode" />
@@ -70,7 +70,7 @@
         <div class="redis-pagination">
           <span class="result-count">{{ t('redis.scanCount', { n: keys.length }) }}</span>
           <span style="flex:1"></span>
-          <el-select v-model="pageSize" size="small" style="width: 70px" @change="onPageSizeChange">
+          <el-select v-model="pageSize" size="small" style="width: 4.375rem" @change="onPageSizeChange">
             <el-option v-for="s in pageSizes" :key="s" :label="String(s)" :value="s" />
           </el-select>
           <button class="page-btn" :disabled="cursorStack.length === 0" @click="onPrevPage"><ChevronLeft :size="'0.875rem'" /></button>
@@ -91,9 +91,9 @@
             <div class="meta-row">
               <span class="meta-label">{{ t('redis.ttl') }}</span>
               <span class="meta-value ttl-row">
-                <el-input-number v-model="editTTL" size="small" style="width: 100px" :min="-1" controls-position="right" />
+                <el-input-number v-model="editTTL" size="small" style="width: 6.25rem" :min="-1" controls-position="right" />
                 <el-button size="small" @click="onSetTTL">{{ t('redis.setTTL') }}</el-button>
-                <span style="font-size:11px;color:var(--text-muted)">{{ t('redis.ttlHint') }}</span>
+                <span style="font-size:0.6875rem;color:var(--text-muted)">{{ t('redis.ttlHint') }}</span>
               </span>
             </div>
           </div>
@@ -107,7 +107,7 @@
             <!-- Hash Editor -->
             <template v-else-if="selectedKeyInfo?.type === 'hash'">
               <el-table :data="hashEntries" border size="small">
-                <el-table-column type="index" label="#" width="40" />
+                <el-table-column type="index" label="#" width="uiPx(40)" />
                 <el-table-column prop="field" :label="t('redis.field')">
                   <template #default="{ $index }">
                     <el-input v-model="hashEntries[$index].field" size="small" type="textarea" :rows="1" autosize />
@@ -118,77 +118,77 @@
                     <el-input v-model="hashEntries[$index].value" size="small" type="textarea" :rows="1" autosize />
                   </template>
                 </el-table-column>
-                <el-table-column width="50">
+                <el-table-column width="uiPx(50)">
                   <template #default="{ $index }">
                     <button class="btn btn-ghost btn-icon btn-sm danger" title="Delete" @click="hashEntries.splice($index, 1)"><Trash2 :size="'0.875rem'" /></button>
                   </template>
                 </el-table-column>
               </el-table>
-              <el-button size="small" style="margin-top: 4px" @click="hashEntries.push({ field: '', value: '' })"><Plus :size="'0.875rem'" /></el-button>
+              <el-button size="small" style="margin-top: 0.25rem" @click="hashEntries.push({ field: '', value: '' })"><Plus :size="'0.875rem'" /></el-button>
             </template>
 
             <!-- List Editor -->
             <template v-else-if="selectedKeyInfo?.type === 'list'">
               <el-table :data="listEntries" border size="small">
-                <el-table-column width="26" class-name="drag-col">
+                <el-table-column width="uiPx(26)" class-name="drag-col">
                   <template #default="{ $index }">
                     <span class="drag-handle" draggable="true" @dragstart="onListDragStart($index)" @dragover.prevent="onListDragOver($index)" @drop="onListDrop($index)"><GripVertical :size="'0.875rem'" /></span>
                   </template>
                 </el-table-column>
-                <el-table-column type="index" label="#" width="40" />
+                <el-table-column type="index" label="#" width="uiPx(40)" />
                 <el-table-column :label="t('redis.value')">
                   <template #default="{ $index }">
                     <el-input v-model="listEntries[$index]" size="small" type="textarea" :rows="1" autosize />
                   </template>
                 </el-table-column>
-                <el-table-column width="50">
+                <el-table-column width="uiPx(50)">
                   <template #default="{ $index }">
                     <button class="btn btn-ghost btn-icon btn-sm danger" title="Delete" @click="listEntries.splice($index, 1)"><Trash2 :size="'0.875rem'" /></button>
                   </template>
                 </el-table-column>
               </el-table>
-              <el-button size="small" style="margin-top: 4px" @click="addListItem"><Plus :size="'0.875rem'" /></el-button>
+              <el-button size="small" style="margin-top: 0.25rem" @click="addListItem"><Plus :size="'0.875rem'" /></el-button>
             </template>
 
             <!-- Set Editor -->
             <template v-else-if="selectedKeyInfo?.type === 'set'">
               <el-table :data="setEntries" border size="small">
-                <el-table-column type="index" label="#" width="40" />
+                <el-table-column type="index" label="#" width="uiPx(40)" />
                 <el-table-column :label="t('redis.member')">
                   <template #default="{ $index }">
                     <el-input v-model="setEntries[$index]" size="small" type="textarea" :rows="1" autosize />
                   </template>
                 </el-table-column>
-                <el-table-column width="50">
+                <el-table-column width="uiPx(50)">
                   <template #default="{ $index }">
                     <button class="btn btn-ghost btn-icon btn-sm danger" title="Delete" @click="setEntries.splice($index, 1)"><Trash2 :size="'0.875rem'" /></button>
                   </template>
                 </el-table-column>
               </el-table>
-              <el-button size="small" style="margin-top: 4px" @click="setEntries.push('')"><Plus :size="'0.875rem'" /></el-button>
+              <el-button size="small" style="margin-top: 0.25rem" @click="setEntries.push('')"><Plus :size="'0.875rem'" /></el-button>
             </template>
 
             <!-- ZSet Editor -->
             <template v-else-if="selectedKeyInfo?.type === 'zset'">
               <el-table :data="zsetEntries" border size="small">
-                <el-table-column type="index" label="#" width="40" />
+                <el-table-column type="index" label="#" width="uiPx(40)" />
                 <el-table-column :label="t('redis.member')">
                   <template #default="{ $index }">
                     <el-input v-model="zsetEntries[$index].member" size="small" type="textarea" :rows="1" autosize />
                   </template>
                 </el-table-column>
-                <el-table-column :label="t('redis.score')" width="100">
+                <el-table-column :label="t('redis.score')" width="uiPx(100)">
                   <template #default="{ $index }">
                     <el-input-number v-model="zsetEntries[$index].score" size="small" controls-position="right" style="width: 100%" />
                   </template>
                 </el-table-column>
-                <el-table-column width="50">
+                <el-table-column width="uiPx(50)">
                   <template #default="{ $index }">
                     <button class="btn btn-ghost btn-icon btn-sm danger" title="Delete" @click="zsetEntries.splice($index, 1)"><Trash2 :size="'0.875rem'" /></button>
                   </template>
                 </el-table-column>
               </el-table>
-              <el-button size="small" style="margin-top: 4px" @click="zsetEntries.push({ member: '', score: 0 })"><Plus :size="'0.875rem'" /></el-button>
+              <el-button size="small" style="margin-top: 0.25rem" @click="zsetEntries.push({ member: '', score: 0 })"><Plus :size="'0.875rem'" /></el-button>
             </template>
 
             <!-- Action buttons -->
@@ -204,14 +204,14 @@
     </div>
 
     <!-- New Key Dialog -->
-    <el-dialog append-to-body v-model="showNewKeyDialog" :title="t('redis.newKey')" width="500px">
-      <el-form label-width="80px">
+    <el-dialog append-to-body v-model="showNewKeyDialog" :title="t('redis.newKey')" width="31.25rem">
+      <el-form label-width="5rem">
         <el-form-item :label="t('redis.keyName')">
           <el-input v-model="newKeyName" />
         </el-form-item>
         <el-form-item :label="t('redis.ttl')" v-if="newKeyType">
-          <el-input-number v-model="newKeyTTL" :min="-1" controls-position="right" style="width: 120px" />
-          <span style="font-size:11px;color:var(--text-muted);margin-left:8px">{{ t('redis.ttlHint') }}</span>
+          <el-input-number v-model="newKeyTTL" :min="-1" controls-position="right" style="width: 7.5rem" />
+          <span style="font-size:0.6875rem;color:var(--text-muted);margin-left:0.5rem">{{ t('redis.ttlHint') }}</span>
         </el-form-item>
         <el-form-item :label="t('redis.type')">
           <el-radio-group v-model="newKeyType" @change="onNewKeyTypeChange">
@@ -236,46 +236,46 @@
               <el-table-column prop="value" :label="t('redis.value')">
                 <template #default="{ $index }"><el-input v-model="newHashEntries[$index].value" size="small" type="textarea" :rows="1" autosize /></template>
               </el-table-column>
-              <el-table-column width="50">
+              <el-table-column width="uiPx(50)">
                 <template #default="{ $index }"><button class="btn btn-ghost btn-icon btn-sm danger" title="Delete" @click="newHashEntries.splice($index, 1)"><Trash2 :size="'0.875rem'" /></button></template>
               </el-table-column>
             </el-table>
-            <el-button size="small" style="margin-top: 4px" @click="newHashEntries.push({ field: '', value: '' })"><Plus :size="'0.875rem'" /></el-button>
+            <el-button size="small" style="margin-top: 0.25rem" @click="newHashEntries.push({ field: '', value: '' })"><Plus :size="'0.875rem'" /></el-button>
           </el-form-item>
         </template>
         <!-- List: value table -->
         <template v-if="newKeyType === 'list'">
           <el-form-item :label="t('redis.entryValue')">
             <el-table :data="newListEntries" border size="small">
-              <el-table-column width="26" class-name="drag-col">
+              <el-table-column width="uiPx(26)" class-name="drag-col">
                 <template #default="{ $index }">
                   <span class="drag-handle" draggable="true" @dragstart="onNewListDragStart($index)" @dragover.prevent="onNewListDragOver($index)" @drop="onNewListDrop($index)"><GripVertical :size="'0.875rem'" /></span>
                 </template>
               </el-table-column>
-              <el-table-column type="index" label="#" width="40" />
+              <el-table-column type="index" label="#" width="uiPx(40)" />
               <el-table-column :label="t('redis.value')">
                 <template #default="{ $index }"><el-input v-model="newListEntries[$index]" size="small" type="textarea" :rows="1" autosize /></template>
               </el-table-column>
-              <el-table-column width="50">
+              <el-table-column width="uiPx(50)">
                 <template #default="{ $index }"><button class="btn btn-ghost btn-icon btn-sm danger" title="Delete" @click="newListEntries.splice($index, 1)"><Trash2 :size="'0.875rem'" /></button></template>
               </el-table-column>
             </el-table>
-            <el-button size="small" style="margin-top: 4px" @click="newListEntries.push('')"><Plus :size="'0.875rem'" /></el-button>
+            <el-button size="small" style="margin-top: 0.25rem" @click="newListEntries.push('')"><Plus :size="'0.875rem'" /></el-button>
           </el-form-item>
         </template>
         <!-- Set: member table -->
         <template v-if="newKeyType === 'set'">
           <el-form-item :label="t('redis.entryValue')">
             <el-table :data="newSetEntries" border size="small">
-              <el-table-column type="index" label="#" width="40" />
+              <el-table-column type="index" label="#" width="uiPx(40)" />
               <el-table-column :label="t('redis.member')">
                 <template #default="{ $index }"><el-input v-model="newSetEntries[$index]" size="small" type="textarea" :rows="1" autosize /></template>
               </el-table-column>
-              <el-table-column width="50">
+              <el-table-column width="uiPx(50)">
                 <template #default="{ $index }"><button class="btn btn-ghost btn-icon btn-sm danger" title="Delete" @click="newSetEntries.splice($index, 1)"><Trash2 :size="'0.875rem'" /></button></template>
               </el-table-column>
             </el-table>
-            <el-button size="small" style="margin-top: 4px" @click="newSetEntries.push('')"><Plus :size="'0.875rem'" /></el-button>
+            <el-button size="small" style="margin-top: 0.25rem" @click="newSetEntries.push('')"><Plus :size="'0.875rem'" /></el-button>
           </el-form-item>
         </template>
         <!-- ZSet: member/score table -->
@@ -285,14 +285,14 @@
               <el-table-column prop="member" :label="t('redis.member')">
                 <template #default="{ $index }"><el-input v-model="newZSetEntries[$index].member" size="small" type="textarea" :rows="1" autosize /></template>
               </el-table-column>
-              <el-table-column prop="score" :label="t('redis.score')" width="100">
+              <el-table-column prop="score" :label="t('redis.score')" width="uiPx(100)">
                 <template #default="{ $index }"><el-input-number v-model="newZSetEntries[$index].score" size="small" controls-position="right" style="width: 100%" /></template>
               </el-table-column>
-              <el-table-column width="50">
+              <el-table-column width="uiPx(50)">
                 <template #default="{ $index }"><button class="btn btn-ghost btn-icon btn-sm danger" title="Delete" @click="newZSetEntries.splice($index, 1)"><Trash2 :size="'0.875rem'" /></button></template>
               </el-table-column>
             </el-table>
-            <el-button size="small" style="margin-top: 4px" @click="newZSetEntries.push({ member: '', score: 0 })"><Plus :size="'0.875rem'" /></el-button>
+            <el-button size="small" style="margin-top: 0.25rem" @click="newZSetEntries.push({ member: '', score: 0 })"><Plus :size="'0.875rem'" /></el-button>
           </el-form-item>
         </template>
       </el-form>
@@ -310,6 +310,7 @@ import { ElMessageBox } from 'element-plus'
 import { msg } from '../services/message'
 import { Trash2, Plus, GripVertical, RefreshCw, ChevronLeft, ChevronRight, ChevronDown, Folder, FolderTree, List, Type, TableProperties, ListMinus, ListOrdered } from '@lucide/vue'
 import { useI18n } from '../i18n'
+import { uiPx } from '../utils/uiScale'
 import {
   RedisScanKeys,
   RedisGetKeyInfo,

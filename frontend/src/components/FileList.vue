@@ -93,7 +93,7 @@
         @row-dblclick="onRowDblClick"
         @row-contextmenu="onRowContextMenu"
       >
-      <el-table-column :label="t('sftp.name')" min-width="160" sortable :sort-method="sortByName" show-overflow-tooltip>
+      <el-table-column :label="t('sftp.name')" min-width="uiPx(160)" sortable :sort-method="sortByName" show-overflow-tooltip>
         <template #default="{ row }">
           <div class="name-cell" :draggable="true" @dragstart="onDragStart($event, row)">
             <el-icon v-if="isSymlink(row)"><Link :size="'0.875rem'" /></el-icon>
@@ -105,32 +105,32 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column :label="t('sftp.type')" width="90" sortable :sort-method="sortByType" show-overflow-tooltip>
+      <el-table-column :label="t('sftp.type')" width="uiPx(90)" sortable :sort-method="sortByType" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ fileTypeLabel(row) }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('sftp.modified')" width="150" sortable :sort-method="sortByTime" show-overflow-tooltip>
+      <el-table-column :label="t('sftp.modified')" width="uiPx(150)" sortable :sort-method="sortByTime" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ formatDate(row.modTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('sftp.size')" width="70" align="right" sortable :sort-method="sortBySize" show-overflow-tooltip>
+      <el-table-column :label="t('sftp.size')" width="uiPx(70)" align="right" sortable :sort-method="sortBySize" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ row.isDir ? '-' : formatSize(row.size) }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('sftp.permission')" width="110" show-overflow-tooltip>
+      <el-table-column :label="t('sftp.permission')" width="uiPx(110)" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ row.mode || '-' }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('sftp.owner')" width="100" show-overflow-tooltip>
+      <el-table-column :label="t('sftp.owner')" width="uiPx(100)" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ row.owner || '-' }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('sftp.group')" width="100" show-overflow-tooltip>
+      <el-table-column :label="t('sftp.group')" width="uiPx(100)" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ row.group || '-' }}</span>
         </template>
@@ -244,6 +244,7 @@ import PathBreadcrumb from './PathBreadcrumb.vue'
 import Menu from './Menu.vue'
 import MenuItem from './MenuItem.vue'
 import MenuDivider from './MenuDivider.vue'
+import { uiPx } from '../utils/uiScale'
 
 export interface FileItem {
   name: string
@@ -895,6 +896,7 @@ function applyBandSelection() {
 }
 /* Match the sidebar's tab / close icon-button style (transparent, 1.625rem, muted) */
 .filter-icon-btn {
+  font-size: 0.875rem;
   width: 1.625rem;
   height: 1.625rem;
   display: flex;

@@ -3,7 +3,7 @@
     :model-value="visible"
     @update:model-value="(v: boolean) => !v && onCancel()"
     :title="t('keychainLost.title')"
-    width="440px"
+    width="27.5rem"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :show-close="false"

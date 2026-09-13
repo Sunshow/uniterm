@@ -3,7 +3,7 @@
     append-to-body
     :model-value="visible"
     :title="title"
-    width="400px"
+    width="25rem"
     :close-on-click-modal="false"
     @update:model-value="(v: boolean) => emit('update:visible', v)"
     @closed="emit('closed')"

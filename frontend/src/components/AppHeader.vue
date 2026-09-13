@@ -321,7 +321,7 @@ async function onClose() {
       window.dispatchEvent(new CustomEvent('rdp:overlay-push'))
       try {
         await ElMessageBox.confirm(
-          h('div', { style: 'display:flex;flex-direction:column;gap:10px' }, [
+          h('div', { style: 'display:flex;flex-direction:column;gap:0.625rem' }, [
             h('span', t('app.closeConfirm')),
             h(ElCheckbox, {
               'onUpdate:modelValue': (v: boolean) => { dontShowAgain.value = v }

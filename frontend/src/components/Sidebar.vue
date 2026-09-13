@@ -234,7 +234,7 @@
           <div class="persist-label">{{ t('settings.fontPrimary') }}</div>
           <el-select v-model="settingsStore.settings.terminal.fontFamily" @change="settingsStore.save()">
             <template #header>
-              <div style="padding:4px 12px">
+              <div style="padding:0.25rem 0.75rem">
                 <el-checkbox v-model="fontMonoOnly" @click.stop>{{ t('settings.fontMonoOnly') }}</el-checkbox>
               </div>
             </template>
@@ -251,7 +251,7 @@
           <div class="persist-label">{{ t('settings.fontFallback') }}</div>
           <el-select v-model="settingsStore.settings.terminal.fallbackFont" @change="settingsStore.save()">
             <template #header>
-              <div style="padding:4px 12px">
+              <div style="padding:0.25rem 0.75rem">
                 <el-checkbox v-model="fallbackFontMonoOnly" @click.stop>{{ t('settings.fontMonoOnly') }}</el-checkbox>
               </div>
             </template>
@@ -371,7 +371,7 @@
     </Menu>
 
     <!-- Delete group dialog -->
-    <el-dialog append-to-body v-model="showDeleteGroupDialog" :title="t('conn.deleteGroupTitle')" width="450px">
+    <el-dialog append-to-body v-model="showDeleteGroupDialog" :title="t('conn.deleteGroupTitle')" width="28.125rem">
       <p>{{ deleteGroupPromptText }}</p>
       <template #footer>
         <el-button @click="showDeleteGroupDialog = false">{{ t('conn.deleteGroupCancel') }}</el-button>
@@ -381,7 +381,7 @@
     </el-dialog>
 
     <!-- Rename group dialog -->
-    <el-dialog append-to-body v-model="showRenameGroupDialog" :title="t('conn.renameGroup')" width="360px">
+    <el-dialog append-to-body v-model="showRenameGroupDialog" :title="t('conn.renameGroup')" width="22.5rem">
       <el-form @submit.prevent="confirmRenameGroup">
         <el-form-item :label="t('conn.groupName')">
           <el-input
@@ -398,7 +398,7 @@
     </el-dialog>
 
     <!-- Move to dialog -->
-    <el-dialog append-to-body v-model="showChangeGroupDialog" :title="t('conn.group')" width="400px">
+    <el-dialog append-to-body v-model="showChangeGroupDialog" :title="t('conn.group')" width="25rem">
       <el-tree-select
         v-model="changeGroupTargetId"
         :data="groupTreeData"
@@ -415,8 +415,8 @@
     </el-dialog>
 
     <!-- Standalone new group dialog -->
-    <el-dialog append-to-body v-model="showNewGroupDialog" :title="t('conn.newGroupTitle')" width="400px">
-      <el-form label-width="80px" @submit.prevent="confirmNewGroup">
+    <el-dialog append-to-body v-model="showNewGroupDialog" :title="t('conn.newGroupTitle')" width="25rem">
+      <el-form label-width="5rem" @submit.prevent="confirmNewGroup">
         <el-form-item :label="t('conn.groupName')">
           <el-input
             v-model="newGroupName"
@@ -443,8 +443,8 @@
     </el-dialog>
 
     <!-- New group dialog (for change group flow) -->
-    <el-dialog append-to-body v-model="showChangeNewGroupDialog" :title="t('conn.newGroupTitle')" width="400px">
-      <el-form label-width="80px" @submit.prevent="confirmChangeNewGroup">
+    <el-dialog append-to-body v-model="showChangeNewGroupDialog" :title="t('conn.newGroupTitle')" width="25rem">
+      <el-form label-width="5rem" @submit.prevent="confirmChangeNewGroup">
         <el-form-item :label="t('conn.groupName')">
           <el-input
             v-model="changeNewGroupName"
@@ -2098,6 +2098,7 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 
 .sidebar-header .icon-btn {
   margin-left: auto;
+  font-size: 0.875rem;
 }
 
 
@@ -2141,6 +2142,7 @@ defineExpose({ focusSearch, openQuickCommands, openChangeGroupFor, openChangeGro
 }
 
 .sidebar-tab {
+  font-size: 0.875rem;
   width: 1.625rem;
   height: 1.625rem;
   display: flex;

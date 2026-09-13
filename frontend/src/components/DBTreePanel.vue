@@ -105,7 +105,7 @@
     <el-dialog append-to-body
       v-model="confirmVisible"
       :title="confirmTitle"
-      width="420px"
+      width="26.25rem"
     >
       <div class="confirm-body">
         <p class="confirm-text">{{ confirmText }}</p>
@@ -121,8 +121,8 @@
     </el-dialog>
 
     <!-- New Database dialog -->
-    <el-dialog append-to-body v-model="newDbVisible" :title="t('db.newDatabase')" width="380px">
-      <el-form label-width="80px">
+    <el-dialog append-to-body v-model="newDbVisible" :title="t('db.newDatabase')" width="23.75rem">
+      <el-form label-width="5rem">
         <el-form-item :label="t('db.dbName')">
           <el-input v-model="newDbName" />
         </el-form-item>
@@ -136,8 +136,8 @@
     </el-dialog>
 
     <!-- New Table dialog -->
-    <el-dialog append-to-body v-model="newTableVisible" :title="t('db.newTable')" width="380px">
-      <el-form label-width="80px">
+    <el-dialog append-to-body v-model="newTableVisible" :title="t('db.newTable')" width="23.75rem">
+      <el-form label-width="5rem">
         <el-form-item :label="t('db.tableName')">
           <el-input v-model="newTableName" />
         </el-form-item>
@@ -156,8 +156,8 @@
     </el-dialog>
 
     <!-- Copy Table dialog -->
-    <el-dialog append-to-body v-model="copyTableVisible" :title="t('db.copyTable')" width="380px">
-      <el-form label-width="80px">
+    <el-dialog append-to-body v-model="copyTableVisible" :title="t('db.copyTable')" width="23.75rem">
+      <el-form label-width="5rem">
         <el-form-item :label="t('db.sourceTable')">
           <el-input :model-value="copySourceTable" disabled />
         </el-form-item>
@@ -545,7 +545,7 @@ function showScriptFailure(result: { failedLine: number; failedSql?: string; err
   ElMessageBox.alert(h('div', { style: 'display:flex;flex-direction:column' }, children), t('db.runSqlFile'), {
     confirmButtonText: t('common.confirm'),
     type: 'error',
-    customStyle: { maxWidth: '560px', width: '560px' },
+    customStyle: { maxWidth: '35rem', width: '35rem' },
   }).catch(() => {})
 }
 
@@ -792,7 +792,6 @@ async function onCreateTable() {
   font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
   flex-shrink: 0;
 }
 .search-wrap {

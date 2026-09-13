@@ -3,10 +3,10 @@
     append-to-body
     :model-value="visible"
     :title="identity ? t('settings.editIdentity') : t('settings.addIdentity')"
-    width="480px"
+    width="30rem"
     @update:model-value="v => emit('update:visible', v)"
   >
-    <el-form label-width="90px">
+    <el-form label-width="5.625rem">
       <el-form-item :label="t('conn.name')">
         <el-input v-model="form.name" :placeholder="t('conn.namePlaceholder')" />
       </el-form-item>
@@ -44,7 +44,7 @@
           <template v-if="!keyContentRevealed">
             <el-button size="small" @click="keyContentRevealed = true">
               <el-icon><Eye :size="'0.875rem'" /></el-icon>
-              <span style="margin-left: 4px">{{ t('conn.keyTextReveal') }}</span>
+              <span style="margin-left: 0.25rem">{{ t('conn.keyTextReveal') }}</span>
             </el-button>
           </template>
           <template v-else>
@@ -59,11 +59,11 @@
             <div class="key-content-actions">
               <el-button size="small" @click="keyContentRevealed = false">
                 <el-icon><EyeOff :size="'0.875rem'" /></el-icon>
-                <span style="margin-left: 4px">{{ t('conn.keyTextHide') }}</span>
+                <span style="margin-left: 0.25rem">{{ t('conn.keyTextHide') }}</span>
               </el-button>
               <el-button size="small" @click="importKeyText">
                 <el-icon><FolderOpen :size="'0.875rem'" /></el-icon>
-                <span style="margin-left: 4px">{{ t('conn.importFromFile') }}</span>
+                <span style="margin-left: 0.25rem">{{ t('conn.importFromFile') }}</span>
               </el-button>
             </div>
           </template>

@@ -2,11 +2,11 @@
   <el-dialog append-to-body
     v-model="visible"
     :title="t('editRepo.title')"
-    width="520px"
+    width="32.5rem"
     :close-on-click-modal="false"
     @close="handleClose"
   >
-    <el-form label-width="120px" class="edit-repo-form">
+    <el-form label-width="7.5rem" class="edit-repo-form">
       <el-form-item :label="t('editRepo.url')">
         <div class="locked-field">
           <span class="locked-value">{{ syncStore.config.repoUrl }}</span>

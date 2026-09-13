@@ -1135,7 +1135,7 @@ async function closeTab(tabId: string, opts: { skipConfirm?: boolean } = {}) {
         RDPHideForOverlay()
         try {
           await ElMessageBox.confirm(
-            h('div', { style: 'display:flex;flex-direction:column;gap:10px' }, [
+            h('div', { style: 'display:flex;flex-direction:column;gap:0.625rem' }, [
               h('span', t('tab.closeConnectedConfirm')),
               h(ElCheckbox, {
                 'onUpdate:modelValue': (v: boolean) => { dontShowAgain.value = v }
@@ -1265,7 +1265,7 @@ async function closeTabBatch(tabIds: string[]) {
     const dontShowAgain = ref(false)
     try {
       await ElMessageBox.confirm(
-        h('div', { style: 'display:flex;flex-direction:column;gap:10px' }, [
+        h('div', { style: 'display:flex;flex-direction:column;gap:0.625rem' }, [
           h('span', t('tab.closeConnectedBatchConfirm', { count: connectedCount })),
           h(ElCheckbox, {
             'onUpdate:modelValue': (v: boolean) => { dontShowAgain.value = v }

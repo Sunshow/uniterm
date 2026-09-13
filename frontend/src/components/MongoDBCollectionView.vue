@@ -76,7 +76,7 @@
                 :key="col"
                 :prop="col"
                 :label="col"
-                min-width="120"
+                min-width="uiPx(120)"
                 show-overflow-tooltip
               >
                 <template #default="{ row }">
@@ -86,7 +86,7 @@
                   >{{ formatCellValue(row[col]) }}</span>
                 </template>
               </el-table-column>
-              <el-table-column width="80" fixed="right">
+              <el-table-column width="uiPx(80)" fixed="right">
                 <template #default="{ row }">
                   <button class="btn btn-ghost btn-icon btn-sm" @click.stop="onRowDblClick(row)">
                     <Pencil :size="'0.875rem'" />
@@ -130,7 +130,7 @@
           <span class="loading-text">{{ t('db.loading') }}</span>
         </div>
       </div>
-      <div style="margin-bottom:8px;display:flex;justify-content:flex-end">
+      <div style="margin-bottom:0.5rem;display:flex;justify-content:flex-end">
         <button class="btn btn-default btn-sm" @click="openNewIndexDialog">
           <Plus :size="'0.875rem'" /> {{ t('db.addIndex') }}
         </button>
@@ -143,12 +143,12 @@
           </template>
         </el-table-column>
         <el-table-column prop="type" :label="t('db.colType')" />
-        <el-table-column prop="unique" label="Unique" width="80">
+        <el-table-column prop="unique" label="Unique" width="uiPx(80)">
           <template #default="{ row }">
             {{ row.unique ? '✓' : '' }}
           </template>
         </el-table-column>
-        <el-table-column width="60">
+        <el-table-column width="uiPx(60)">
           <template #default="{ row }">
             <button v-if="row.name !== '_id_'" class="btn btn-ghost btn-icon btn-sm" style="color:var(--error)" @click="dropIndex(row.name)">
               <Trash2 :size="'0.875rem'" />
@@ -159,8 +159,8 @@
     </div>
 
     <!-- Indexes sub-tab -->
-    <el-dialog append-to-body v-model="newIndexDialogVisible" :title="t('db.addIndex')" width="400px">
-      <el-form label-width="80px">
+    <el-dialog append-to-body v-model="newIndexDialogVisible" :title="t('db.addIndex')" width="25rem">
+      <el-form label-width="5rem">
         <el-form-item :label="t('db.colName')">
           <el-input v-model="newIndexName" placeholder="index_name" />
         </el-form-item>
@@ -183,14 +183,14 @@
     <el-dialog append-to-body
       v-model="docDialogVisible"
       :title="docDialogMode === 'insert' ? t('mongodb.newDocument') : t('mongodb.editDocument')"
-      width="600px"
+      width="37.5rem"
     >
       <SyntaxEditor
         v-model="docEditorText"
         lang="json"
         class="doc-editor"
       />
-      <div v-if="docEditorError" class="error-msg" style="margin-top:8px">{{ docEditorError }}</div>
+      <div v-if="docEditorError" class="error-msg" style="margin-top:0.5rem">{{ docEditorError }}</div>
       <template #footer>
         <el-button @click="docDialogVisible = false">{{ t('settings.cancel') }}</el-button>
         <el-button type="primary" :loading="docSaving" @click="saveDocument">{{ t('redis.save') }}</el-button>
@@ -206,6 +206,7 @@ import { ElMessageBox } from 'element-plus'
 import { useI18n } from '../i18n'
 import { msg } from '../services/message'
 import { chat } from '../services/llm'
+import { uiPx } from '../utils/uiScale'
 import {
   MongoFind,
   MongoInsertOne,

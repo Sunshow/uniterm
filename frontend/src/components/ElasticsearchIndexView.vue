@@ -81,7 +81,7 @@
                 :key="col"
                 :prop="col"
                 :label="col"
-                min-width="120"
+                min-width="uiPx(120)"
                 show-overflow-tooltip
               >
                 <template #default="{ row }">
@@ -91,7 +91,7 @@
                   >{{ formatCellValue(row[col]) }}</span>
                 </template>
               </el-table-column>
-              <el-table-column width="80" fixed="right">
+              <el-table-column width="uiPx(80)" fixed="right">
                 <template #default="{ row }">
                   <button class="btn btn-ghost btn-icon btn-sm" @click.stop="onRowDblClick(row)">
                     <Pencil :size="'0.875rem'" />
@@ -141,10 +141,10 @@
     <el-dialog
       v-model="docDialogVisible"
       :title="docDialogMode === 'create' ? t('es.newDocument') : t('es.editDocument')"
-      width="640px"
+      width="40rem"
       destroy-on-close
     >
-      <el-form label-width="80px">
+      <el-form label-width="5rem">
         <el-form-item v-if="docDialogMode === 'create'" :label="t('es.documentId')">
           <el-input v-model="docEditId" :placeholder="t('es.documentIdAuto')" />
         </el-form-item>
@@ -166,6 +166,7 @@ import { Pencil, Trash2, Plus } from '@lucide/vue'
 import { ElMessageBox } from 'element-plus'
 import { useI18n } from '../i18n'
 import { msg } from '../services/message'
+import { uiPx } from '../utils/uiScale'
 import {
   EsSearch,
   EsGetMapping,

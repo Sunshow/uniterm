@@ -5,7 +5,7 @@
         v-if="session?.runtime === 'nerdctl'"
         :model-value="session.namespace"
         size="small"
-        style="width: 140px"
+        style="width: 8.75rem"
         filterable
         allow-create
         @change="onNamespaceChange"
@@ -17,7 +17,7 @@
         size="small"
         :placeholder="t('k8s.filter')"
         clearable
-        style="width: 200px"
+        style="width: 12.5rem"
       />
       <div class="toolbar-spacer" />
       <el-button size="small" @click="createOpen = true">{{ t('container.create') }}</el-button>
@@ -36,22 +36,22 @@
         <el-table
           :data="filteredContainers"
           size="small"
-          height="calc(100% - 40px)"
+          height="calc(100% - 2.5rem)"
           class="k8s-list-table"
           border
           @row-click="openDetail"
         >
-          <el-table-column :label="t('container.colName')" min-width="180" sortable :sort-method="(a, b) => a.name.localeCompare(b.name)" show-overflow-tooltip>
+          <el-table-column :label="t('container.colName')" min-width="uiPx(180)" sortable :sort-method="(a, b) => a.name.localeCompare(b.name)" show-overflow-tooltip>
             <template #default="{ row }">
               <span>{{ row.name }}</span>
             </template>
           </el-table-column>
-          <el-table-column :label="t('container.colImage')" min-width="220" sortable :sort-method="(a, b) => a.image.localeCompare(b.image)" show-overflow-tooltip>
+          <el-table-column :label="t('container.colImage')" min-width="uiPx(220)" sortable :sort-method="(a, b) => a.image.localeCompare(b.image)" show-overflow-tooltip>
             <template #default="{ row }">{{ row.image }}</template>
           </el-table-column>
           <el-table-column
             :label="t('container.colState')"
-            width="110"
+            width="uiPx(110)"
             sortable
             :sort-method="(a, b) => a.state.localeCompare(b.state)"
             :filters="stateFilters"
@@ -61,13 +61,13 @@
               <span :data-state="row.state" class="container-state">{{ row.state }}</span>
             </template>
           </el-table-column>
-          <el-table-column :label="t('container.colPorts')" min-width="160" sortable :sort-method="(a, b) => a.ports.localeCompare(b.ports)" show-overflow-tooltip>
+          <el-table-column :label="t('container.colPorts')" min-width="uiPx(160)" sortable :sort-method="(a, b) => a.ports.localeCompare(b.ports)" show-overflow-tooltip>
             <template #default="{ row }">{{ row.ports }}</template>
           </el-table-column>
-          <el-table-column :label="t('container.colCreated')" min-width="130" sortable :sort-method="(a, b) => a.createdAt.localeCompare(b.createdAt)" show-overflow-tooltip>
+          <el-table-column :label="t('container.colCreated')" min-width="uiPx(130)" sortable :sort-method="(a, b) => a.createdAt.localeCompare(b.createdAt)" show-overflow-tooltip>
             <template #default="{ row }">{{ row.createdAt }}</template>
           </el-table-column>
-          <el-table-column :label="t('container.colActions')" width="172" fixed="right" class-name="k8s-action-cell">
+          <el-table-column :label="t('container.colActions')" width="uiPx(172)" fixed="right" class-name="k8s-action-cell">
             <template #default="{ row }">
               <button class="btn btn-ghost btn-icon btn-sm" :title="t('container.exec')" @click.stop="openExec(row)">
                 <SquareTerminal :size="'0.875rem'" />
@@ -99,26 +99,26 @@
         <el-table
           :data="filteredImages"
           size="small"
-          height="calc(100% - 80px)"
+          height="calc(100% - 5.0rem)"
           class="k8s-list-table"
           border
         >
-          <el-table-column :label="t('container.colRepository')" min-width="220" sortable :sort-method="(a, b) => a.repository.localeCompare(b.repository)" show-overflow-tooltip>
+          <el-table-column :label="t('container.colRepository')" min-width="uiPx(220)" sortable :sort-method="(a, b) => a.repository.localeCompare(b.repository)" show-overflow-tooltip>
             <template #default="{ row }">{{ row.repository }}</template>
           </el-table-column>
-          <el-table-column :label="t('container.colTag')" min-width="140" sortable :sort-method="(a, b) => a.tag.localeCompare(b.tag)" show-overflow-tooltip>
+          <el-table-column :label="t('container.colTag')" min-width="uiPx(140)" sortable :sort-method="(a, b) => a.tag.localeCompare(b.tag)" show-overflow-tooltip>
             <template #default="{ row }">{{ row.tag }}</template>
           </el-table-column>
-          <el-table-column :label="t('container.colId')" width="130">
+          <el-table-column :label="t('container.colId')" width="uiPx(130)">
             <template #default="{ row }">{{ shortId(row.id) }}</template>
           </el-table-column>
-          <el-table-column :label="t('container.colSize')" width="110" sortable :sort-method="(a, b) => a.size.localeCompare(b.size)">
+          <el-table-column :label="t('container.colSize')" width="uiPx(110)" sortable :sort-method="(a, b) => a.size.localeCompare(b.size)">
             <template #default="{ row }">{{ row.size }}</template>
           </el-table-column>
-          <el-table-column :label="t('container.colCreated')" min-width="130" sortable :sort-method="(a, b) => a.createdAt.localeCompare(b.createdAt)" show-overflow-tooltip>
+          <el-table-column :label="t('container.colCreated')" min-width="uiPx(130)" sortable :sort-method="(a, b) => a.createdAt.localeCompare(b.createdAt)" show-overflow-tooltip>
             <template #default="{ row }">{{ row.createdAt }}</template>
           </el-table-column>
-          <el-table-column :label="t('container.colActions')" width="38" fixed="right" class-name="k8s-action-cell">
+          <el-table-column :label="t('container.colActions')" width="uiPx(38)" fixed="right" class-name="k8s-action-cell">
             <template #default="{ row }">
               <button class="btn btn-ghost btn-icon btn-sm danger" :title="t('container.removeImage')" @click.stop="onRemoveImage(row)">
                 <Trash2 :size="'0.875rem'" />
@@ -127,7 +127,7 @@
           </el-table-column>
         </el-table>
         <div class="pull-actions">
-          <el-input v-model="pullImage" size="small" :placeholder="t('container.pullPlaceholder')" style="width: 320px" @keyup.enter="onPull" />
+          <el-input v-model="pullImage" size="small" :placeholder="t('container.pullPlaceholder')" style="width: 20.0rem" @keyup.enter="onPull" />
           <el-button size="small" :loading="pulling" @click="onPull">{{ t('container.pull') }}</el-button>
         </div>
         <div v-if="pullLines.length" class="pull-log">
@@ -157,6 +157,7 @@ import { useI18n } from '../i18n'
 import ContainerDetailDrawer from './ContainerDetailDrawer.vue'
 import ContainerCreateDialog from './ContainerCreateDialog.vue'
 import type { ContainerImage, ContainerInfo, ContainerTab } from '../types/container'
+import { uiPx } from '../utils/uiScale'
 
 const props = defineProps<{ tab: ContainerTab }>()
 

@@ -2,7 +2,7 @@
   <el-dialog
     :model-value="updateCheck.updateDialogVisible"
     :title="t('settings.updateDialogTitle')"
-    width="540px"
+    width="33.75rem"
     :close-on-click-modal="false"
     :close-on-press-escape="!locked"
     :show-close="!locked"

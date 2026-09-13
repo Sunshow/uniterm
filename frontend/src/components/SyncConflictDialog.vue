@@ -2,7 +2,7 @@
   <el-dialog append-to-body
     v-model="visible"
     :title="t('sync.conflictTitle')"
-    width="480px"
+    width="30rem"
     :close-on-click-modal="false"
     @close="handleCancel"
   >

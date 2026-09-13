@@ -14,7 +14,7 @@
       :data="filtered"
       size="small"
       v-loading="loading"
-      height="calc(100% - 44px)"
+      height="calc(100% - 2.75rem)"
       class="object-table"
     >
       <el-table-column :label="t('db.colName')" prop="name" sortable>
@@ -25,7 +25,7 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('db.colType')" prop="type" sortable width="100">
+      <el-table-column :label="t('db.colType')" prop="type" sortable width="uiPx(100)">
         <template #default="{ row }">
           {{ row.type === 'view' ? t('db.typeView') : t('db.typeTable') }}
         </template>
@@ -33,10 +33,10 @@
       <el-table-column
         :label="t('db.colComment')"
         prop="comment"
-        min-width="160"
+        min-width="uiPx(160)"
         show-overflow-tooltip
       />
-      <el-table-column :label="t('db.actions')" width="110" align="right">
+      <el-table-column :label="t('db.actions')" width="uiPx(110)" align="right">
         <template #default="{ row }">
           <button
             v-if="row.type === 'view'"
@@ -59,7 +59,7 @@
     </el-table>
 
     <!-- Confirm dialog (type-to-confirm), mirrors the tree context menu -->
-    <el-dialog append-to-body v-model="confirmVisible" :title="confirmTitle" width="420px">
+    <el-dialog append-to-body v-model="confirmVisible" :title="confirmTitle" width="26.25rem">
       <div class="confirm-body">
         <p class="confirm-text">{{ confirmText }}</p>
         <p class="confirm-hint">{{ t('db.typeToConfirm', { name: confirmName }) }}</p>
@@ -74,8 +74,8 @@
     </el-dialog>
 
     <!-- New Table dialog -->
-    <el-dialog append-to-body v-model="newTableVisible" :title="t('db.newTable')" width="380px">
-      <el-form label-width="80px">
+    <el-dialog append-to-body v-model="newTableVisible" :title="t('db.newTable')" width="23.75rem">
+      <el-form label-width="5rem">
         <el-form-item :label="t('db.tableName')">
           <el-input v-model="newTableName" />
         </el-form-item>
@@ -97,6 +97,7 @@ import { useI18n } from '../i18n'
 import { GetTables, CreateTable, DropTable, DropView, TruncateTable } from '../../bindings/github.com/ys-ll/uniterm/app'
 import { msg } from '../services/message'
 import type { TableInfo } from '../types/database'
+import { uiPx } from '../utils/uiScale'
 
 defineOptions({ name: 'DBObjectList' })
 

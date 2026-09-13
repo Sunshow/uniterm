@@ -3,7 +3,7 @@
     append-to-body
     :model-value="visible"
     :title="t('sftp.changePermission')"
-    width="400px"
+    width="25rem"
     :close-on-click-modal="false"
     @update:model-value="(v: boolean) => emit('update:visible', v)"
     @closed="onClosed"
@@ -12,7 +12,7 @@
       <span class="chmod-filename">{{ name }}</span>
       <span v-if="owner || group" class="chmod-ownergroup">{{ owner || '-' }}:{{ group || '-' }}</span>
     </div>
-    <el-form class="chmod-form" label-width="80px">
+    <el-form class="chmod-form" label-width="5rem">
       <el-form-item label="Owner">
         <el-checkbox v-model="ownerR">Read</el-checkbox>
         <el-checkbox v-model="ownerW">Write</el-checkbox>

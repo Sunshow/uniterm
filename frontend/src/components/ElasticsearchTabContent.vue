@@ -188,7 +188,7 @@
                 class="db-result-table"
                 :empty-text="t('db.noData')"
               >
-                <el-table-column prop="name" :label="t('es.indexName')" min-width="180" show-overflow-tooltip>
+                <el-table-column prop="name" :label="t('es.indexName')" min-width="uiPx(180)" show-overflow-tooltip>
                   <template #default="{ row }">
                     <span class="object-name" @click="openIndexTab(row.name)">
                       <Layers :size="'0.875rem'" class="object-icon" />
@@ -196,16 +196,16 @@
                     </span>
                   </template>
                 </el-table-column>
-                <el-table-column prop="health" :label="t('es.health')" width="90" />
-                <el-table-column prop="status" :label="t('es.status')" width="90" />
-                <el-table-column :label="t('es.docsCount')" width="100">
+                <el-table-column prop="health" :label="t('es.health')" width="uiPx(90)" />
+                <el-table-column prop="status" :label="t('es.status')" width="uiPx(90)" />
+                <el-table-column :label="t('es.docsCount')" width="uiPx(100)">
                   <template #default="{ row }">{{ formatDocs(row.docsCount) }}</template>
                 </el-table-column>
-                <el-table-column prop="storeSize" :label="t('es.storeSize')" width="110" />
-                <el-table-column :label="t('es.shards')" width="90">
+                <el-table-column prop="storeSize" :label="t('es.storeSize')" width="uiPx(110)" />
+                <el-table-column :label="t('es.shards')" width="uiPx(90)">
                   <template #default="{ row }">{{ row.pri }} / {{ row.rep }}</template>
                 </el-table-column>
-                <el-table-column :label="t('common.actions')" width="80" align="right">
+                <el-table-column :label="t('common.actions')" width="uiPx(80)" align="right">
                   <template #default="{ row }">
                     <button
                       class="btn btn-ghost btn-icon btn-sm danger"
@@ -223,7 +223,7 @@
             <!-- REST sub-tab -->
             <div v-else class="rest-section">
               <div class="rest-toolbar">
-                <el-select v-model="restMethod" style="width:110px" size="small">
+                <el-select v-model="restMethod" style="width:6.875rem" size="small">
                   <el-option v-for="m in restMethods" :key="m" :label="m" :value="m" />
                 </el-select>
                 <input v-model="restPath" class="rest-path" placeholder="/_cluster/health" @keydown.enter="runRest" />
@@ -274,8 +274,8 @@
     </Menu>
 
     <!-- Create index dialog -->
-    <el-dialog v-model="createIndexVisible" :title="t('es.newIndex')" width="520px" destroy-on-close>
-      <el-form label-width="80px">
+    <el-dialog v-model="createIndexVisible" :title="t('es.newIndex')" width="32.5rem" destroy-on-close>
+      <el-form label-width="5rem">
         <el-form-item :label="t('es.indexName')" required>
           <el-input v-model="newIndexName" />
         </el-form-item>
@@ -302,6 +302,7 @@ import SyntaxEditor from './SyntaxEditor.vue'
 import MenuItem from './MenuItem.vue'
 import MenuDivider from './MenuDivider.vue'
 import ElasticsearchIndexView from './ElasticsearchIndexView.vue'
+import { uiPx } from '../utils/uiScale'
 import {
   EsClusterInfo,
   EsClusterHealth,

@@ -3,7 +3,7 @@
     :model-value="visible"
     @update:model-value="(v: boolean) => !v && onCancel()"
     :title="t('unlock.title')"
-    width="400px"
+    width="25rem"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :show-close="false"

@@ -3,7 +3,7 @@
     :model-value="visible"
     @update:model-value="(v: boolean) => !v && onCancel()"
     :title="title"
-    width="400px"
+    width="25rem"
     :close-on-click-modal="false"
     @opened="onDialogOpened"
   >

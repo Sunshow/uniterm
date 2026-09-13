@@ -26,7 +26,7 @@
       v-if="frame.kind === 'custom'"
       :data="crdFiltered"
       size="small"
-      height="calc(100% - 40px)"
+      height="calc(100% - 2.5rem)"
       class="k8s-list-table"
       border
       v-loading="isLoading"
@@ -37,7 +37,7 @@
         <template #default="{ row }">{{ evalJsonPath(row, pc.jsonPath) }}</template>
       </el-table-column>
       <el-table-column label="Age"><template #default="{ row }">{{ age(row.metadata?.creationTimestamp) }}</template></el-table-column>
-      <el-table-column :label="t('k8s.actions')" width="66" fixed="right" class-name="k8s-action-cell">
+      <el-table-column :label="t('k8s.actions')" width="uiPx(66)" fixed="right" class-name="k8s-action-cell">
         <template #default="{ row }">
           <button class="btn btn-ghost btn-icon btn-sm" :title="t('k8s.actionEdit')" @click.stop="emit('open-yaml', row)">
             <Pencil :size="'0.875rem'" />
@@ -54,7 +54,7 @@
       v-else
       :data="filtered"
       size="small"
-      height="calc(100% - 40px)"
+      height="calc(100% - 2.5rem)"
       class="k8s-list-table"
       border
       v-loading="isLoading"
@@ -65,7 +65,7 @@
         v-for="col in desc?.columns || []"
         :key="col.header"
         :label="col.header"
-        :width="col.width"
+        :width="uiPx(col.width)"
         sortable
         show-overflow-tooltip
         :sort-method="(a, b) => compareCells(col, a, b)"
@@ -75,7 +75,7 @@
         <template #default="{ row }">{{ cellText(col.value(row, usageOf(row))) }}</template>
       </el-table-column>
 
-      <el-table-column v-if="actionColWidth" :label="t('k8s.actions')" :width="actionColWidth" fixed="right" class-name="k8s-action-cell">
+      <el-table-column v-if="actionColWidth" :label="t('k8s.actions')" :width="uiPx(actionColWidth)" fixed="right" class-name="k8s-action-cell">
         <template #default="{ row }">
           <button v-if="has('detail')" class="btn btn-ghost btn-icon btn-sm" :title="t('k8s.actionEdit')" @click.stop="emit('open-yaml', row)">
             <Pencil :size="'0.875rem'" />
@@ -121,6 +121,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch, onBeforeUnmount, h } from 'vue'
+import { uiPx } from '../utils/uiScale'
 import {
   ElTable, ElTableColumn, ElInput, ElButton,
   ElMessageBox, ElMessage, ElCheckbox,
@@ -335,7 +336,7 @@ async function confirmDelete(kind: string, name: string): Promise<boolean> {
     confirmButtonText: t('common.confirm'),
     cancelButtonText: t('common.cancel'),
     message: () => h('div', [
-      h('p', { style: 'margin: 0 0 8px' }, t('k8s.deleteConfirm', { kind, name })),
+      h('p', { style: 'margin: 0 0 0.5rem' }, t('k8s.deleteConfirm', { kind, name })),
       h(ElCheckbox, {
         modelValue: force.value,
         'onUpdate:modelValue': (v: any) => { force.value = !!v },

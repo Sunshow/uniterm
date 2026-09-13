@@ -152,7 +152,7 @@
                 class="db-result-table"
                 :empty-text="t('db.noData')"
               >
-                <el-table-column :label="t('mongodb.collection')" min-width="240" show-overflow-tooltip>
+                <el-table-column :label="t('mongodb.collection')" min-width="uiPx(240)" show-overflow-tooltip>
                   <template #default="{ row }">
                     <span class="object-name" @click="openCollectionTab(tab.dbName, row)">
                       <Layers :size="'0.875rem'" class="object-icon" />
@@ -160,7 +160,7 @@
                     </span>
                   </template>
                 </el-table-column>
-                <el-table-column :label="t('common.actions')" width="80" align="right">
+                <el-table-column :label="t('common.actions')" width="uiPx(80)" align="right">
                   <template #default="{ row }">
                     <button
                       class="btn btn-ghost btn-icon btn-sm danger"
@@ -225,9 +225,9 @@
     <el-dialog append-to-body
       v-model="newColDialogVisible"
       :title="t('mongodb.newCollection')"
-      width="380px"
+      width="23.75rem"
     >
-      <el-form label-width="80px">
+      <el-form label-width="5rem">
         <el-form-item :label="t('mongodb.collection')">
           <el-input v-model="newColName" :placeholder="t('mongodb.collection')" />
         </el-form-item>
@@ -246,8 +246,8 @@
     </el-dialog>
 
     <!-- New Database dialog -->
-    <el-dialog append-to-body v-model="newDbDialogVisible" :title="t('db.newDatabase')" width="380px">
-      <el-form label-width="80px">
+    <el-dialog append-to-body v-model="newDbDialogVisible" :title="t('db.newDatabase')" width="23.75rem">
+      <el-form label-width="5rem">
         <el-form-item :label="t('db.databases')">
           <el-input v-model="newDbName" :placeholder="t('db.databases')" />
         </el-form-item>
@@ -271,6 +271,7 @@ import { Database, Layers, ChevronRight, ChevronDown, RefreshCw, MoreHorizontal,
 import { ElMessageBox } from 'element-plus'
 import { useI18n } from '../i18n'
 import { msg } from '../services/message'
+import { uiPx } from '../utils/uiScale'
 import {
   MongoListDatabases,
   MongoListCollections,

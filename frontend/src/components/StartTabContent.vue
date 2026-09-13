@@ -374,7 +374,7 @@
     </div>
 
     <!-- Rename group dialog -->
-    <el-dialog append-to-body v-model="showRenameGroupDialog" :title="t('conn.renameGroup')" width="360px">
+    <el-dialog append-to-body v-model="showRenameGroupDialog" :title="t('conn.renameGroup')" width="22.5rem">
       <el-form @submit.prevent="confirmRenameGroup">
         <el-form-item :label="t('conn.groupName')">
           <el-input
@@ -391,8 +391,8 @@
     </el-dialog>
 
     <!-- New group dialog -->
-    <el-dialog append-to-body v-model="showNewGroupDialog" :title="t('conn.newGroupTitle')" width="400px">
-      <el-form label-width="80px" @submit.prevent="doAddGroup">
+    <el-dialog append-to-body v-model="showNewGroupDialog" :title="t('conn.newGroupTitle')" width="25rem">
+      <el-form label-width="5rem" @submit.prevent="doAddGroup">
         <el-form-item :label="t('conn.groupName')">
           <el-input
             v-model="newGroupDialogName"
@@ -419,7 +419,7 @@
     </el-dialog>
 
     <!-- Delete group dialog -->
-    <el-dialog append-to-body v-model="showDeleteGroupDialog" :title="t('conn.deleteGroupTitle')" width="450px">
+    <el-dialog append-to-body v-model="showDeleteGroupDialog" :title="t('conn.deleteGroupTitle')" width="28.125rem">
       <p>{{ deleteGroupPromptText }}</p>
       <template #footer>
         <el-button @click="showDeleteGroupDialog = false">{{ t('conn.deleteGroupCancel') }}</el-button>

@@ -3,13 +3,13 @@
     :model-value="visible"
     @update:model-value="(v: boolean) => !v && onCancel()"
     :title="t('encrypt.title')"
-    width="480px"
+    width="30rem"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :show-close="false"
   >
     <p v-if="existingSecrets > 0" class="encrypt-hint">{{ t('encrypt.existing', { n: existingSecrets }) }}</p>
-    <el-form label-width="120px" class="encrypt-form" @submit.prevent="onConfirm">
+    <el-form label-width="7.5rem" class="encrypt-form" @submit.prevent="onConfirm">
       <el-form-item :label="t('config.encryption')">
         <el-select v-model="mode" popper-class="mode-select-popper" style="width: 100%">
           <el-option :label="t('encrypt.keychain')" value="keychain">

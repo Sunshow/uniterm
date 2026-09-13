@@ -153,7 +153,7 @@
       <el-dialog
         v-model="insertingRow"
         :title="t('db.insertRow')"
-        width="640px"
+        width="40rem"
         append-to-body
         destroy-on-close
       >
@@ -176,7 +176,7 @@
       <el-dialog
         v-model="editingRow"
         :title="t('common.edit')"
-        width="640px"
+        width="40rem"
         append-to-body
         destroy-on-close
       >

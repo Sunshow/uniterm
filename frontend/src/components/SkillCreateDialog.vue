@@ -2,7 +2,7 @@
   <el-dialog
     :model-value="true"
     :title="t('settings.skillsCreateTitle')"
-    width="540px"
+    width="33.75rem"
     @close="$emit('close')"
   >
     <div class="skill-create-body">
@@ -42,7 +42,7 @@
         <span class="import-hint">{{ t('settings.skillsImportFolderHint') }}</span>
       </div>
 
-      <el-form label-position="right" label-width="72px" size="small">
+      <el-form label-position="right" label-width="4.5rem" size="small">
         <el-form-item required :label="t('settings.skillsName')">
           <el-input
             v-model="form.name"

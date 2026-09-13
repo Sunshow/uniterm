@@ -3,11 +3,11 @@
     append-to-body
     v-model="visible"
     :title="t('container.create')"
-    width="560px"
+    width="35rem"
     :close-on-click-modal="false"
     destroy-on-close
   >
-    <el-form label-width="110px" size="small">
+    <el-form label-width="6.875rem" size="small">
       <el-form-item :label="t('container.createDialog.image')" required :error="imageError">
         <el-input v-model="form.image" placeholder="nginx:latest" @input="imageError = ''" />
       </el-form-item>
