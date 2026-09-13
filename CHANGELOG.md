@@ -1,5 +1,111 @@
 # Changelog
 
+## v1.9.3-alpha
+
+### What's Changed
+
+**New Features**
+- Connections: favorites. Star any connection; a pinned Favorites group sits above the sidebar groups with drag-to-reorder, and the start page gains a favorites section. Synced across devices.
+- SSH: Kerberos (GSSAPI) authentication, SSH agent authentication, and SSH agent forwarding. (@windtear)
+- SCP: a new SCP protocol transfer type; SSH connections can set their file-transfer protocol to SFTP or SCP, compatible with hosts without an SFTP subsystem (embedded devices, minimal systems, etc.).
+- SFTP overhaul:
+  - File panes: back / forward / up navigation history, Explorer-style rubber-band selection (Ctrl-drag adds to the selection), a selection stats bar, a grouped flat toolbar, and copy-path context-menu actions.
+  - Transfers: unified transfer tasks with retry (already-completed files are skipped), expandable per-file detail for directory transfers, dismiss, failed tasks marked on disconnect, auto-show on new tasks and a collapsible panel bar; SCP recursive transfers reach full parity.
+  - Sidebar: a follow-terminal-path toggle — the file sidebar follows the active SSH/WSL terminal's cwd, reported via OSC-7.
+  - Symbolic links: create links from the context menu, navigate directory links to their targets (SFTP / SCP / WSL).
+- WSL (Windows): WSL file sidebar support — browse and manage distro files over the //wsl.localhost share; `/mnt/<drive>/...` paths map directly onto local Windows drives.
+- Local shells (Windows): a "Command Prompt (Clink)" shell and administrator Command Prompt / PowerShell terminals launched through a UAC broker, embedded as ordinary tabs. (@kxn)
+- Workspace: duplicate sessions within the current workspace and open SSH sessions into existing workspaces. (@windtear)
+- Workspace: panels can be maximized to fill the workspace, with a configurable maximize shortcut. (@windtear)
+- Shortcuts: numbered tab switching (Ctrl+1–9) and workspace panel switching (Alt+1–9), and a quick-commands shortcut. (@windtear, @kxn)
+- Monitor: new Services, Hardware Devices and IPMI tabs; the system info tab gains a clock section showing host clock skew.
+- Auto-update: in-app updates with GitHub/Gitee dual-source failover, streaming download progress, SHA256 verification and one-click install; the update source is selectable in Settings → About; release notes render as localized markdown. (@Sunshow)
+- UI: a major display overhaul, especially on macOS — the entire interface now scales on a rem baseline, with a new "UI font size" setting that takes effect immediately (platform-aware defaults; the macOS baseline is raised to 14px), and the forced grayscale font smoothing is removed. This fixes text rendering too small and looking blurry on macOS.
+
+**Improvements**
+- Connection form: RDP smart sizing defaults to off, the shell resets when switching local/WSL, credentials clear when switching auth type, identity auth is listed first, and validation errors surface instead of being swallowed.
+- Terminal: the search bar follows the app theme colors.
+- Terminal: input broadcast now works across all tabs and workspaces, not just within one workspace — right-click a terminal or workspace tab to add it as a broadcast target.
+- Local shells (Windows): auto-detection of Cygwin, MSYS2 and Nushell.
+- SSH keepalive for SFTP and SCP sessions, so idle transfer connections are no longer dropped by servers or NAT/firewall timeouts.
+- Redis: keys grouped into a folder tree by a configurable separator, with a flat-list toggle. (@surenwuyuwuqiu)
+- Database: "Run SQL File" against a database and "Copy Table" from the database tree context menus; script feedback shows failure details and affected rows. (@surenwuyuwuqiu)
+- Shortcuts: the keyboard settings page is regrouped into titled sections, with a unified shortcut display.
+- Shortcuts (macOS): shortcut hints now render with the UI font so modifier symbols keep their native shapes.
+- Panel headers gain a right-click menu aligned with the tab menu (reconnect, copy address, AI lock, broadcast, close).
+- AI: the syncable AI config is split into a dedicated `ai.json` (model catalog and agent turn limit); app personalization settings (theme, paths, shells, keybindings, etc.) are now device-local and no longer participate in cloud sync.
+- Session logs: improved file naming, and charset escape sequences no longer pollute the log. (@windtear)
+
+**Bug Fixes**
+- macOS IME: committed keystrokes are delivered directly to the terminal (no more dropped or duplicated characters under fast typing), duplicate input is prevented, and an IME-committed Enter no longer triggers app shortcuts (AI send, search jump, dialog confirm, ~25 handlers). (@surenwuyuwuqiu)
+- Terminal: fixed copy-on-select writing to the clipboard when WKWebView lacks focus. (@surenwuyuwuqiu)
+- Terminal: fixed terminal device attribute queries (DA) being swallowed, so remote TUI apps' capability probing now gets a response. (@windtear)
+- Windows: rounded corners are restored on first launch, and the startup background matches the theme so it no longer flashes a black background.
+- zsh now starts as a login shell so `.zprofile` is sourced before `.zshrc`. (@boltomli)
+- Tunnel: start failures are surfaced with actionable hints, a config test and an SSH example; error toasts include the tunnel name and a localized prefix.
+- SSH: the server's actual error is reported when keyboard-interactive auth is rejected cold. (@kxn)
+- AI: markdown rendering escapes quotes and closes an XSS vector in slash-separated attributes. (@kxn)
+- Shortcuts: rebinding no longer fires runtime handlers mid-capture; digit-shortcut conflicts between tabs and panels are resolved with fixed platform bindings. (@kxn)
+- File transfer: fixed recursive directory retry, SCP fetch completion and the zmodem cancel path; file panels auto-reconnect when a refresh hits a dead session.
+- Sync / update: automatic update check logic fixed; OSC-7 payloads terminate at the first terminator so crafted output can't pollute cwd reporting.
+
+**Notes**
+- As this open-source software has not purchased a code-signing certificate, the unsigned executable may trigger false positives in some antivirus engines (e.g. Windows Defender). This is a known issue with Go/Wails applications (see [wailsapp/wails#3308](https://github.com/wailsapp/wails/issues/3308)). You can add an exclusion rule in your antivirus to allow it. Please download only from the official open-source channels — GitHub and Gitee. If you are still concerned about malware, you can download the source code and build and run it locally yourself.
+
+Thanks to @windtear, @kxn, @surenwuyuwuqiu, @boltomli, and @Sunshow for their contributions to this release.
+
+### 更新内容
+
+**新功能**
+- 连接：新增收藏功能。任意连接可加星标；侧边栏顶部出现可拖拽排序的「收藏」固定分组，起始页新增收藏区。收藏跨设备同步。
+- SSH：新增 Kerberos（GSSAPI）认证、SSH agent 认证与 SSH agent 转发。（@windtear）
+- SCP：新增 SCP 协议传输类型；SSH 连接可将文件传输协议配置为 sftp 或 scp，兼容无 SFTP 子系统的主机（嵌入式设备、精简系统等）。
+- SFTP 全面改版：
+  - 文件面板：新增 后退 / 前进 / 上级 导航历史、资源管理器式橡皮筋框选（Ctrl 拖拽为追加选择）、选中统计条、分组式扁平工具栏与复制路径右键菜单。
+  - 传输：统一的传输任务支持失败重试（自动跳过已完成文件）、目录传输可展开查看每个文件明细、可移除、断线时任务标记失败、新任务自动展开、面板条可折叠；SCP 递归传输能力对齐 SFTP。
+  - 文件边栏：新增「跟随终端路径」开关——跟随当前 SSH/WSL 终端的 cwd（通过 OSC-7 上报）。
+  - 符号链接：右键菜单可创建链接，目录链接可点入并落到真实目标（SFTP / SCP / WSL）。
+- WSL（Windows）：支持 WSL 文件边栏，通过 //wsl.localhost 共享浏览与管理发行版文件；`/mnt/<盘>/...` 路径直接映射到本地 Windows 盘符。
+- 本地终端（Windows）：新增「命令提示符（Clink）」与管理员命令提示符 / PowerShell 终端，经 UAC broker 提权后以普通标签页嵌入。（@kxn）
+- 工作区：支持在当前工作区内复制会话、将 SSH 会话打开到已有工作区。（@windtear）
+- 工作区：支持面板最大化铺满工作区，最大化快捷键可配置。（@windtear）
+- 快捷键：新增 数字键切换标签（Ctrl+1–9）与切换工作区面板（Alt+1–9）、快捷命令快捷键。（@windtear、@kxn）
+- 监控：新增 服务、硬件设备、IPMI 三个标签页；系统信息新增时钟区，展示主机时钟与本机偏差。
+- 自动更新：应用内更新，GitHub/Gitee 双源自动切换，流式下载进度、SHA256 校验与一键安装；设置 → 关于中可选择更新源；更新说明按语言渲染为 Markdown。（@Sunshow）
+- 界面：界面显示整体优化（重点针对 macOS）——整个界面改为基于 rem 基准缩放，新增「界面字号」设置（即时生效，默认值随平台；macOS 默认基准字号提升为 14px），并移除强制灰度字体平滑，解决 macOS 下文本偏小、字体发虚的问题。
+
+**改进**
+- 连接表单：RDP 智能缩放默认关闭；切换 本地/WSL 时重置 Shell；切换认证方式时清除凭据；身份认证排到认证方式首位；表单校验错误如实提示不再吞掉。
+- 终端：搜索栏颜色跟随应用主题。
+- 终端：输入广播不再局限于单个工作区——右键任意终端或工作区标签即可加入广播目标，全应用内广播。
+- 本地终端（Windows）：自动检测 Cygwin、MSYS2、Nushell。
+- SFTP / SCP 会话增加 SSH 保活，空闲的传输连接不再被服务端或 NAT/防火墙超时断开。
+- Redis：键名按可配置分隔符组装为文件夹树，可切换回平铺列表。（@surenwuyuwuqiu）
+- 数据库：数据库树右键菜单新增「运行 SQL 文件」与「复制表」；脚本执行反馈显示失败详情与影响行数。（@surenwuyuwuqiu）
+- 快捷键：键盘设置页重新分组，快捷键展示样式统一。
+- 快捷键（macOS）：快捷键提示改用界面字体渲染，修饰键符号显示为系统原生字形。
+- 面板标题栏新增右键菜单，与标签右键菜单保持一致（重连、复制地址、AI 锁定、广播、关闭）。
+- AI：AI 配置拆分为独立的 `ai.json`（模型目录与 agent 轮次上限，跨设备同步）；应用个性化配置（主题、路径、Shell、快捷键等）改为仅本机生效，不再参与云同步。
+- 会话日志：文件名更规范，不再混入字符集转义序列。（@windtear）
+
+**Bug 修复**
+- macOS 输入法：提交后的按键直接送达终端（快速输入不再丢字/重复）、不再产生重复输入；输入法回车上屏不再触发应用快捷键（AI 发送、搜索跳转、对话框确认等约 25 处）。（@surenwuyuwuqiu）
+- 终端：修复 WKWebView 失焦时选中文本即写入剪贴板的问题。（@surenwuyuwuqiu）
+- 终端：修复终端设备属性查询（DA）应答被拦截的问题，远程 TUI 程序的能力探测现在能正常得到回应。（@windtear）
+- Windows：首次启动恢复 Win11 圆角；启动背景与主题一致，不再闪黑色背景。
+- zsh 改为以登录 shell 启动，`.zprofile` 在 `.zshrc` 之前生效。（@boltomli）
+- 隧道：启动失败如实提示，附配置测试与 SSH 示例；错误提示包含隧道名与本地化前缀。
+- SSH：keyboard-interactive 认证被服务端直接拒绝时，如实上报服务端错误。（@kxn）
+- AI：Markdown 渲染转义引号，修复斜杠分隔属性处的 XSS 注入。（@kxn）
+- 快捷键：录制改绑时不再误触发运行时快捷键；数字键在标签/面板间的冲突以固定平台绑定方式解决。（@kxn）
+- 文件传输：修复递归目录重试、SCP 拉取完成判断与 zmodem 取消路径；刷新遇到已断开会话时自动重连。
+- 同步/更新：修复自动检查更新逻辑；OSC-7 载荷在首个终结符处截断，防止构造输出污染 cwd 上报。
+
+**说明**
+- 由于本开源软件未购买代码签名证书，未签名的可执行文件可能被部分杀毒引擎（如 Windows Defender）误报拦截。这是 Go/Wails 应用的已知问题（参见 [wailsapp/wails#3308](https://github.com/wailsapp/wails/issues/3308)）。可在杀毒软件中为其添加排除规则以放行。请务必从 GitHub、Gitee 官方开源渠道下载软件。如仍担心存在病毒，可自行下载源代码在本地构建运行。
+
+感谢 @windtear、@kxn、@surenwuyuwuqiu、@boltomli 和 @Sunshow 对本版本的贡献。
+
 ## v1.9.2
 
 ### What's Changed
