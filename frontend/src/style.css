@@ -99,6 +99,16 @@
   /* Element Plus sizing */
   --el-input-height: 1.75rem;
   --el-component-size: 1.75rem;
+
+  /* Element Plus font sizes: rem-based so EP text (tables, dialogs, etc.)
+     follows the UI font size setting applied to the rem root. Baseline is
+     1rem = 16px; EP ships these as fixed px which never scales. */
+  --el-font-size-extra-small: 0.75rem;
+  --el-font-size-small: 0.8125rem;
+  --el-font-size-base: 0.875rem;
+  --el-font-size-medium: 0.875rem;
+  --el-font-size-large: 1.125rem;
+  --el-font-size-extra-large: 1.25rem;
 }
 
 /* Deep blue - oceanic dark */
