@@ -22,6 +22,7 @@ export default defineConfig({
   // optimizeDeps.esbuildOptions.target is deprecated and has no rolldown
   // equivalent).
   server: {
+    host: '127.0.0.1',
     port: 34115,
     strictPort: true
   }
