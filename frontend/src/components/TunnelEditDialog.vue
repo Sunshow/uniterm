@@ -2,7 +2,7 @@
   <el-dialog append-to-body
     v-model="visible"
     :title="editingId ? t('tunnels.editTunnel') : t('tunnels.addTunnel')"
-    width="500px"
+    width="31.25rem"
     class="tunnel-dialog"
     @close="resetForm"
   >
@@ -17,14 +17,14 @@
           :class="{ active: form.mode === m.value }"
           @click="form.mode = m.value"
         >
-          <component :is="m.icon" :size="18" />
+          <component :is="m.icon" :size="'1.125rem'" />
           <span>{{ m.label }}</span>
         </button>
       </div>
       <div class="mode-desc">{{ t(`tunnels.hint.${form.mode}`) }}</div>
     </div>
 
-    <el-form :model="form" label-width="90px">
+    <el-form :model="form" label-width="5.625rem">
       <el-form-item :label="t('tunnels.name')" required>
         <el-input v-model="form.name" :placeholder="t('tunnels.namePlaceholder')" maxlength="50" />
       </el-form-item>
@@ -283,47 +283,47 @@ const needsGatewayHint = computed(() => {
 <style scoped>
 .full { width: 100%; }
 .tunnel-dialog :deep(.el-select) { width: 100%; }
-.inline-hint { font-size: 12px; color: var(--text-secondary); margin-left: 10px; }
-.hostport { display: grid; grid-template-columns: 1fr auto 120px; gap: 8px; align-items: center; width: 100%; }
+.inline-hint { font-size: 0.75rem; color: var(--text-secondary); margin-left: 0.625rem; }
+.hostport { display: grid; grid-template-columns: 1fr auto 7.5rem; gap: 0.5rem; align-items: center; width: 100%; }
 .hostport .colon { color: var(--text-muted); text-align: center; }
 .hostport :deep(.el-input-number) { width: 100%; }
-.form-error { color: var(--error); font-size: 12px; margin-top: 2px; }
+.form-error { color: var(--error); font-size: 0.75rem; margin-top: 0.125rem; }
 
 /* Equivalent ssh command row (a form item like the fields above) */
 .se-cmd {
-  font-family: var(--font-mono, monospace); font-size: 12px; color: var(--text-primary);
+  font-family: var(--font-mono, monospace); font-size: 0.75rem; color: var(--text-primary);
   word-break: break-all; user-select: all;
 }
-.se-hint { width: 100%; font-size: 11px; color: var(--warning, #e0a54b); line-height: 1.4; }
+.se-hint { width: 100%; font-size: 0.6875rem; color: var(--warning, #e0a54b); line-height: 1.4; }
 
 /* Mode buttons: identical look to the connection form's sub-type selection */
 .mode-section {
-  padding-bottom: 14px;
-  margin-bottom: 16px;
+  padding-bottom: 0.875rem;
+  margin-bottom: 1rem;
   border-bottom: 1px solid var(--border-subtle);
 }
 .mode-grid {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 6px;
+  gap: 0.375rem;
 }
 .mode-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  width: 80px;
-  height: 56px;
-  padding: 4px;
+  gap: 0.1875rem;
+  width: 5rem;
+  height: 3.5rem;
+  padding: 0.25rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
   font-family: var(--font-ui);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 500;
   transition: all 0.15s ease;
 }
@@ -336,15 +336,15 @@ const needsGatewayHint = computed(() => {
   background: linear-gradient(135deg, var(--accent), var(--accent));
   color: var(--on-accent);
   border-color: var(--accent-glow);
-  box-shadow: 0 0 0 1px var(--accent-glow), 0 2px 8px var(--accent-glow);
+  box-shadow: 0 0 0 1px var(--accent-glow), 0 0.125rem 0.5rem var(--accent-glow);
 }
 .mode-btn span {
   text-align: center;
   line-height: 1.2;
 }
 .mode-desc {
-  margin-top: 12px;
-  font-size: 12px;
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
   line-height: 1.5;
   text-align: center;
@@ -352,6 +352,6 @@ const needsGatewayHint = computed(() => {
 
 /* ── Dialog overrides ── */
 :deep(.el-dialog__body) {
-  padding: 16px 20px;
+  padding: 1rem 1.25rem;
 }
 </style>

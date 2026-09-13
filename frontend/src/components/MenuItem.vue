@@ -48,12 +48,12 @@ defineProps<{
 .menu-item.has-shortcut {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 1.5rem;
 }
 .menu-shortcut {
   flex-shrink: 0;
   margin-left: auto;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-family: var(--font-mono);
   color: var(--text-muted, var(--text-disabled));
   opacity: 0.8;
@@ -73,14 +73,14 @@ defineProps<{
      revealed block reads as the button itself, not a bar spanning the row. */
   position: absolute;
   top: 50%;
-  right: 10px;
+  right: 0.625rem;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
   /* Uniform padding hugs the button content into a square; --bg-hover matches
      the hovered row so the block looks like a natural highlight, and being an
      opaque solid it occludes the row text passing beneath. */
-  padding: 2px;
+  padding: 0.125rem;
   background: var(--bg-hover);
   border-radius: var(--radius-sm);
   opacity: 0;

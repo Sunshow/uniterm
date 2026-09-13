@@ -89,7 +89,7 @@
             :disabled="!followSupported"
             :title="t('sftp.followPath')"
             @click="toggleFollow"
-          ><el-icon><FolderSync :size="14" /></el-icon></button>
+          ><el-icon><FolderSync :size="'0.875rem'" /></el-icon></button>
         </template>
         <template #actions-end>
           <button
@@ -97,7 +97,7 @@
             :disabled="!sessionId"
             :title="t('companion.openSftpTab')"
             @click="openStandaloneSftp"
-          ><el-icon><ExternalLink :size="14" /></el-icon></button>
+          ><el-icon><ExternalLink :size="'0.875rem'" /></el-icon></button>
         </template>
       </TransferPanel>
     </template>
@@ -535,8 +535,8 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 10px;
-  font-size: 12px;
+  padding: 0.5rem 0.625rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-primary);
   border-bottom: 1px solid var(--border-subtle);
@@ -544,12 +544,12 @@ onUnmounted(() => {
 }
 .companion-actions {
   display: flex;
-  gap: 2px;
+  gap: 0.125rem;
   align-items: center;
 }
 .filter-icon-btn {
-  width: 26px;
-  height: 26px;
+  width: 1.625rem;
+  height: 1.625rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -575,17 +575,17 @@ onUnmounted(() => {
 }
 .transfer-badge {
   position: absolute;
-  top: -2px;
-  right: -2px;
-  min-width: 14px;
-  height: 14px;
-  padding: 0 3px;
-  border-radius: 999px;
+  top: -0.125rem;
+  right: -0.125rem;
+  min-width: 0.875rem;
+  height: 0.875rem;
+  padding: 0 0.1875rem;
+  border-radius: 62.4375rem;
   background: var(--accent, #22d3ee);
   color: #0b1220;
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
-  line-height: 14px;
+  line-height: 0.875rem;
   text-align: center;
 }
 .companion-empty {
@@ -594,8 +594,8 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
-  font-size: 12px;
-  padding: 16px;
+  font-size: 0.75rem;
+  padding: 1rem;
   text-align: center;
 }
 .file-body {
@@ -621,11 +621,11 @@ onUnmounted(() => {
   pointer-events: none;
 }
 .drop-overlay span {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--text-primary);
-  padding: 12px 24px;
-  border: 2px dashed var(--border-hover, var(--accent, #22d3ee));
-  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  border: 0.125rem dashed var(--border-hover, var(--accent, #22d3ee));
+  border-radius: 0.5rem;
   background: var(--bg-elevated, rgba(0, 0, 0, 0.35));
 }
 .transfer-panel {
@@ -637,7 +637,7 @@ onUnmounted(() => {
   min-height: 0;
 }
 .transfer-panel-resize {
-  height: 5px;
+  height: 0.3125rem;
   flex-shrink: 0;
   cursor: ns-resize;
   background: transparent;
@@ -649,8 +649,8 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 6px 8px 4px;
-  font-size: 12px;
+  padding: 0.375rem 0.5rem 0.25rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
   flex-shrink: 0;
@@ -658,25 +658,25 @@ onUnmounted(() => {
 .transfer-panel-actions {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 0.125rem;
 }
 .transfer-empty {
-  padding: 16px 12px;
+  padding: 1rem 0.75rem;
   text-align: center;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .transfer-panel :deep(.transfer-progress-bar) {
   border-top: none;
   max-height: none;
   flex: 1;
   overflow-y: auto;
-  padding: 4px 8px 8px;
+  padding: 0.25rem 0.5rem 0.5rem;
 }
 .file-footer {
   flex-shrink: 0;
-  padding: 4px 10px;
-  font-size: 11px;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.6875rem;
   color: var(--text-muted);
   border-top: 1px solid var(--border-subtle);
 }
@@ -688,13 +688,13 @@ onUnmounted(() => {
   text-decoration: underline;
 }
 .companion-editor-meta {
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
 .lang-badge {
   display: inline-block;
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 999px;
+  font-size: 0.6875rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 62.4375rem;
   background: var(--bg-hover, rgba(255,255,255,0.08));
   color: var(--text-secondary);
 }
@@ -702,11 +702,11 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 0.75rem;
   width: 100%;
 }
 .companion-editor-opts {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
 }
 </style>

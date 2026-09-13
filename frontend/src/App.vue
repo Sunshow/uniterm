@@ -1135,7 +1135,7 @@ async function closeTab(tabId: string, opts: { skipConfirm?: boolean } = {}) {
         RDPHideForOverlay()
         try {
           await ElMessageBox.confirm(
-            h('div', { style: 'display:flex;flex-direction:column;gap:10px' }, [
+            h('div', { style: 'display:flex;flex-direction:column;gap:0.625rem' }, [
               h('span', t('tab.closeConnectedConfirm')),
               h(ElCheckbox, {
                 'onUpdate:modelValue': (v: boolean) => { dontShowAgain.value = v }
@@ -1265,7 +1265,7 @@ async function closeTabBatch(tabIds: string[]) {
     const dontShowAgain = ref(false)
     try {
       await ElMessageBox.confirm(
-        h('div', { style: 'display:flex;flex-direction:column;gap:10px' }, [
+        h('div', { style: 'display:flex;flex-direction:column;gap:0.625rem' }, [
           h('span', t('tab.closeConnectedBatchConfirm', { count: connectedCount })),
           h(ElCheckbox, {
             'onUpdate:modelValue': (v: boolean) => { dontShowAgain.value = v }
@@ -2156,17 +2156,17 @@ watch(
   flex-direction: column;
   overflow: hidden;
   background: var(--bg-base);
-  padding: 3px;
+  padding: 0.1875rem;
 }
 
 .group-list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.125rem;
 }
 .group-list .group-item {
-  padding: 10px 14px;
-  border-radius: 6px;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.375rem;
   cursor: pointer;
   transition: background .15s;
 }
@@ -2205,7 +2205,7 @@ watch(
 }
 /* 标签栏毛玻璃 */
 .app-container.has-bg :deep(.app-header) {
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(0.5rem);
 }
 /* 对话框、下拉/右键菜单保持不透明背景（覆盖全局 * 透明规则）*/
 .app-container.has-bg .main-content :deep(.el-dialog),
@@ -2275,20 +2275,20 @@ body > .conn-context-menu {
 .app-container.has-bg .main-content :deep(.sidebar),
 .app-container.has-bg .main-content :deep(.ai-sidebar),
 .app-container.has-bg .main-content :deep(.companion-sidebar) {
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(0.5rem);
 }
 /* 开始页卡片、按钮毛玻璃 */
 .app-container.has-bg .main-content :deep(.start-card),
 .app-container.has-bg .main-content :deep(.start-action-btn),
 .app-container.has-bg .main-content :deep(.start-action-btn-dropdown-arrow) {
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(0.5rem);
 }
 /* 各类输入框毛玻璃 */
 .app-container.has-bg .main-content :deep(.el-input__wrapper),
 .app-container.has-bg .main-content :deep(.el-textarea__inner),
 .app-container.has-bg .main-content :deep(.el-input-number),
 .app-container.has-bg .main-content :deep(.el-select__wrapper) {
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(0.5rem);
 }
 /* 表格固定列（el-table fixed right/left）：背景图模式下被透明规则抹掉背景，
    固定列会和下方内容重叠 → 加毛玻璃遮住滚动内容。
@@ -2300,14 +2300,14 @@ body > .conn-context-menu {
 .app-container.has-bg .main-content :deep(.k8s-action-cell),
 .app-container.has-bg .main-content :deep(.db-action-cell) {
   background-color: var(--bg-surface) !important;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(0.5rem);
   pointer-events: auto !important;
   z-index: 3 !important;
 }
 /* 划出面板（K8sDetailDrawer / MonitorTabContent 等）：背景图模式下同样被透明规则抹掉背景，
    加毛玻璃保证内容在背景图上清晰。 */
 .app-container.has-bg .main-content :deep(.detail-drawer) {
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(0.5rem);
 }
 /* 拖拽/等待遮罩：全局透明规则会抹掉底色，这里给几处遮罩恢复颜色，
    保证背景图下 SFTP 拖入、终端拖文件、分屏落位提示、loading 蒙层仍清晰可见 */

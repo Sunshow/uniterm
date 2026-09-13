@@ -119,7 +119,7 @@ function showUpdateNotification(info: UpdateInfo) {
           openUpdateDialog()
         },
       }, t('settings.updateInstall')) : null,
-      channel.value === 'package' ? h('div', { style: 'margin-top:6px;' }, t('settings.updatePackageManager')) : null,
+      channel.value === 'package' ? h('div', { style: 'margin-top:0.375rem;' }, t('settings.updatePackageManager')) : null,
     ]),
     type: 'success',
     duration: 0,

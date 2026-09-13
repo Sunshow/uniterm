@@ -22,13 +22,13 @@
   <!-- Windows/Linux: match header-btn style -->
   <div v-else class="window-controls">
       <button class="wc-btn win minimise" @click="$emit('minimise')" :aria-label="t('window.minimize')">
-        <svg viewBox="0 0 12 12" width="14" height="14"><path d="M1 5.5h10v1H1z"/></svg>
+        <svg viewBox="0 0 12 12" width="0.875rem" height="0.875rem"><path d="M1 5.5h10v1H1z"/></svg>
       </button>
       <button class="wc-btn win maximise" @click="$emit('maximise')" :aria-label="t('window.maximize')">
-        <svg v-if="isMaximised" viewBox="0 0 12 12" width="14" height="14">
+        <svg v-if="isMaximised" viewBox="0 0 12 12" width="0.875rem" height="0.875rem">
           <defs>
             <mask :id="restoreMaskId">
-              <rect width="12" height="12" fill="white"/>
+              <rect width="0.75rem" height="0.75rem" fill="white"/>
               <rect x="1" y="3.5" width="6.5" height="6.5" fill="black"/>
             </mask>
           </defs>
@@ -37,10 +37,10 @@
           <!-- 前方小矩形（左下），完整显示 -->
           <rect x="1" y="3.5" width="6.5" height="6.5" fill="none" stroke="currentColor" stroke-width="1"/>
         </svg>
-        <svg v-else viewBox="0 0 12 12" width="14" height="14"><rect x="1.5" y="1.5" width="9" height="9" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+        <svg v-else viewBox="0 0 12 12" width="0.875rem" height="0.875rem"><rect x="1.5" y="1.5" width="0.5625rem" height="0.5625rem" fill="none" stroke="currentColor" stroke-width="1"/></svg>
       </button>
       <button class="wc-btn win close" @click="$emit('close')" :aria-label="t('window.close')">
-        <svg viewBox="0 0 12 12" width="14" height="14"><path d="M2 2l8 8M10 2L2 10" stroke="currentColor" stroke-width="1.2"/></svg>
+        <svg viewBox="0 0 12 12" width="0.875rem" height="0.875rem"><path d="M2 2l8 8M10 2L2 10" stroke="currentColor" stroke-width="1.2"/></svg>
       </button>
   </div>
 </template>
@@ -67,21 +67,21 @@ const restoreMaskId = `rm-${Math.random().toString(36).slice(2, 9)}`
 .window-controls {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 0.125rem;
   --wails-draggable: no-drag;
 }
 
 /* ── macOS traffic lights ── */
 .window-controls.mac {
-  gap: 8px;
+  gap: 0.5rem;
   /* nudge right of the header padding so the dots sit clear of the
      window's rounded corners, matching the native macOS inset */
-  margin-left: 6px;
+  margin-left: 0.375rem;
 }
 
 .wc-btn.mac {
-  width: 12px;
-  height: 12px;
+  width: 0.75rem;
+  height: 0.75rem;
   padding: 0;
   border: none;
   border-radius: 50%;
@@ -98,8 +98,8 @@ const restoreMaskId = `rm-${Math.random().toString(36).slice(2, 9)}`
 
 /* Glyphs appear when hovering anywhere over the group (macOS behaviour) */
 .wc-btn.mac svg {
-  width: 8px;
-  height: 8px;
+  width: 0.5rem;
+  height: 0.5rem;
   color: rgba(0, 0, 0, 0.55);
   opacity: 0;
   transition: opacity 0.1s ease;
@@ -114,8 +114,8 @@ const restoreMaskId = `rm-${Math.random().toString(36).slice(2, 9)}`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 5px 8px;
-  height: 28px;
+  padding: 0.3125rem 0.5rem;
+  height: 1.75rem;
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;

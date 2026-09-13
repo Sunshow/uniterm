@@ -2,7 +2,7 @@
   <el-dialog
     :model-value="updateCheck.updateDialogVisible"
     :title="t('settings.updateDialogTitle')"
-    width="540px"
+    width="33.75rem"
     :close-on-click-modal="false"
     :close-on-press-escape="!locked"
     :show-close="!locked"
@@ -119,46 +119,46 @@ function fmtSize(bytes: number): string {
 
 <style scoped>
 .update-dialog-version {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   font-family: var(--font-ui);
-  margin-bottom: 10px;
+  margin-bottom: 0.625rem;
 }
 .update-dialog-hint {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-muted, #8a8a8a);
-  margin-bottom: 10px;
+  margin-bottom: 0.625rem;
 }
 .update-dialog-changelog {
-  max-height: 320px;
+  max-height: 20rem;
   overflow-y: auto;
   background: var(--bg-overlay);
   border: 1px solid var(--border-subtle);
-  border-radius: 6px;
-  padding: 10px 12px;
-  margin-bottom: 12px;
-  font-size: 12.5px;
+  border-radius: 0.375rem;
+  padding: 0.625rem 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.7813rem;
   line-height: 1.6;
   font-family: var(--font-ui);
   color: var(--text-primary);
 }
 .update-dialog-changelog :deep(h2) {
-  font-size: 14px;
-  margin: 0 0 8px;
+  font-size: 0.875rem;
+  margin: 0 0 0.5rem;
 }
 .update-dialog-changelog :deep(h3) {
-  font-size: 13px;
-  margin: 12px 0 6px;
+  font-size: 0.8125rem;
+  margin: 0.75rem 0 0.375rem;
 }
 .update-dialog-changelog :deep(p) {
-  margin: 6px 0;
+  margin: 0.375rem 0;
 }
 .update-dialog-changelog :deep(ul) {
-  margin: 6px 0;
-  padding-left: 18px;
+  margin: 0.375rem 0;
+  padding-left: 1.125rem;
 }
 .update-dialog-changelog :deep(li) {
-  margin: 3px 0;
+  margin: 0.1875rem 0;
 }
 .update-dialog-changelog :deep(a) {
   color: var(--accent);
@@ -170,25 +170,25 @@ function fmtSize(bytes: number): string {
 .update-dialog-changelog :deep(code) {
   background: var(--bg-overlay);
   border: 1px solid var(--border-subtle);
-  border-radius: 3px;
-  padding: 0 4px;
+  border-radius: 0.1875rem;
+  padding: 0 0.25rem;
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: 0.7188rem;
 }
 .update-dialog-changelog :deep(hr) {
   border: none;
   border-top: 1px solid var(--border-subtle);
-  margin: 10px 0;
+  margin: 0.625rem 0;
 }
 .update-dialog-error {
   color: #f56c6c;
-  font-size: 13px;
-  margin-bottom: 10px;
+  font-size: 0.8125rem;
+  margin-bottom: 0.625rem;
   word-break: break-word;
 }
 .update-dialog-progress-label {
-  font-size: 13px;
-  margin-top: 8px;
+  font-size: 0.8125rem;
+  margin-top: 0.5rem;
   color: var(--text-muted, #8a8a8a);
 }
 .update-dialog-progress-size {

@@ -16,18 +16,18 @@
       <!-- History navigation: toolbar buttons in the flat (dual-pane) layout,
            menu entries in the compact (sidebar) layout. -->
       <button v-if="flatToolbar" class="filter-icon-btn" :disabled="!canBack" @click="emit('back')" :title="t('sftp.back')">
-        <el-icon><ChevronLeft :size="14" /></el-icon>
+        <el-icon><ChevronLeft :size="'0.875rem'" /></el-icon>
       </button>
       <button v-if="flatToolbar" class="filter-icon-btn" :disabled="!canForward" @click="emit('forward')" :title="t('sftp.forward')">
-        <el-icon><ChevronRight :size="14" /></el-icon>
+        <el-icon><ChevronRight :size="'0.875rem'" /></el-icon>
       </button>
       <button v-if="flatToolbar" class="filter-icon-btn" @click="emit('up')" :title="t('sftp.goUp')">
-        <el-icon><CornerLeftUp :size="14" /></el-icon>
+        <el-icon><CornerLeftUp :size="'0.875rem'" /></el-icon>
       </button>
       <!-- View group: refresh + hidden-files visibility. -->
       <span v-if="flatToolbar" class="toolbar-divider" />
       <button class="filter-icon-btn" @click="emit('refresh')" :title="t('sftp.refresh')">
-        <el-icon><RefreshCw :size="14" /></el-icon>
+        <el-icon><RefreshCw :size="'0.875rem'" /></el-icon>
       </button>
       <button
         v-if="flatToolbar"
@@ -36,27 +36,27 @@
         @click="toggleShowHidden"
         :title="showHidden ? t('sftp.hideHidden') : t('sftp.showHidden')"
       >
-        <el-icon><Eye :size="14" /></el-icon>
+        <el-icon><Eye :size="'0.875rem'" /></el-icon>
       </button>
       <!-- Transfer group: upload. -->
       <span v-if="flatToolbar && mode === 'remote'" class="toolbar-divider" />
       <button v-if="mode === 'remote'" class="filter-icon-btn" @click="emit('upload')" :title="t('sftp.upload')">
-        <el-icon><Upload :size="14" /></el-icon>
+        <el-icon><Upload :size="'0.875rem'" /></el-icon>
       </button>
       <!-- Create group: new file / directory / link. Flat keeps every action
            on the bar, so there is no more-menu in this layout. -->
       <span v-if="flatToolbar" class="toolbar-divider" />
       <button v-if="flatToolbar" class="filter-icon-btn" @click="doNewFile" :title="t('sftp.newFile')">
-        <el-icon><FilePlus2 :size="14" /></el-icon>
+        <el-icon><FilePlus2 :size="'0.875rem'" /></el-icon>
       </button>
       <button v-if="flatToolbar" class="filter-icon-btn" @click="doMkdir" :title="t('sftp.newDirectory')">
-        <el-icon><FolderPlus :size="14" /></el-icon>
+        <el-icon><FolderPlus :size="'0.875rem'" /></el-icon>
       </button>
       <button v-if="flatToolbar && supportsSymlink" class="filter-icon-btn" @click="doSymlink" :title="t('sftp.newLink')">
-        <el-icon><Link :size="14" /></el-icon>
+        <el-icon><Link :size="'0.875rem'" /></el-icon>
       </button>
       <button v-if="!flatToolbar" class="filter-icon-btn" @click.stop="moreMenuRef?.toggle($event.currentTarget as HTMLElement)" :title="t('sftp.more')">
-        <el-icon><MoreHorizontal :size="14" /></el-icon>
+        <el-icon><MoreHorizontal :size="'0.875rem'" /></el-icon>
       </button>
     </div>
     <PathBreadcrumb
@@ -93,44 +93,44 @@
         @row-dblclick="onRowDblClick"
         @row-contextmenu="onRowContextMenu"
       >
-      <el-table-column :label="t('sftp.name')" min-width="160" sortable :sort-method="sortByName" show-overflow-tooltip>
+      <el-table-column :label="t('sftp.name')" min-width="uiPx(160)" sortable :sort-method="sortByName" show-overflow-tooltip>
         <template #default="{ row }">
           <div class="name-cell" :draggable="true" @dragstart="onDragStart($event, row)">
-            <el-icon v-if="isSymlink(row)"><Link :size="14" /></el-icon>
-            <el-icon v-else-if="row.isDir"><Folder :size="14" /></el-icon>
-            <el-icon v-else><File :size="14" /></el-icon>
+            <el-icon v-if="isSymlink(row)"><Link :size="'0.875rem'" /></el-icon>
+            <el-icon v-else-if="row.isDir"><Folder :size="'0.875rem'" /></el-icon>
+            <el-icon v-else><File :size="'0.875rem'" /></el-icon>
             <div class="name-info">
               <span class="file-name" :class="{ selected: isSelected(row) }">{{ row.name }}</span>
             </div>
           </div>
         </template>
       </el-table-column>
-      <el-table-column :label="t('sftp.type')" width="90" sortable :sort-method="sortByType" show-overflow-tooltip>
+      <el-table-column :label="t('sftp.type')" width="uiPx(90)" sortable :sort-method="sortByType" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ fileTypeLabel(row) }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('sftp.modified')" width="150" sortable :sort-method="sortByTime" show-overflow-tooltip>
+      <el-table-column :label="t('sftp.modified')" width="uiPx(150)" sortable :sort-method="sortByTime" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ formatDate(row.modTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('sftp.size')" width="70" align="right" sortable :sort-method="sortBySize" show-overflow-tooltip>
+      <el-table-column :label="t('sftp.size')" width="uiPx(70)" align="right" sortable :sort-method="sortBySize" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ row.isDir ? '-' : formatSize(row.size) }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('sftp.permission')" width="110" show-overflow-tooltip>
+      <el-table-column :label="t('sftp.permission')" width="uiPx(110)" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ row.mode || '-' }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('sftp.owner')" width="100" show-overflow-tooltip>
+      <el-table-column :label="t('sftp.owner')" width="uiPx(100)" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ row.owner || '-' }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('sftp.group')" width="100" show-overflow-tooltip>
+      <el-table-column :label="t('sftp.group')" width="uiPx(100)" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ row.group || '-' }}</span>
         </template>
@@ -227,7 +227,7 @@
       <MenuItem v-if="supportsSymlink" @click="doSymlink">{{ t('sftp.newLink') }}</MenuItem>
       <MenuDivider />
       <MenuItem class="iconic" :class="{ active: showHidden }" @click="toggleShowHidden">
-        <el-icon><Eye :size="14" /></el-icon>
+        <el-icon><Eye :size="'0.875rem'" /></el-icon>
         {{ showHidden ? t('sftp.hideHidden') : t('sftp.showHidden') }}
       </MenuItem>
     </Menu>
@@ -244,6 +244,7 @@ import PathBreadcrumb from './PathBreadcrumb.vue'
 import Menu from './Menu.vue'
 import MenuItem from './MenuItem.vue'
 import MenuDivider from './MenuDivider.vue'
+import { uiPx } from '../utils/uiScale'
 
 export interface FileItem {
   name: string
@@ -874,11 +875,11 @@ function applyBandSelection() {
 .filter-bar {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 0.125rem;
   padding-top: 0;
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-bottom: 6px;
+  padding-left: 0.625rem;
+  padding-right: 0.625rem;
+  padding-bottom: 0.375rem;
   border-bottom: 1px solid var(--border-subtle);
 }
 .filter-bar .el-input {
@@ -888,15 +889,16 @@ function applyBandSelection() {
    transfer / create). Compact (sidebar) layout has no groups and no dividers. */
 .toolbar-divider {
   width: 1px;
-  height: 16px;
-  margin: 0 3px;
+  height: 1rem;
+  margin: 0 0.1875rem;
   flex-shrink: 0;
   background: var(--border-subtle);
 }
-/* Match the sidebar's tab / close icon-button style (transparent, 26px, muted) */
+/* Match the sidebar's tab / close icon-button style (transparent, 1.625rem, muted) */
 .filter-icon-btn {
-  width: 26px;
-  height: 26px;
+  font-size: 0.875rem;
+  width: 1.625rem;
+  height: 1.625rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -926,10 +928,10 @@ function applyBandSelection() {
 .clipboard-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
   border-bottom: 1px solid var(--border-subtle);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .clipboard-info {
   flex: 1;
@@ -938,10 +940,10 @@ function applyBandSelection() {
 .selection-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
   border-top: 1px solid var(--border-subtle);
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-secondary);
 }
 .selection-info {
@@ -957,7 +959,7 @@ function applyBandSelection() {
 .name-cell {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
 }
 .name-info {
   display: flex;
@@ -970,7 +972,7 @@ function applyBandSelection() {
   color: var(--accent);
 }
 .file-mode {
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--text-disabled);
 }
 
@@ -998,12 +1000,12 @@ function applyBandSelection() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
 }
 .loading-spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid rgba(255, 255, 255, 0.15);
+  width: 2rem;
+  height: 2rem;
+  border: 0.1875rem solid rgba(255, 255, 255, 0.15);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -1012,7 +1014,7 @@ function applyBandSelection() {
   to { transform: rotate(360deg); }
 }
 .loading-text {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-primary);
 }
 

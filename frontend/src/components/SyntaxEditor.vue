@@ -312,7 +312,7 @@ defineExpose({
   min-width: 0;
   height: 55vh;
   border: 1px solid var(--border-subtle);
-  border-radius: 4px;
+  border-radius: 0.25rem;
   overflow: hidden;
   background: var(--bg-base);
   color: var(--text-primary);

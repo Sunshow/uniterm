@@ -1406,8 +1406,6 @@
   "unlock.title": "Anmeldedaten entsperren",
   "settings.storageSecurity": "Speicher & Sicherheit",
   "settings.appearance": "Erscheinungsbild",
-  "settings.aiFontSize": "KI-Schriftgröße",
-  "settings.aiFontSizeDesc": "Schriftgröße für KI-Nachrichten und den Eingabeeditor. Standard: 12.",
   "settings.interaction": "Interaktion",
   "settings.session": "Sitzung",
   "conn.esAuthType": "ES Auth",

@@ -7,7 +7,7 @@
       <!-- Search row -->
     <div class="start-search-row">
       <span class="start-filter-btn" :class="{ active: selectedTypeFilter !== 'all' }" @click.stop="filterMenuRef?.toggle($event.currentTarget)">
-        <el-icon><Filter :size="14" /></el-icon>
+        <el-icon><Filter :size="'0.875rem'" /></el-icon>
         <span>{{ filterDisplay }}</span>
       </span>
       <Menu ref="filterMenuRef" align="start" v-model:visible="showFilterMenu">
@@ -34,16 +34,16 @@
     <!-- Action buttons -->
     <div class="start-action-btns">
       <button class="start-action-btn primary" @click="emit('new-connection', { groupId: tab.viewMode === 'group' ? tab.groupId : undefined, host: (searchQuery || '').trim() || undefined })">
-        <el-icon><Plus :size="14" /></el-icon>
+        <el-icon><Plus :size="'0.875rem'" /></el-icon>
         {{ t('header.newConnection') }}
       </button>
       <div class="start-action-btn-group">
         <button class="start-action-btn" @click="handleDefaultLocalTerminal">
-          <el-icon><Laptop :size="14" /></el-icon>
+          <el-icon><Laptop :size="'0.875rem'" /></el-icon>
           {{ t('conn.startLocalTerminal') }}
         </button>
         <button class="start-action-btn-dropdown-arrow" @click.stop="shellMenuRef?.toggle($event.currentTarget)">
-          <el-icon><ChevronDown :size="12" /></el-icon>
+          <el-icon><ChevronDown :size="'0.75rem'" /></el-icon>
         </button>
         <Menu ref="shellMenuRef" v-model:visible="shellMenuVisible">
           <MenuItem
@@ -70,7 +70,7 @@
         <span v-else class="link" @click="enterGroupAt(crumb.id)">{{ crumb.name }}</span>
       </template>
       <span class="start-add-group-btn" @click="openNewGroupDialog" :title="t('conn.newGroupTitle')">
-        <el-icon><Plus :size="12" /></el-icon>
+        <el-icon><Plus :size="'0.75rem'" /></el-icon>
       </span>
     </div>
 
@@ -91,39 +91,39 @@
           >
             <div class="start-card-top">
               <div class="start-card-icon" :class="config.type">
-                <el-icon v-if="config.type === 'ssh'"><SquareTerminal :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'telnet'"><Terminal :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'mosh'"><Zap :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'local'"><Laptop :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'wsl'"><LaptopMinimal :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'serial'"><Cable :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'tcp'"><ArrowLeftRight :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'sftp'"><Folders :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'scp'"><FileUp :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'ftp'"><FolderUp :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'smb'"><HardDrive :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 's3'"><Cloud :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'webdav'"><Globe :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'rdp'"><Monitor :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'vnc'"><MonitorSmartphone :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'spice'"><MonitorCloud :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'x11-desktop'"><AppWindow :size="28" /></el-icon>
+                <el-icon v-if="config.type === 'ssh'"><SquareTerminal :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'telnet'"><Terminal :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'mosh'"><Zap :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'local'"><Laptop :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'wsl'"><LaptopMinimal :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'serial'"><Cable :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'tcp'"><ArrowLeftRight :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'sftp'"><Folders :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'scp'"><FileUp :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'ftp'"><FolderUp :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'smb'"><HardDrive :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 's3'"><Cloud :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'webdav'"><Globe :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'rdp'"><Monitor :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'vnc'"><MonitorSmartphone :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'spice'"><MonitorCloud :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'x11-desktop'"><AppWindow :size="'1.75rem'" /></el-icon>
                 <el-icon v-else-if="config.type === 'database'">
-                  <DatabaseZap v-if="config.dbType === 'redis'" :size="28" />
-                  <Layers v-else-if="config.dbType === 'mongodb'" :size="28" />
-                  <DatabaseSearch v-else-if="config.dbType === 'elasticsearch'" :size="28" />
-                  <Database v-else :size="28" />
+                  <DatabaseZap v-if="config.dbType === 'redis'" :size="'1.75rem'" />
+                  <Layers v-else-if="config.dbType === 'mongodb'" :size="'1.75rem'" />
+                  <DatabaseSearch v-else-if="config.dbType === 'elasticsearch'" :size="'1.75rem'" />
+                  <Database v-else :size="'1.75rem'" />
                 </el-icon>
-                <el-icon v-else-if="config.type === 'k8s'"><ShipWheel :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'container'"><Boxes :size="28" /></el-icon>
-                <el-icon v-else><Server :size="28" /></el-icon>
+                <el-icon v-else-if="config.type === 'k8s'"><ShipWheel :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'container'"><Boxes :size="'1.75rem'" /></el-icon>
+                <el-icon v-else><Server :size="'1.75rem'" /></el-icon>
               </div>
               <div>
                 <div class="start-card-name">{{ config.name }}</div>
                 <div class="start-card-meta">{{ getCardSubtitle(config) }}</div>
               </div>
             </div>
-            <button class="card-more-btn" @click.stop="onCardMoreClick($event, config, 'recent:')" :title="t('terminal.more')"><MoreHorizontal :size="16" /></button>
+            <button class="card-more-btn" @click.stop="onCardMoreClick($event, config, 'recent:')" :title="t('terminal.more')"><MoreHorizontal :size="'1rem'" /></button>
           </div>
         </div>
       </template>
@@ -131,7 +131,7 @@
       <!-- Groups -->
       <div class="start-section-label">
         {{ t('startTab.groups') }}
-        <span class="start-add-group-btn" @click="openNewGroupDialog" :title="t('conn.newGroupTitle')"><el-icon><Plus :size="12" /></el-icon></span>
+        <span class="start-add-group-btn" @click="openNewGroupDialog" :title="t('conn.newGroupTitle')"><el-icon><Plus :size="'0.75rem'" /></el-icon></span>
       </div>
       <div class="start-cards-grid">
         <div
@@ -144,7 +144,7 @@
           @contextmenu.prevent="onGroupContextMenu($event, group.id, group.name)"
         >
           <div class="start-card-top">
-            <div class="start-card-icon group"><el-icon><Folder :size="22" /></el-icon></div>
+            <div class="start-card-icon group"><el-icon><Folder :size="'1.375rem'" /></el-icon></div>
             <div>
               <div class="start-card-name">{{ group.name }}</div>
               <div class="start-card-meta">{{ t('startTab.connectionsCount', { count: group.count }) }}</div>
@@ -159,7 +159,7 @@
           @dblclick="enterGroup('__ungrouped__')"
         >
           <div class="start-card-top">
-            <div class="start-card-icon ungrouped"><el-icon><FolderOpen :size="22" /></el-icon></div>
+            <div class="start-card-icon ungrouped"><el-icon><FolderOpen :size="'1.375rem'" /></el-icon></div>
             <div>
               <div class="start-card-name">{{ t('conn.noGroup') }}</div>
               <div class="start-card-meta">{{ t('startTab.connectionsCount', { count: groupCards.ungroupedCount }) }}</div>
@@ -183,39 +183,39 @@
           >
             <div class="start-card-top">
               <div class="start-card-icon" :class="config.type">
-                <el-icon v-if="config.type === 'ssh'"><SquareTerminal :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'telnet'"><Terminal :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'mosh'"><Zap :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'local'"><Laptop :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'wsl'"><LaptopMinimal :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'serial'"><Cable :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'tcp'"><ArrowLeftRight :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'sftp'"><Folders :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'scp'"><FileUp :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'ftp'"><FolderUp :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'smb'"><HardDrive :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 's3'"><Cloud :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'webdav'"><Globe :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'rdp'"><Monitor :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'vnc'"><MonitorSmartphone :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'spice'"><MonitorCloud :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'x11-desktop'"><AppWindow :size="28" /></el-icon>
+                <el-icon v-if="config.type === 'ssh'"><SquareTerminal :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'telnet'"><Terminal :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'mosh'"><Zap :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'local'"><Laptop :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'wsl'"><LaptopMinimal :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'serial'"><Cable :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'tcp'"><ArrowLeftRight :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'sftp'"><Folders :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'scp'"><FileUp :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'ftp'"><FolderUp :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'smb'"><HardDrive :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 's3'"><Cloud :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'webdav'"><Globe :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'rdp'"><Monitor :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'vnc'"><MonitorSmartphone :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'spice'"><MonitorCloud :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'x11-desktop'"><AppWindow :size="'1.75rem'" /></el-icon>
                 <el-icon v-else-if="config.type === 'database'">
-                  <DatabaseZap v-if="config.dbType === 'redis'" :size="28" />
-                  <Layers v-else-if="config.dbType === 'mongodb'" :size="28" />
-                  <DatabaseSearch v-else-if="config.dbType === 'elasticsearch'" :size="28" />
-                  <Database v-else :size="28" />
+                  <DatabaseZap v-if="config.dbType === 'redis'" :size="'1.75rem'" />
+                  <Layers v-else-if="config.dbType === 'mongodb'" :size="'1.75rem'" />
+                  <DatabaseSearch v-else-if="config.dbType === 'elasticsearch'" :size="'1.75rem'" />
+                  <Database v-else :size="'1.75rem'" />
                 </el-icon>
-                <el-icon v-else-if="config.type === 'k8s'"><ShipWheel :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'container'"><Boxes :size="28" /></el-icon>
-                <el-icon v-else><Server :size="28" /></el-icon>
+                <el-icon v-else-if="config.type === 'k8s'"><ShipWheel :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'container'"><Boxes :size="'1.75rem'" /></el-icon>
+                <el-icon v-else><Server :size="'1.75rem'" /></el-icon>
               </div>
               <div>
                 <div class="start-card-name">{{ config.name }}</div>
                 <div class="start-card-meta">{{ getCardSubtitle(config) }}</div>
               </div>
             </div>
-            <button class="card-more-btn" @click.stop="onCardMoreClick($event, config)" :title="t('terminal.more')"><MoreHorizontal :size="16" /></button>
+            <button class="card-more-btn" @click.stop="onCardMoreClick($event, config)" :title="t('terminal.more')"><MoreHorizontal :size="'1rem'" /></button>
           </div>
         </div>
         <div v-if="filteredConnections.length === 0 && connectionStore.connections.length > 0" class="start-empty-hint">
@@ -239,7 +239,7 @@
           @contextmenu.prevent="onGroupContextMenu($event, group.id, group.name)"
         >
           <div class="start-card-top">
-            <div class="start-card-icon group"><el-icon><Folder :size="22" /></el-icon></div>
+            <div class="start-card-icon group"><el-icon><Folder :size="'1.375rem'" /></el-icon></div>
             <div>
               <div class="start-card-name">{{ group.name }}</div>
               <div class="start-card-meta">{{ t('startTab.connectionsCount', { count: group.count }) }}</div>
@@ -262,39 +262,39 @@
         >
           <div class="start-card-top">
             <div class="start-card-icon" :class="config.type">
-              <el-icon v-if="config.type === 'ssh'"><SquareTerminal :size="28" /></el-icon>
-              <el-icon v-else-if="config.type === 'telnet'"><Terminal :size="28" /></el-icon>
-              <el-icon v-else-if="config.type === 'mosh'"><Zap :size="28" /></el-icon>
-              <el-icon v-else-if="config.type === 'local'"><Laptop :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'wsl'"><LaptopMinimal :size="28" /></el-icon>
-              <el-icon v-else-if="config.type === 'serial'"><Cable :size="28" /></el-icon>
-                <el-icon v-else-if="config.type === 'tcp'"><ArrowLeftRight :size="28" /></el-icon>
-              <el-icon v-else-if="config.type === 'sftp'"><Folders :size="28" /></el-icon>
-              <el-icon v-else-if="config.type === 'scp'"><FileUp :size="28" /></el-icon>
-              <el-icon v-else-if="config.type === 'ftp'"><FolderUp :size="28" /></el-icon>
-              <el-icon v-else-if="config.type === 'smb'"><HardDrive :size="28" /></el-icon>
-              <el-icon v-else-if="config.type === 's3'"><Cloud :size="28" /></el-icon>
-              <el-icon v-else-if="config.type === 'webdav'"><Globe :size="28" /></el-icon>
-              <el-icon v-else-if="config.type === 'rdp'"><Monitor :size="28" /></el-icon>
-              <el-icon v-else-if="config.type === 'vnc'"><MonitorSmartphone :size="28" /></el-icon>
-              <el-icon v-else-if="config.type === 'spice'"><MonitorCloud :size="28" /></el-icon>
-              <el-icon v-else-if="config.type === 'x11-desktop'"><AppWindow :size="28" /></el-icon>
+              <el-icon v-if="config.type === 'ssh'"><SquareTerminal :size="'1.75rem'" /></el-icon>
+              <el-icon v-else-if="config.type === 'telnet'"><Terminal :size="'1.75rem'" /></el-icon>
+              <el-icon v-else-if="config.type === 'mosh'"><Zap :size="'1.75rem'" /></el-icon>
+              <el-icon v-else-if="config.type === 'local'"><Laptop :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'wsl'"><LaptopMinimal :size="'1.75rem'" /></el-icon>
+              <el-icon v-else-if="config.type === 'serial'"><Cable :size="'1.75rem'" /></el-icon>
+                <el-icon v-else-if="config.type === 'tcp'"><ArrowLeftRight :size="'1.75rem'" /></el-icon>
+              <el-icon v-else-if="config.type === 'sftp'"><Folders :size="'1.75rem'" /></el-icon>
+              <el-icon v-else-if="config.type === 'scp'"><FileUp :size="'1.75rem'" /></el-icon>
+              <el-icon v-else-if="config.type === 'ftp'"><FolderUp :size="'1.75rem'" /></el-icon>
+              <el-icon v-else-if="config.type === 'smb'"><HardDrive :size="'1.75rem'" /></el-icon>
+              <el-icon v-else-if="config.type === 's3'"><Cloud :size="'1.75rem'" /></el-icon>
+              <el-icon v-else-if="config.type === 'webdav'"><Globe :size="'1.75rem'" /></el-icon>
+              <el-icon v-else-if="config.type === 'rdp'"><Monitor :size="'1.75rem'" /></el-icon>
+              <el-icon v-else-if="config.type === 'vnc'"><MonitorSmartphone :size="'1.75rem'" /></el-icon>
+              <el-icon v-else-if="config.type === 'spice'"><MonitorCloud :size="'1.75rem'" /></el-icon>
+              <el-icon v-else-if="config.type === 'x11-desktop'"><AppWindow :size="'1.75rem'" /></el-icon>
               <el-icon v-else-if="config.type === 'database'">
-                <DatabaseZap v-if="config.dbType === 'redis'" :size="28" />
-                <Layers v-else-if="config.dbType === 'mongodb'" :size="28" />
-                <DatabaseSearch v-else-if="config.dbType === 'elasticsearch'" :size="28" />
-                <Database v-else :size="28" />
+                <DatabaseZap v-if="config.dbType === 'redis'" :size="'1.75rem'" />
+                <Layers v-else-if="config.dbType === 'mongodb'" :size="'1.75rem'" />
+                <DatabaseSearch v-else-if="config.dbType === 'elasticsearch'" :size="'1.75rem'" />
+                <Database v-else :size="'1.75rem'" />
               </el-icon>
-              <el-icon v-else-if="config.type === 'k8s'"><ShipWheel :size="28" /></el-icon>
-              <el-icon v-else-if="config.type === 'container'"><Boxes :size="28" /></el-icon>
-              <el-icon v-else><Server :size="28" /></el-icon>
+              <el-icon v-else-if="config.type === 'k8s'"><ShipWheel :size="'1.75rem'" /></el-icon>
+              <el-icon v-else-if="config.type === 'container'"><Boxes :size="'1.75rem'" /></el-icon>
+              <el-icon v-else><Server :size="'1.75rem'" /></el-icon>
             </div>
             <div>
               <div class="start-card-name">{{ config.name }}</div>
               <div class="start-card-meta">{{ getCardSubtitle(config) }}</div>
             </div>
           </div>
-          <button class="card-more-btn" @click.stop="onCardMoreClick($event, config)" :title="t('terminal.more')"><MoreHorizontal :size="16" /></button>
+          <button class="card-more-btn" @click.stop="onCardMoreClick($event, config)" :title="t('terminal.more')"><MoreHorizontal :size="'1rem'" /></button>
         </div>
       </div>
       <div v-if="filteredConnections.length === 0" class="start-empty-hint">
@@ -311,7 +311,7 @@
       @dblclick="emit('new-connection', { host: searchQuery.trim() })"
     >
       <div class="start-card-top">
-        <div class="start-card-icon quick"><el-icon><Zap :size="22" /></el-icon></div>
+        <div class="start-card-icon quick"><el-icon><Zap :size="'1.375rem'" /></el-icon></div>
         <div>
           <div class="start-card-name quick-name">{{ t('startTab.quickConnect', { host: searchQuery.trim() }) }}</div>
           <div class="start-card-meta">{{ t('startTab.quickConnectDesc') }}</div>
@@ -374,7 +374,7 @@
     </div>
 
     <!-- Rename group dialog -->
-    <el-dialog append-to-body v-model="showRenameGroupDialog" :title="t('conn.renameGroup')" width="360px">
+    <el-dialog append-to-body v-model="showRenameGroupDialog" :title="t('conn.renameGroup')" width="22.5rem">
       <el-form @submit.prevent="confirmRenameGroup">
         <el-form-item :label="t('conn.groupName')">
           <el-input
@@ -391,8 +391,8 @@
     </el-dialog>
 
     <!-- New group dialog -->
-    <el-dialog append-to-body v-model="showNewGroupDialog" :title="t('conn.newGroupTitle')" width="400px">
-      <el-form label-width="80px" @submit.prevent="doAddGroup">
+    <el-dialog append-to-body v-model="showNewGroupDialog" :title="t('conn.newGroupTitle')" width="25rem">
+      <el-form label-width="5rem" @submit.prevent="doAddGroup">
         <el-form-item :label="t('conn.groupName')">
           <el-input
             v-model="newGroupDialogName"
@@ -419,7 +419,7 @@
     </el-dialog>
 
     <!-- Delete group dialog -->
-    <el-dialog append-to-body v-model="showDeleteGroupDialog" :title="t('conn.deleteGroupTitle')" width="450px">
+    <el-dialog append-to-body v-model="showDeleteGroupDialog" :title="t('conn.deleteGroupTitle')" width="28.125rem">
       <p>{{ deleteGroupPromptText }}</p>
       <template #footer>
         <el-button @click="showDeleteGroupDialog = false">{{ t('conn.deleteGroupCancel') }}</el-button>
@@ -828,16 +828,21 @@ function goHome() {
 const startTabRef = ref<HTMLElement | null>(null)
 const contentWidth = ref(0)
 
-const CARD_WIDTH = 240
-const CARD_GAP = 12
-const PADDING = 64 // .start-tab padding on each side
+// Card geometry lives in CSS as rem values (.start-cards-grid 15rem cards,
+// 0.75rem gap, .start-tab 4rem side padding) so it scales with the platform
+// root font size. Derive the px constants from the live root font-size to
+// keep this JS math in sync with the CSS on every platform.
+const remPx = () => parseFloat(getComputedStyle(document.documentElement).fontSize)
+const CARD_WIDTH = () => 15 * remPx()
+const CARD_GAP = () => 0.75 * remPx()
+const PADDING = () => 4 * remPx() // .start-tab padding on each side
 
 function updateContentWidth() {
   const el = startTabRef.value
   if (!el) return
-  const available = el.clientWidth - PADDING * 2
-  const cols = Math.max(2, Math.min(6, Math.floor((available + CARD_GAP) / (CARD_WIDTH + CARD_GAP))))
-  contentWidth.value = cols * CARD_WIDTH + (cols - 1) * CARD_GAP
+  const available = el.clientWidth - PADDING() * 2
+  const cols = Math.max(2, Math.min(6, Math.floor((available + CARD_GAP()) / (CARD_WIDTH() + CARD_GAP()))))
+  contentWidth.value = cols * CARD_WIDTH() + (cols - 1) * CARD_GAP()
 }
 
 const contentStyle = computed(() => ({
@@ -893,7 +898,7 @@ function isCardFocused(key: string): boolean {
 
 function getGridColumns(): number {
   if (contentWidth.value === 0) return 3
-  return Math.max(1, Math.floor((contentWidth.value + CARD_GAP) / (CARD_WIDTH + CARD_GAP)))
+  return Math.max(1, Math.floor((contentWidth.value + CARD_GAP()) / (CARD_WIDTH() + CARD_GAP())))
 }
 
 function onSearchKeydown(e: KeyboardEvent) {
@@ -1277,7 +1282,7 @@ async function doDelete(config: ConnectionConfig | null) {
 
 <style scoped>
 .start-tab {
-  padding: 32px 64px 32px 64px;
+  padding: 2rem 4rem 2rem 4rem;
   height: 100%;
   overflow-y: auto;
   outline: none;
@@ -1289,32 +1294,32 @@ async function doDelete(config: ConnectionConfig | null) {
 
 .start-brand {
   text-align: center;
-  font-size: 32px;
+  font-size: 2rem;
   font-weight: 700;
   color: var(--accent);
-  margin-top: 64px;
-  margin-bottom: 36px;
+  margin-top: 4rem;
+  margin-bottom: 2.25rem;
   user-select: none;
 }
 
 .start-search-row {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
 }
 
 .start-filter-btn {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 8px 12px;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   background: var(--bg-surface);
   color: var(--text-secondary);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 0.8125rem;
   white-space: nowrap;
   user-select: none;
 }
@@ -1333,7 +1338,7 @@ async function doDelete(config: ConnectionConfig | null) {
 .start-search-input .el-input__wrapper {
   background-color: var(--bg-surface) !important;
   box-shadow: 0 0 0 1px var(--border-subtle) inset !important;
-  padding: 4px 14px !important;
+  padding: 0.25rem 0.875rem !important;
   border-radius: var(--radius-md) !important;
 }
 .start-search-input .el-input__wrapper.is-focus {
@@ -1341,7 +1346,7 @@ async function doDelete(config: ConnectionConfig | null) {
 }
 .start-search-input .el-input__inner {
   font-family: inherit !important;
-  font-size: 13px !important;
+  font-size: 0.8125rem !important;
   color: var(--text-primary) !important;
 }
 .start-search-input .el-input__inner::placeholder {
@@ -1350,22 +1355,22 @@ async function doDelete(config: ConnectionConfig | null) {
 
 .start-action-btns {
   display: flex;
-  gap: 10px;
-  margin-bottom: 28px;
+  gap: 0.625rem;
+  margin-bottom: 1.75rem;
   align-items: flex-start;
 }
 
 .start-action-btn {
-  padding: 8px 20px;
+  padding: 0.5rem 1.25rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   background: var(--bg-surface);
   color: var(--text-secondary);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 0.8125rem;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
   transition: background 0.15s;
 }
 .start-action-btn:hover {
@@ -1391,7 +1396,7 @@ async function doDelete(config: ConnectionConfig | null) {
 }
 
 .start-action-btn-dropdown-arrow {
-  padding: 8px 10px;
+  padding: 0.5rem 0.625rem;
   border: 1px solid var(--border-subtle);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   background: var(--bg-surface);
@@ -1410,9 +1415,9 @@ async function doDelete(config: ConnectionConfig | null) {
 .start-breadcrumb {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 10px;
-  font-size: 12px;
+  gap: 0.375rem;
+  margin-bottom: 0.625rem;
+  font-size: 0.75rem;
   color: var(--text-disabled);
 }
 .start-breadcrumb .link {
@@ -1433,21 +1438,21 @@ async function doDelete(config: ConnectionConfig | null) {
 .start-section-label {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  gap: 0.375rem;
+  font-size: 0.75rem;
   color: var(--text-disabled);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-top: 24px;
-  margin-bottom: 10px;
+  margin-top: 1.5rem;
+  margin-bottom: 0.625rem;
 }
 .start-add-group-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 0.25rem;
   cursor: pointer;
   color: var(--text-disabled);
   transition: background 0.15s, color 0.15s;
@@ -1460,13 +1465,13 @@ async function doDelete(config: ConnectionConfig | null) {
 .start-divider {
   border: none;
   border-top: 1px solid var(--border-subtle);
-  margin: 20px 0;
+  margin: 1.25rem 0;
 }
 
 .start-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 240px);
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, 15rem);
+  gap: 0.75rem;
 }
 
 .start-card {
@@ -1474,10 +1479,10 @@ async function doDelete(config: ConnectionConfig | null) {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  padding: 8px 12px;
+  padding: 0.5rem 0.75rem;
   cursor: pointer;
   transition: border-color 0.15s;
-  width: 240px;
+  width: 15rem;
 }
 .start-card:hover {
   border-color: var(--accent);
@@ -1487,11 +1492,11 @@ async function doDelete(config: ConnectionConfig | null) {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  right: 6px;
+  right: 0.375rem;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 1.75rem;
+  height: 1.75rem;
   border: none;
   background: var(--bg-elevated);
   color: var(--text-muted);
@@ -1522,7 +1527,7 @@ async function doDelete(config: ConnectionConfig | null) {
 .start-card-top {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   min-width: 0;
 }
 .start-card-top > div:last-child {
@@ -1532,14 +1537,14 @@ async function doDelete(config: ConnectionConfig | null) {
 }
 
 .start-card-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 7px;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.4375rem;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 1.375rem;
   background: var(--bg-overlay);
   color: var(--text-secondary);
 }
@@ -1559,16 +1564,16 @@ async function doDelete(config: ConnectionConfig | null) {
 
 .start-card-name {
   font-weight: 600;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 172px;
+  max-width: 10.75rem;
 }
 .start-card-meta {
-  margin-top: 3px;
-  font-size: 10px;
+  margin-top: 0.1875rem;
+  font-size: 0.625rem;
   color: var(--text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1579,11 +1584,11 @@ async function doDelete(config: ConnectionConfig | null) {
   background: transparent;
   border: 1px dashed var(--accent);
   border-radius: var(--radius-lg);
-  padding: 8px 12px;
+  padding: 0.5rem 0.75rem;
   cursor: pointer;
   transition: background 0.15s;
-  margin-top: 12px;
-  width: 240px;
+  margin-top: 0.75rem;
+  width: 15rem;
 }
 .start-quick-card.focused {
   border-style: solid;
@@ -1601,13 +1606,13 @@ async function doDelete(config: ConnectionConfig | null) {
 .start-empty-state {
   text-align: center;
   color: var(--text-disabled);
-  font-size: 14px;
-  margin-top: 48px;
+  font-size: 0.875rem;
+  margin-top: 3rem;
 }
 .empty-icon {
-  font-size: 48px;
+  font-size: 3rem;
   display: block;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
   opacity: 0.3;
 }
 

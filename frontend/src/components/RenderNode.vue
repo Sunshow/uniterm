@@ -114,7 +114,7 @@ const splitStyle = computed(() => {
   }
   const parts: string[] = []
   for (let i = 0; i < props.node.children.length; i++) {
-    if (i > 0) parts.push('4px')
+    if (i > 0) parts.push('0.25rem')
     parts.push(`${props.node.sizes[i]}fr`)
   }
   const template = parts.join(' ')
@@ -157,7 +157,7 @@ function onPanelDragStart(e: DragEvent, panelId: string) {
   img.textContent = title
   img.style.cssText = `
     position: fixed; left: -9999px; top: -9999px;
-    padding: 6px 14px; background: var(--bg-surface);
+    padding: 0.375rem 0.875rem; background: var(--bg-surface);
     border: 1px solid var(--accent); border-radius: var(--radius-sm);
     color: var(--text-primary); font-size: 12px; font-family: var(--font-ui);
     box-shadow: var(--shadow-md); white-space: nowrap; pointer-events: none;

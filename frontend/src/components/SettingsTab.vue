@@ -307,7 +307,7 @@
                   </el-option-group>
                 </el-select>
                 <button class="btn btn-ghost btn-icon btn-sm" :title="t('theme.newTitle')" @click="openThemeEditor()">
-                  <Plus :size="14" />
+                  <Plus :size="'0.875rem'" />
                 </button>
                 <button
                   v-if="isCustomTheme(settingsStore.settings.terminal.theme)"
@@ -315,7 +315,7 @@
                   :title="t('theme.editTitle')"
                   @click="openThemeEditor(settingsStore.settings.terminal.theme)"
                 >
-                  <Pencil :size="14" />
+                  <Pencil :size="'0.875rem'" />
                 </button>
               </div>
             </div>
@@ -329,7 +329,7 @@
             <div class="setting-control">
               <el-select v-model="settingsStore.settings.terminal.fontFamily" @change="settingsStore.save()">
                 <template #header>
-                  <div style="padding:4px 12px">
+                  <div style="padding:0.25rem 0.75rem">
                     <el-checkbox v-model="firstMonoOnly" @click.stop>{{ t('settings.fontMonoOnly') }}</el-checkbox>
                   </div>
                 </template>
@@ -352,7 +352,7 @@
             <div class="setting-control">
               <el-select v-model="settingsStore.settings.terminal.fallbackFont" @change="settingsStore.save()">
                 <template #header>
-                  <div style="padding:4px 12px">
+                  <div style="padding:0.25rem 0.75rem">
                     <el-checkbox v-model="secondMonoOnly" @click.stop>{{ t('settings.fontMonoOnly') }}</el-checkbox>
                   </div>
                 </template>
@@ -628,7 +628,7 @@
                 <template #append>
                   <el-tooltip :content="t('settings.browse')" placement="top">
                     <el-button :aria-label="t('settings.browse')" @click="pickLogDir">
-                      <el-icon><FolderOpen :size="16" /></el-icon>
+                      <el-icon><FolderOpen :size="'1rem'" /></el-icon>
                     </el-button>
                   </el-tooltip>
                 </template>
@@ -745,13 +745,13 @@
         <h2 class="section-title">{{ t('settings.identities') }}</h2>
         <p class="section-desc">{{ t('settings.identitiesDesc') }}</p>
         <el-button type="primary" @click="openIdentityDialog()">{{ t('settings.addIdentity') }}</el-button>
-        <el-table :data="identityStore.identities" size="small" style="margin-top: 12px">
+        <el-table :data="identityStore.identities" size="small" style="margin-top: 0.75rem">
           <el-table-column prop="name" :label="t('conn.name')" />
           <el-table-column prop="username" :label="t('conn.user')" />
           <el-table-column :label="t('conn.authType')">
             <template #default="{ row }">{{ row.authType === 'password' ? t('conn.password') : row.authType === 'keyText' ? t('conn.keyText') : t('conn.keyPath') }}</template>
           </el-table-column>
-          <el-table-column :label="t('common.actions')" width="160">
+          <el-table-column :label="t('common.actions')" width="uiPx(160)">
             <template #default="{ row }">
               <el-button size="small" @click="openIdentityDialog(row)">{{ t('common.edit') }}</el-button>
               <el-button size="small" type="danger" @click="removeIdentity(row)">{{ t('common.delete') }}</el-button>
@@ -766,13 +766,13 @@
         <h2 class="section-title">{{ t('settings.proxies') }}</h2>
         <p class="section-desc">{{ t('settings.proxiesDesc') }}</p>
         <el-button type="primary" @click="openProxyDialog()">{{ t('settings.addProxy') }}</el-button>
-        <el-table :data="proxyStore.proxies" size="small" style="margin-top: 12px">
+        <el-table :data="proxyStore.proxies" size="small" style="margin-top: 0.75rem">
           <el-table-column prop="name" :label="t('conn.name')" />
-          <el-table-column prop="kind" :label="t('conn.proxyType')" width="100" />
+          <el-table-column prop="kind" :label="t('conn.proxyType')" width="uiPx(100)" />
           <el-table-column :label="t('settings.proxyHost')">
             <template #default="{ row }">{{ row.host }}:{{ row.port }}</template>
           </el-table-column>
-          <el-table-column :label="t('settings.enabled')" width="80">
+          <el-table-column :label="t('settings.enabled')" width="uiPx(80)">
             <template #default="{ row }">
               <el-switch
                 :model-value="row.enabled !== false"
@@ -781,7 +781,7 @@
               />
             </template>
           </el-table-column>
-          <el-table-column :label="t('common.actions')" width="160">
+          <el-table-column :label="t('common.actions')" width="uiPx(160)">
             <template #default="{ row }">
               <el-button size="small" @click="openProxyDialog(row)">{{ t('common.edit') }}</el-button>
               <el-button size="small" type="danger" @click="removeProxy(row)">{{ t('common.delete') }}</el-button>
@@ -796,15 +796,15 @@
         <h2 class="section-title">{{ t('settings.tunnels') }}</h2>
         <p class="section-desc">{{ t('settings.tunnelsDesc') }}</p>
         <el-button type="primary" @click="openTunnelDialog()">{{ t('tunnels.addTunnel') }}</el-button>
-        <el-table :data="tunnelStore.tunnels" size="small" style="margin-top: 12px">
+        <el-table :data="tunnelStore.tunnels" size="small" style="margin-top: 0.75rem">
           <el-table-column prop="name" :label="t('tunnels.name')" />
-          <el-table-column :label="t('tunnels.modeCol')" width="100">
+          <el-table-column :label="t('tunnels.modeCol')" width="uiPx(100)">
             <template #default="{ row }">{{ modeName(row.mode) }}</template>
           </el-table-column>
-          <el-table-column :label="t('tunnels.listenCol')" width="120">
+          <el-table-column :label="t('tunnels.listenCol')" width="uiPx(120)">
             <template #default="{ row }">:{{ effPort(row) }}</template>
           </el-table-column>
-          <el-table-column :label="t('tunnels.statusCol')" width="120">
+          <el-table-column :label="t('tunnels.statusCol')" width="uiPx(120)">
             <template #default="{ row }">
               <el-switch
                 :model-value="statusOf(row.id) === 'running'"
@@ -813,7 +813,7 @@
               />
             </template>
           </el-table-column>
-          <el-table-column :label="t('common.actions')" width="160">
+          <el-table-column :label="t('common.actions')" width="uiPx(160)">
             <template #default="{ row }">
               <!-- Editing a running tunnel would desync the form from what's
                    actually running; edits require a stop first. -->
@@ -840,19 +840,19 @@
           </div>
           <div class="about-links">
             <a href="#" class="about-link" @click.prevent="Browser.OpenURL('https://uniterm.net')">
-              <Globe :size="14" class="about-link-icon" />
+              <Globe :size="'0.875rem'" class="about-link-icon" />
               {{ t('settings.homepage') }}
             </a>
             <a href="#" class="about-link" @click.prevent="Browser.OpenURL(locale === 'zh-CN' ? 'https://uniterm.net/guide/zh/introduction' : 'https://uniterm.net/guide/en/introduction')">
-              <BookOpen :size="14" class="about-link-icon" />
+              <BookOpen :size="'0.875rem'" class="about-link-icon" />
               {{ t('settings.userManual') }}
             </a>
             <a href="#" class="about-link" @click.prevent="Browser.OpenURL('https://github.com/ys-ll/uniterm')">
-              <svg class="about-link-icon" viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+              <svg class="about-link-icon" viewBox="0 0 16 16" width="0.875rem" height="0.875rem" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
               GitHub
             </a>
             <a href="#" class="about-link" @click.prevent="Browser.OpenURL('https://gitee.com/ys-l/uniterm')">
-              <svg class="about-link-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M11.984 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.016 0zm6.09 5.333c.328 0 .593.266.592.593v1.482a.594.594 0 0 1-.593.592H9.777c-.982 0-1.778.796-1.778 1.778v5.63c0 .327.266.592.593.592h5.63c.982 0 1.778-.796 1.778-1.778v-.296a.593.593 0 0 0-.592-.593h-4.15a.592.592 0 0 1-.592-.592v-1.482a.593.593 0 0 1 .593-.592h6.815c.327 0 .593.265.593.592v3.408a4 4 0 0 1-4 4H5.926a.593.593 0 0 1-.593-.593V9.778a4.444 4.444 0 0 1 4.445-4.444h8.296z"/></svg>
+              <svg class="about-link-icon" viewBox="0 0 24 24" width="0.875rem" height="0.875rem" fill="currentColor"><path d="M11.984 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.016 0zm6.09 5.333c.328 0 .593.266.592.593v1.482a.594.594 0 0 1-.593.592H9.777c-.982 0-1.778.796-1.778 1.778v5.63c0 .327.266.592.593.592h5.63c.982 0 1.778-.796 1.778-1.778v-.296a.593.593 0 0 0-.592-.593h-4.15a.592.592 0 0 1-.592-.592v-1.482a.593.593 0 0 1 .593-.592h6.815c.327 0 .593.265.593.592v3.408a4 4 0 0 1-4 4H5.926a.593.593 0 0 1-.593-.593V9.778a4.444 4.444 0 0 1 4.445-4.444h8.296z"/></svg>
               Gitee
             </a>
           </div>
@@ -898,7 +898,7 @@
               <tr>
                 <th>{{ t('shortcut.colFunction') }}</th>
                 <th>{{ t('shortcut.colBinding') }}</th>
-                <th style="width:190px;">{{ t('shortcut.colActions') }}</th>
+                <th style="width:11.875rem;">{{ t('shortcut.colActions') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -1019,21 +1019,6 @@
         <div class="settings-group">
           <div class="setting-card">
             <div class="setting-info">
-              <div class="setting-title">{{ t('settings.aiFontSize') }}</div>
-              <div class="setting-desc">{{ t('settings.aiFontSizeDesc') }}</div>
-            </div>
-            <div class="setting-control">
-              <el-input-number
-                v-model="settingsStore.settings.ai.fontSize"
-                :min="10"
-                :max="24"
-                @change="settingsStore.save()"
-              />
-            </div>
-          </div>
-
-          <div class="setting-card">
-            <div class="setting-info">
               <div class="setting-title">{{ t('settings.maxTurns') }}</div>
               <div class="setting-desc">{{ t('settings.maxTurnsDesc') }}</div>
             </div>
@@ -1053,7 +1038,7 @@
               <div class="setting-desc">{{ t('settings.modelListDesc') }}</div>
             </div>
             <div class="setting-control">
-              <el-button @click="openNewModelForm"><Plus :size="14" /> {{ t('settings.addModel') }}</el-button>
+              <el-button @click="openNewModelForm"><Plus :size="'0.875rem'" /> {{ t('settings.addModel') }}</el-button>
             </div>
           </div>
 
@@ -1075,10 +1060,10 @@
             </div>
             <div class="model-actions">
               <el-button link @click="editModel(model)">
-                <el-icon><Pencil :size="14" /></el-icon>
+                <el-icon><Pencil :size="'0.875rem'" /></el-icon>
               </el-button>
               <el-button link type="danger" @click="removeModelConfirm(model)">
-                <el-icon><Trash2 :size="14" /></el-icon>
+                <el-icon><Trash2 :size="'0.875rem'" /></el-icon>
               </el-button>
             </div>
           </div>
@@ -1087,8 +1072,8 @@
     </div>
 
     <!-- Model Form Dialog -->
-    <el-dialog append-to-body v-model="showModelForm" :title="editingModel ? t('settings.editModel') : t('settings.newModel')" width="400px">
-      <el-form label-width="80px">
+    <el-dialog append-to-body v-model="showModelForm" :title="editingModel ? t('settings.editModel') : t('settings.newModel')" width="25rem">
+      <el-form label-width="5rem">
         <el-form-item :label="t('settings.modelName')">
           <el-input v-model="modelForm.name" />
         </el-form-item>
@@ -1128,7 +1113,7 @@
               />
             </el-select>
             <el-button class="inline-add-btn" :title="t('conn.newProxy')" @click="modelProxyDialogVisible = true">
-              <Plus :size="14" />
+              <Plus :size="'0.875rem'" />
             </el-button>
           </div>
         </el-form-item>
@@ -1159,10 +1144,10 @@
           <el-button :loading="testingConnection" @click="testConnection">
             {{ t('settings.testConnection') }}
           </el-button>
-          <span v-if="testResult != null" :class="testResult ? 'test-ok' : 'test-fail'" style="margin-left: 8px; font-size: 13px;">
+          <span v-if="testResult != null" :class="testResult ? 'test-ok' : 'test-fail'" style="margin-left: 0.5rem; font-size: 0.8125rem;">
             {{ testResult ? t('settings.testSuccess') : t('settings.testFailed') }}
           </span>
-          <span v-if="testError" style="margin-left: 8px; font-size: 12px; color: var(--error); word-break: break-all;">{{ testError }}</span>
+          <span v-if="testError" style="margin-left: 0.5rem; font-size: 0.75rem; color: var(--error); word-break: break-all;">{{ testError }}</span>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -1185,8 +1170,8 @@
     <!-- Config dialogs -->
     <DataDirDialog v-model:visible="dataDirVisible" :first-run="false" @done="onDataDirChange" />
 
-    <el-dialog append-to-body v-model="showSetupMaster" :title="t('config.setupMasterTitle')" width="440px">
-      <el-form label-width="100px" class="settings-form" @submit.prevent="doSetupMaster">
+    <el-dialog append-to-body v-model="showSetupMaster" :title="t('config.setupMasterTitle')" width="27.5rem">
+      <el-form label-width="6.25rem" class="settings-form" @submit.prevent="doSetupMaster">
         <el-form-item :label="t('encrypt.password')">
           <el-input v-model="setupPw" type="password" show-password />
         </el-form-item>
@@ -1201,8 +1186,8 @@
       </template>
     </el-dialog>
 
-    <el-dialog append-to-body v-model="showVerifyMaster" :title="t('config.verifyMasterTitle')" width="440px">
-      <el-form label-width="100px" class="settings-form" @submit.prevent="doVerifyMaster">
+    <el-dialog append-to-body v-model="showVerifyMaster" :title="t('config.verifyMasterTitle')" width="27.5rem">
+      <el-form label-width="6.25rem" class="settings-form" @submit.prevent="doVerifyMaster">
         <el-form-item :label="t('config.verifyCurrentPassword')">
           <div class="verify-field">
             <el-input v-model="verifyPw" type="password" show-password />
@@ -1217,8 +1202,8 @@
       </template>
     </el-dialog>
 
-    <el-dialog append-to-body v-model="showChangePassword" :title="t('config.changePassword')" width="440px">
-      <el-form label-width="100px" class="settings-form" @submit.prevent="doChangePassword">
+    <el-dialog append-to-body v-model="showChangePassword" :title="t('config.changePassword')" width="27.5rem">
+      <el-form label-width="6.25rem" class="settings-form" @submit.prevent="doChangePassword">
         <el-form-item :label="t('config.oldPassword')">
           <el-input v-model="oldPw" type="password" show-password />
         </el-form-item>
@@ -1275,6 +1260,7 @@ import type { Tunnel, TunnelMode } from '../stores/tunnelStore'
 import type { Identity } from '../types/identity'
 import { Browser } from '@wailsio/runtime'
 import type { Proxy } from '../types/proxy'
+import { uiPx } from '../utils/uiScale'
 
 const settingsStore = useSettingsStore()
 const syncStore = useSyncStore()
@@ -2165,28 +2151,28 @@ async function onToggleSystemTitleBar(v: boolean) {
 }
 
 .settings-sidebar {
-  width: 180px;
+  width: 11.25rem;
   flex-shrink: 0;
-  margin-left: 20px;
-  margin-right: 10px;
-  padding: 16px 0;
+  margin-left: 1.25rem;
+  margin-right: 0.625rem;
+  padding: 1rem 0;
   border-right: 1px solid var(--border-hover);
 }
 
 .settings-category {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  margin: 0 8px;
-  font-size: 13px;
+  gap: 0.625rem;
+  padding: 0.625rem 1rem;
+  margin: 0 0.5rem;
+  font-size: 0.8125rem;
   font-family: var(--font-ui);
   cursor: pointer;
   user-select: none;
   color: var(--text-secondary);
   border-radius: var(--radius-sm);
   transition: all 0.12s ease;
-  border-left: 3px solid transparent;
+  border-left: 0.1875rem solid transparent;
 }
 
 .settings-category:hover {
@@ -2198,11 +2184,11 @@ async function onToggleSystemTitleBar(v: boolean) {
   background: var(--accent-subtle);
   color: var(--accent);
   border-left-color: var(--accent);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(0.5rem);
 }
 
 .category-icon {
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .category-label {
@@ -2211,41 +2197,41 @@ async function onToggleSystemTitleBar(v: boolean) {
 
 .settings-panel {
   flex: 1;
-  padding: 24px 32px;
+  padding: 1.5rem 2rem;
   overflow-y: auto;
 }
 
 .settings-section {
-  min-width: 400px;
+  min-width: 25rem;
   max-width: 1000px;
   margin: 0 auto;
 }
 
 .section-title {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 600;
   font-family: var(--font-ui);
-  margin: 20px 0 20px 0;
+  margin: 1.25rem 0 1.25rem 0;
   color: var(--text-primary);
 }
 
 .settings-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .setting-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 14px 18px;
+  gap: 1rem;
+  padding: 0.875rem 1.125rem;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   transition: all 0.12s ease;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(0.5rem);
 }
 
 .setting-card:hover {
@@ -2258,15 +2244,15 @@ async function onToggleSystemTitleBar(v: boolean) {
 }
 
 .setting-title {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   font-family: var(--font-ui);
   color: var(--text-primary);
-  margin-bottom: 2px;
+  margin-bottom: 0.125rem;
 }
 
 .setting-desc {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-family: var(--font-ui);
   color: var(--text-muted);
   line-height: 1.4;
@@ -2274,32 +2260,32 @@ async function onToggleSystemTitleBar(v: boolean) {
 
 .setting-control {
   flex-shrink: 0;
-  min-width: 210px;
+  min-width: 13.125rem;
 }
 
 /* Keep the external-editor combobox the same width as the other select
    controls instead of the default 100% (the free-input form stretches). */
 .setting-control .editor-select.el-select {
-  width: 210px;
+  width: 13.125rem;
 }
 
 
 /* The append button's width adds to the input's, so pin the whole group to
-   the 210px the sibling selects render at instead of letting it overflow. */
+   the 13.125rem the sibling selects render at instead of letting it overflow. */
 .setting-control .dir-input {
-  width: 210px;
+  width: 13.125rem;
 }
 
 .config-value {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-secondary);
 }
 
-.settings-form { display: flex; flex-direction: column; gap: 4px; }
-.switch-mode-hint { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
-.verify-field { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+.settings-form { display: flex; flex-direction: column; gap: 0.25rem; }
+.switch-mode-hint { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; }
+.verify-field { display: flex; flex-direction: column; gap: 0.25rem; width: 100%; }
 
-.form-error { color: var(--el-color-danger); font-size: 13px; margin-top: 8px; }
+.form-error { color: var(--el-color-danger); font-size: 0.8125rem; margin-top: 0.5rem; }
 
 .setting-control .el-select,
 .setting-control .el-input-number {
@@ -2309,7 +2295,7 @@ async function onToggleSystemTitleBar(v: boolean) {
 .theme-select-row {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.25rem;
   width: 100%;
 }
 
@@ -2324,8 +2310,8 @@ async function onToggleSystemTitleBar(v: boolean) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 12px 18px;
+  gap: 1rem;
+  padding: 0.75rem 1.125rem;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
@@ -2344,62 +2330,62 @@ async function onToggleSystemTitleBar(v: boolean) {
 .model-main {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.125rem;
   flex: 1;
   min-width: 0;
 }
 
 .model-name {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-primary);
 }
 
 .model-detail {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-family: var(--font-mono);
   color: var(--text-muted);
-  margin-left: 24px;
+  margin-left: 1.5rem;
 }
 
 .model-actions {
   display: flex;
-  gap: 4px;
+  gap: 0.25rem;
   flex-shrink: 0;
 }
 
 .about-content {
   text-align: left;
-  padding: 20px 0;
+  padding: 1.25rem 0;
 }
 .about-appname {
-  font-size: 28px;
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 12px;
+  margin-bottom: 0.75rem;
 }
 .about-desc {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--text-secondary);
-  margin: 0 0 24px 0;
+  margin: 0 0 1.5rem 0;
   line-height: 1.6;
-  max-width: 400px;
+  max-width: 25rem;
 }
 .about-version {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-muted);
   font-family: var(--font-mono);
 }
 .about-links {
   display: flex;
-  gap: 16px;
-  margin-top: 12px;
+  gap: 1rem;
+  margin-top: 0.75rem;
 }
 .about-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  gap: 0.375rem;
+  font-size: 0.75rem;
   color: var(--accent);
   text-decoration: none;
   transition: opacity 0.12s ease;
@@ -2414,7 +2400,7 @@ async function onToggleSystemTitleBar(v: boolean) {
 }
 
 .section-desc {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-secondary);
   margin: 0;
   line-height: 1.5;
@@ -2424,7 +2410,7 @@ async function onToggleSystemTitleBar(v: boolean) {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
   overflow: hidden;
 }
 
@@ -2432,29 +2418,29 @@ async function onToggleSystemTitleBar(v: boolean) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   font-family: var(--font-ui);
   color: var(--text-primary);
-  padding: 8px 12px 8px 18px;
+  padding: 0.5rem 0.75rem 0.5rem 1.125rem;
   background: var(--bg-hover);
   border-bottom: 1px solid var(--border-subtle);
 }
 
 .sync-card-body {
-  padding: 16px 18px;
+  padding: 1rem 1.125rem;
 }
 
 .sync-card-body.empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 28px 18px;
+  gap: 0.75rem;
+  padding: 1.75rem 1.125rem;
 }
 
 .empty-text {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-muted);
   margin: 0;
 }
@@ -2463,19 +2449,19 @@ async function onToggleSystemTitleBar(v: boolean) {
 .repo-info {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 12px;
+  gap: 0.375rem;
+  margin-bottom: 0.75rem;
 }
 
 .repo-info-row {
   display: flex;
-  gap: 12px;
-  font-size: 13px;
+  gap: 0.75rem;
+  font-size: 0.8125rem;
 }
 
 .repo-label {
   color: var(--text-muted);
-  min-width: 70px;
+  min-width: 4.375rem;
   flex-shrink: 0;
 }
 
@@ -2488,14 +2474,14 @@ async function onToggleSystemTitleBar(v: boolean) {
 .repo-warning {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
+  gap: 0.5rem;
+  padding: 0.625rem 0.875rem;
   background: var(--el-color-warning-light-9);
   border: 1px solid var(--el-color-warning-light-5);
-  border-radius: 6px;
-  margin-bottom: 14px;
+  border-radius: 0.375rem;
+  margin-bottom: 0.875rem;
   color: var(--el-color-warning-dark-2);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.5;
 }
 
@@ -2503,32 +2489,32 @@ async function onToggleSystemTitleBar(v: boolean) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .repo-actions-left {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 /* Sync status */
 .sync-status {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 14px;
+  gap: 0.375rem;
+  margin-bottom: 0.875rem;
 }
 
 .sync-status-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
 }
 
 .sync-label {
   color: var(--text-muted);
-  min-width: 70px;
+  min-width: 4.375rem;
   flex-shrink: 0;
 }
 
@@ -2537,9 +2523,9 @@ async function onToggleSystemTitleBar(v: boolean) {
 }
 
 .sync-tag {
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 10px;
+  font-size: 0.6875rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.625rem;
   font-weight: 500;
 }
 
@@ -2562,32 +2548,32 @@ async function onToggleSystemTitleBar(v: boolean) {
 }
 
 .sync-actions-row {
-  margin-bottom: 14px;
+  margin-bottom: 0.875rem;
 }
 
 .sync-auto-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding-top: 14px;
+  gap: 0.625rem;
+  padding-top: 0.875rem;
   border-top: 1px solid var(--border-subtle);
 }
 
 .sync-auto-label {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-primary);
 }
 
 .sync-auto-desc {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-muted);
   flex: 1;
 }
 
 .model-fetch-row {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   width: 100%;
 }
 .model-autocomplete {
@@ -2598,55 +2584,55 @@ async function onToggleSystemTitleBar(v: boolean) {
 .inline-add-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
   width: 100%;
 }
 .inline-add-btn {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
 }
 
 .about-update-actions {
-  margin-top: 20px;
+  margin-top: 1.25rem;
 }
 .about-auto-check {
-  margin-top: 12px;
-  font-size: 13px;
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
   font-family: var(--font-ui);
 }
 .about-update-source {
-  margin-top: 10px;
+  margin-top: 0.625rem;
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
   font-family: var(--font-ui);
 }
 .about-update-source-select {
-  width: 190px;
+  width: 11.875rem;
 }
 
 .kb-key {
   display: inline-block;
-  padding: 2px 8px;
+  padding: 0.125rem 0.5rem;
   background: var(--bg-overlay);
   border: 1px solid var(--border-subtle);
-  border-radius: 4px;
+  border-radius: 0.25rem;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-primary);
 }
 
 .kb-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 .kb-table th, .kb-table td {
-  padding: 10px 12px;
+  padding: 0.625rem 0.75rem;
   text-align: left;
   border-bottom: 1px solid var(--border-subtle);
 }
@@ -2654,7 +2640,7 @@ async function onToggleSystemTitleBar(v: boolean) {
 .kb-table th {
   color: var(--text-muted);
   font-weight: 500;
-  font-size: 12px;
+  font-size: 0.75rem;
   text-transform: uppercase;
 }
 
@@ -2663,23 +2649,23 @@ async function onToggleSystemTitleBar(v: boolean) {
 }
 
 .kb-hint {
-  margin-top: 2px;
-  font-size: 12px;
+  margin-top: 0.125rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
 }
 
 .kb-modifier-note {
-  margin: 0 0 10px;
+  margin: 0 0 0.625rem;
 }
 
 .kb-actions {
   display: flex;
-  gap: 6px;
+  gap: 0.375rem;
 }
 
-.bg-image-row { display: flex; align-items: center; gap: 8px; }
+.bg-image-row { display: flex; align-items: center; gap: 0.5rem; }
 .bg-thumb {
-  width: 64px; height: 40px; border-radius: 4px;
+  width: 4rem; height: 2.5rem; border-radius: 0.25rem;
   background-size: cover; background-position: center;
   border: 1px solid var(--border-subtle);
 }

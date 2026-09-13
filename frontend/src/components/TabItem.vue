@@ -31,7 +31,7 @@
       <span v-else-if="!isActive && hasNotification && !tab.locked" class="tab-notification-dot" />
     </span>
     <span v-if="!editing" class="tab-name" :class="{ 'tab-disconnected': isDisconnected }" :title="tab.name" @dblclick.stop="startEdit">
-      <ArrowDownUp v-if="hasActiveTransfers" class="transfer-indicator" :size="14" title="Transferring..." />
+      <ArrowDownUp v-if="hasActiveTransfers" class="transfer-indicator" :size="'0.875rem'" title="Transferring..." />
       <span class="tab-name-text">{{ tab.name }}</span>
     </span>
     <input
@@ -48,7 +48,7 @@
     <Radio
       v-if="showBroadcastIcon"
       class="tab-broadcast-icon"
-      :size="14"
+      :size="'0.875rem'"
       :title="t('tab.unbroadcast')"
     />
     <button
@@ -626,17 +626,17 @@ onMounted(async () => {
 .tab-item {
   display: flex;
   align-items: center;
-  gap: 2px;
-  height: 28px;
-  min-width: 144px;
-  padding: 0 12px;
+  gap: 0.125rem;
+  height: 1.75rem;
+  min-width: 9rem;
+  padding: 0 0.75rem;
   margin: 0 1px;
   cursor: pointer;
   user-select: none;
   border-radius: var(--radius-sm);
   position: relative;
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: 0.75rem;
   transition: background 0.15s ease, color 0.15s ease;
   flex-shrink: 0;
   --wails-draggable: no-drag;
@@ -651,22 +651,22 @@ onMounted(async () => {
   box-shadow: inset 0 0 0 1px var(--accent);
 }
 .tab-item.ai-locked {
-  box-shadow: inset 2px 0 0 var(--warning), inset 0 0 12px var(--warning-subtle);
+  box-shadow: inset 0.125rem 0 0 var(--warning), inset 0 0 0.75rem var(--warning-subtle);
 }
 .tab-item.active.ai-locked {
   background: var(--bg-hover);
   color: var(--text-primary);
-  box-shadow: inset 0 0 0 1px var(--accent), inset 2px 0 0 var(--warning), inset 0 0 12px var(--warning-subtle);
+  box-shadow: inset 0 0 0 1px var(--accent), inset 0.125rem 0 0 var(--warning), inset 0 0 0.75rem var(--warning-subtle);
 }
 .tab-name {
-  font-size: 12px;
+  font-size: 0.75rem;
   white-space: nowrap;
   overflow: hidden;
   /* Keep a full IPv6 address visible; longer custom names still use ellipsis. */
-  max-width: 300px;
+  max-width: 18.75rem;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
   font-weight: 500;
 }
 .tab-name-text {
@@ -676,9 +676,9 @@ onMounted(async () => {
 }
 .tab-shortcut {
   flex-shrink: 0;
-  margin-left: 4px;
+  margin-left: 0.25rem;
   color: var(--text-muted);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 500;
 }
 .tab-disconnected {
@@ -688,15 +688,15 @@ onMounted(async () => {
   position: relative;
   display: inline-flex;
   flex-shrink: 0;
-  margin-right: 4px;
+  margin-right: 0.25rem;
 }
 .tab-type-icon {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  height: 14px;
+  width: 0.875rem;
+  height: 0.875rem;
   color: var(--text-muted);
 }
 /* Broadcast status icon occupies the exact same far-right slot as the right
@@ -715,20 +715,20 @@ onMounted(async () => {
 }
 .tab-notification-dot {
   position: absolute;
-  top: -2px;
-  right: -4px;
-  width: 6px;
-  height: 6px;
+  top: -0.125rem;
+  right: -0.25rem;
+  width: 0.375rem;
+  height: 0.375rem;
   border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 0 1px var(--bg-base);
 }
 .tab-log-dot {
   position: absolute;
-  right: -2px;
-  bottom: -2px;
-  width: 6px;
-  height: 6px;
+  right: -0.125rem;
+  bottom: -0.125rem;
+  width: 0.375rem;
+  height: 0.375rem;
   background: #e5484d;
   border-radius: 50%;
   pointer-events: auto;
@@ -742,30 +742,30 @@ onMounted(async () => {
   line-height: 1;
 }
 .tab-name-input {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-family: inherit;
   color: var(--text-primary);
   background: var(--bg-base);
   border: 1px solid var(--accent);
   border-radius: var(--radius-sm);
-  padding: 2px 6px;
-  width: 120px;
+  padding: 0.125rem 0.375rem;
+  width: 7.5rem;
   outline: none;
 }
 .tab-close {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  height: 14px;
-  margin-right: 4px;
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-right: 0.25rem;
   padding: 0;
   background: transparent;
   border: none;
   border-radius: var(--radius-sm);
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 14px;
+  font-size: 0.875rem;
   transition: all 0.12s ease;
 }
 .tab-close:hover {
@@ -774,7 +774,7 @@ onMounted(async () => {
 }
 /* Close button on the right side of the tab (appearance setting).
    margin-left:auto pushes it flush to the far right edge of the tab
-   (inside the 12px horizontal padding), instead of hugging the name.
+   (inside the 0.75rem horizontal padding), instead of hugging the name.
 
    The button is always present in the layout when the right-side setting is on
    — ghosted (visibility:hidden) while not hovered OR the tab is locked — so its

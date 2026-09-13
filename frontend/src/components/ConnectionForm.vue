@@ -1,5 +1,5 @@
 <template>
-  <el-dialog append-to-body v-model="visible" :title="isEdit ? t('conn.editTitle') : t('conn.newTitle')" width="700px" class="conn-dialog" @opened="onDialogOpened">
+  <el-dialog append-to-body v-model="visible" :title="isEdit ? t('conn.editTitle') : t('conn.newTitle')" width="43.75rem" class="conn-dialog" @opened="onDialogOpened">
     <div class="conn-layout">
       <!-- Left sidebar: category icons -->
       <div class="conn-categories">
@@ -10,7 +10,7 @@
           :class="{ active: category === cat.key }"
           @click="onCategorySelect(cat.key)"
         >
-          <component :is="cat.icon" :size="20" />
+          <component :is="cat.icon" :size="'1.25rem'" />
           <span>{{ cat.label }}</span>
         </div>
       </div>
@@ -26,14 +26,14 @@
             :class="{ active: isSubTypeActive(st) }"
             @click="selectType(st)"
           >
-            <component :is="st.icon" :size="18" />
+            <component :is="st.icon" :size="'1.125rem'" />
             <span>{{ st.label }}</span>
           </button>
         </div>
 
         <!-- Form fields -->
         <div class="conn-fields">
-          <el-form :model="form" label-width="90px" @submit.prevent="onSave">
+          <el-form :model="form" label-width="5.625rem" @submit.prevent="onSave">
             <el-form-item :label="t('conn.name')">
               <div class="name-group-row">
                 <el-input v-model="form.name" :placeholder="t('conn.namePlaceholder')" class="name-input" />
@@ -47,7 +47,7 @@
                   class="group-select"
                 />
                 <el-button class="new-group-btn" @click="onGroupSelect('__new__')" :title="t('conn.newGroup')">
-                  <Plus :size="14" />
+                  <Plus :size="'0.875rem'" />
                 </el-button>
               </div>
             </el-form-item>
@@ -100,7 +100,7 @@
                   <el-option v-for="id in identityStore.identities" :key="id.id" :label="`${id.name} (${id.username})`" :value="id.id" />
                 </el-select>
                 <el-button class="inline-add-btn" :title="t('conn.newIdentity')" @click="openNewIdentityDialog">
-                  <Plus :size="14" />
+                  <Plus :size="'0.875rem'" />
                 </el-button>
               </div>
             </el-form-item>
@@ -155,7 +155,7 @@
                 <template #append>
                   <el-tooltip :content="t('conn.selectKeyFile')" placement="top">
                     <el-button :aria-label="t('conn.selectKeyFile')" @click="selectKeyFile">
-                      <el-icon><FolderOpen :size="16" /></el-icon>
+                      <el-icon><FolderOpen :size="'1rem'" /></el-icon>
                     </el-button>
                   </el-tooltip>
                 </template>
@@ -164,8 +164,8 @@
             <el-form-item v-if="form.authType === 'keyText' && (form.type === 'ssh' || form.type === 'scp' || form.type === 'sftp' || form.type === 'mosh' || form.type === 'x11-desktop')" :label="t('conn.keyContent')">
               <template v-if="!keyContentRevealed">
                 <el-button size="small" @click="keyContentRevealed = true">
-                  <el-icon><Eye :size="14" /></el-icon>
-                  <span style="margin-left: 4px">{{ t('conn.keyTextReveal') }}</span>
+                  <el-icon><Eye :size="'0.875rem'" /></el-icon>
+                  <span style="margin-left: 0.25rem">{{ t('conn.keyTextReveal') }}</span>
                 </el-button>
               </template>
               <template v-else>
@@ -179,12 +179,12 @@
                 />
                 <div class="key-content-actions">
                   <el-button size="small" @click="keyContentRevealed = false">
-                    <el-icon><EyeOff :size="14" /></el-icon>
-                    <span style="margin-left: 4px">{{ t('conn.keyTextHide') }}</span>
+                    <el-icon><EyeOff :size="'0.875rem'" /></el-icon>
+                    <span style="margin-left: 0.25rem">{{ t('conn.keyTextHide') }}</span>
                   </el-button>
                   <el-button size="small" @click="importKeyText">
-                    <el-icon><FolderOpen :size="14" /></el-icon>
-                    <span style="margin-left: 4px">{{ t('conn.importFromFile') }}</span>
+                    <el-icon><FolderOpen :size="'0.875rem'" /></el-icon>
+                    <span style="margin-left: 0.25rem">{{ t('conn.importFromFile') }}</span>
                   </el-button>
                 </div>
               </template>
@@ -216,7 +216,7 @@
             </el-form-item>
             <template v-if="form.type === 'serial'">
               <el-form-item :label="t('serial.portLabel')" required>
-                <div style="display:flex;gap:8px;width:100%">
+                <div style="display:flex;gap:0.5rem;width:100%">
                   <el-select v-model="form.serialPort" :placeholder="portPlaceholder" :disabled="serialPorts.length === 0 || serialScanning" :loading="serialScanning" style="flex:1">
                     <el-option v-for="p in serialPorts" :key="p" :label="p" :value="p" />
                   </el-select>
@@ -289,7 +289,7 @@
                 <el-input v-model="form.k8sConfigPath" placeholder="~/.kube/config">
                   <template #append>
                     <el-button @click="pickKubeconfigFile">
-                      <el-icon><FolderOpen :size="16" /></el-icon>
+                      <el-icon><FolderOpen :size="'1rem'" /></el-icon>
                     </el-button>
                   </template>
                 </el-input>
@@ -305,12 +305,12 @@
               </el-form-item>
 
               <el-form-item :label="t('conn.k8sContext')">
-                <div style="display: flex; align-items: center; gap: 8px; width: 100%">
+                <div style="display: flex; align-items: center; gap: 0.5rem; width: 100%">
                   <el-select v-model="form.k8sContext" filterable :placeholder="k8sContextsError || ''" :loading="k8sContextsLoading" style="flex: 1">
                     <el-option v-for="c in k8sContexts" :key="c.name" :value="c.name" :label="c.current ? c.name + ' (current)' : c.name" />
                   </el-select>
                   <el-button @click="reloadK8sContexts" :loading="k8sContextsLoading" :title="t('conn.k8sReloadContexts')">
-                    <el-icon><RefreshCw :size="16" /></el-icon>
+                    <el-icon><RefreshCw :size="'1rem'" /></el-icon>
                   </el-button>
                 </div>
               </el-form-item>
@@ -404,7 +404,7 @@
               <el-input v-model="form.remark" type="textarea" :rows="3" />
             </el-form-item>
             <div v-if="showAdvancedToggle" class="advanced-toggle" @click="showAdvanced = !showAdvanced">
-              <el-icon class="advanced-arrow" :class="{ expanded: showAdvanced }"><ChevronRight :size="14" /></el-icon>
+              <el-icon class="advanced-arrow" :class="{ expanded: showAdvanced }"><ChevronRight :size="'0.875rem'" /></el-icon>
               <span>{{ t('conn.advanced') }}</span>
             </div>
             <template v-if="showAdvanced">
@@ -412,7 +412,7 @@
               <el-input v-model="form.dbParams" :placeholder="defaultParamsHint" style="width:100%" />
             </el-form-item>
 <el-form-item v-if="form.type === 'database' && form.dbType === 'redis'" :label="t('conn.redisKeySeparator')">
-              <el-input v-model="form.redisKeySeparator" style="width: 160px" />
+              <el-input v-model="form.redisKeySeparator" style="width: 10.0rem" />
             </el-form-item>
             <el-form-item v-if="form.type === 'ssh' || form.type === 'telnet' || form.type === 'mosh' || form.type === 'local' || form.type === 'wsl'" :label="t('conn.postLoginScript')">
               <div class="post-login-config">
@@ -468,12 +468,12 @@
                         :title="t('conn.expectRemoveStep')"
                         @click="removeExpectStep(idx)"
                       >
-                        <Trash2 :size="14" />
+                        <Trash2 :size="'0.875rem'" />
                       </el-button>
                     </div>
                   </div>
                   <el-button class="add-step-btn" @click="addExpectStep">
-                    <Plus :size="14" />
+                    <Plus :size="'0.875rem'" />
                     {{ t('conn.expectAddStep') }}
                   </el-button>
                   <div class="expect-help">{{ t('conn.expectVariableHint') }}</div>
@@ -535,11 +535,11 @@
             </el-form-item>
             <el-form-item v-if="form.type === 'ssh'" :label="t('conn.x11Forwarding')">
               <el-switch v-model="form.x11Forwarding" />
-              <span v-if="x11HintKey" class="field-hint" style="margin-left: 12px;">{{ t(x11HintKey) }}</span>
+              <span v-if="x11HintKey" class="field-hint" style="margin-left: 0.75rem;">{{ t(x11HintKey) }}</span>
             </el-form-item>
             <el-form-item v-if="form.type === 'ssh'" :label="t('conn.agentForwarding')">
               <el-switch v-model="form.agentForwarding" />
-              <span class="field-hint" style="margin-left: 12px;">{{ t('conn.agentForwardingDesc') }}</span>
+              <span class="field-hint" style="margin-left: 0.75rem;">{{ t('conn.agentForwardingDesc') }}</span>
             </el-form-item>
             <template v-if="form.type === 'ftp'">
               <el-form-item :label="t('conn.ftpEncryption')">
@@ -586,7 +586,7 @@
                   />
                 </el-select>
                 <el-button class="inline-add-btn" :title="t('conn.newProxy')" @click="openNewProxyDialog">
-                  <Plus :size="14" />
+                  <Plus :size="'0.875rem'" />
                 </el-button>
               </div>
             </el-form-item>
@@ -636,8 +636,8 @@
   </el-dialog>
 
   <!-- New group dialog -->
-  <el-dialog append-to-body v-model="showNewGroupDialog" :title="t('conn.newGroupTitle')" width="400px">
-    <el-form label-width="80px" @submit.prevent="confirmNewGroup">
+  <el-dialog append-to-body v-model="showNewGroupDialog" :title="t('conn.newGroupTitle')" width="25rem">
+    <el-form label-width="5rem" @submit.prevent="confirmNewGroup">
       <el-form-item :label="t('conn.groupName')">
         <el-input
           v-model="newGroupName"
@@ -1754,7 +1754,7 @@ function onConnect() {
 <style scoped>
 /* Inline kubeconfig YAML editor (replaces the former plain textarea). */
 .kubeconfig-editor {
-  height: 140px;
+  height: 8.75rem;
   width: 100%;
 }
 /* Color the connection-test status icon (rendered via el-button's `icon` prop,
@@ -1771,27 +1771,27 @@ function onConnect() {
   font-family: var(--font-mono, ui-monospace, "JetBrains Mono", monospace);
 }
 .key-content-actions {
-  margin-top: 6px;
+  margin-top: 0.375rem;
 }
 .key-content-actions .el-button + .el-button {
-  margin-left: 8px;
+  margin-left: 0.5rem;
 }
 
 /* ── Layout ── */
 .conn-layout {
   display: flex;
   gap: 0;
-  min-height: 360px;
+  min-height: 22.5rem;
 }
 
 /* ── Left sidebar ── */
 .conn-categories {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  width: 90px;
+  gap: 0.25rem;
+  width: 5.625rem;
   flex-shrink: 0;
-  padding: 8px 8px 8px 0;
+  padding: 0.5rem 0.5rem 0.5rem 0;
   border-right: 1px solid var(--border-subtle);
 }
 
@@ -1800,13 +1800,13 @@ function onConnect() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 12px 4px;
+  gap: 0.25rem;
+  padding: 0.75rem 0.25rem;
   border-radius: var(--radius-md);
   cursor: pointer;
   user-select: none;
   color: var(--text-muted);
-  border-left: 2px solid transparent;
+  border-left: 0.125rem solid transparent;
   transition: all 0.15s ease;
 }
 
@@ -1822,7 +1822,7 @@ function onConnect() {
 }
 
 .cat-item span {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 500;
   font-family: var(--font-ui);
   text-align: center;
@@ -1835,7 +1835,7 @@ function onConnect() {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  padding: 0 0 0 16px;
+  padding: 0 0 0 1rem;
 }
 
 /* ── Sub-type icon grid ── */
@@ -1843,9 +1843,9 @@ function onConnect() {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 4px;
-  padding-bottom: 14px;
-  margin-bottom: 12px;
+  gap: 0.25rem;
+  padding-bottom: 0.875rem;
+  margin-bottom: 0.75rem;
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -1854,17 +1854,17 @@ function onConnect() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  min-width: 64px;
-  height: 52px;
-  padding: 4px 8px;
+  gap: 0.1875rem;
+  min-width: 4rem;
+  height: 3.25rem;
+  padding: 0.25rem 0.5rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
   font-family: var(--font-ui);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 500;
   transition: all 0.15s ease;
 }
@@ -1879,26 +1879,26 @@ function onConnect() {
   background: linear-gradient(135deg, var(--accent), var(--accent));
   color: var(--on-accent);
   border-color: var(--accent-glow);
-  box-shadow: 0 0 0 1px var(--accent-glow), 0 2px 8px var(--accent-glow);
+  box-shadow: 0 0 0 1px var(--accent-glow), 0 0.125rem 0.5rem var(--accent-glow);
 }
 
 .subtype-btn span {
   text-align: center;
   line-height: 1.2;
-  font-size: 11px;
+  font-size: 0.6875rem;
   white-space: nowrap;
 }
 
 /* ── Form fields ── */
 .conn-fields {
-  padding-right: 4px;
+  padding-right: 0.25rem;
 }
 
 /* ── Name + group row ── */
 .name-group-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
   width: 100%;
 }
 
@@ -1908,14 +1908,14 @@ function onConnect() {
 }
 
 .group-select {
-  width: 160px;
+  width: 10rem;
   flex-shrink: 0;
 }
 
 .new-group-btn {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
 }
 
@@ -1923,12 +1923,12 @@ function onConnect() {
 .host-port-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
   width: 100%;
 }
 
 .host-input {
-  width: calc(100% - 150px) !important;
+  width: calc(100% - 9.375rem) !important;
 }
 
 .host-port-sep {
@@ -1937,14 +1937,14 @@ function onConnect() {
 }
 
 .port-input {
-  width: 130px !important;
+  width: 8.125rem !important;
   flex-shrink: 0;
 }
 
 /* ── Field hint text ── */
 .field-hint {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.4;
 }
 
@@ -1952,7 +1952,7 @@ function onConnect() {
 .rdp-custom-resolution {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   width: 100%;
 }
 
@@ -1968,13 +1968,13 @@ function onConnect() {
 .advanced-toggle {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 0 8px;
-  margin-bottom: 4px;
+  gap: 0.375rem;
+  padding: 0.625rem 0 0.5rem;
+  margin-bottom: 0.25rem;
   cursor: pointer;
   user-select: none;
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   border-bottom: 1px solid var(--border-subtle);
   transition: color 0.15s;
@@ -1998,27 +1998,27 @@ function onConnect() {
 .post-login-config {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.5rem;
   width: 100%;
 }
 
 .expect-steps {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .expect-table {
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border-subtle);
-  border-radius: 4px;
+  border-radius: 0.25rem;
   overflow: hidden;
 }
 
 .expect-row {
   display: grid;
-  grid-template-columns: 26px minmax(80px, 1fr) minmax(90px, 1fr) 64px 40px 30px;
+  grid-template-columns: 1.625rem minmax(5rem, 1fr) minmax(5.625rem, 1fr) 4rem 2.5rem 1.875rem;
   align-items: stretch;
 }
 
@@ -2039,13 +2039,13 @@ function onConnect() {
 
 .expect-head {
   background: var(--bg-elevated);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.2;
   color: var(--text-secondary);
 }
 
 .expect-head > span {
-  padding: 3px 4px;
+  padding: 0.1875rem 0.25rem;
 }
 
 .expect-row :deep(.el-input__wrapper),
@@ -2066,7 +2066,7 @@ function onConnect() {
 
 .step-index {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .remove-step-btn {
@@ -2077,25 +2077,25 @@ function onConnect() {
   align-self: flex-start;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.25rem;
 }
 
 .expect-help {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.4;
 }
 
 /* ── Group selector row ── */
 .group-select-row {
   display: flex;
-  gap: 6px;
+  gap: 0.375rem;
   align-items: center;
 }
 .add-group-btn {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
 }
 
@@ -2103,18 +2103,18 @@ function onConnect() {
 .inline-add-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
   width: 100%;
 }
 .inline-add-btn {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
 }
 
 /* ── Dialog overrides ── */
 :deep(.el-dialog__body) {
-  padding: 16px 20px;
+  padding: 1rem 1.25rem;
 }
 </style>

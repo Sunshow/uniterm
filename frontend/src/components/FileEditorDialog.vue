@@ -22,16 +22,16 @@
     <template #footer>
       <div class="editor-footer">
         <div class="editor-opts">
-          <el-select v-model="syntaxLang" style="width: 110px" filterable>
+          <el-select v-model="syntaxLang" style="width: 6.875rem" filterable>
             <el-option v-for="l in LANG_OPTIONS" :key="l.value" :label="l.label" :value="l.value" />
           </el-select>
-          <el-select v-model="editorEncoding" style="width: 100px">
+          <el-select v-model="editorEncoding" style="width: 6.25rem">
             <el-option label="UTF-8" value="utf-8" />
             <el-option label="UTF-16 LE" value="utf-16le" />
             <el-option label="UTF-16 BE" value="utf-16be" />
             <el-option label="GBK" value="gbk" />
           </el-select>
-          <el-select v-model="editorLineEnding" style="width: 140px">
+          <el-select v-model="editorLineEnding" style="width: 8.75rem">
             <el-option label="LF (Linux/macOS)" value="lf" />
             <el-option label="CRLF (Windows)" value="crlf" />
             <el-option label="CR (old Mac)" value="cr" />
@@ -350,7 +350,7 @@ defineExpose({ open })
 .editor-host {
   height: 60vh;
   border: 1px solid var(--border-subtle);
-  border-radius: 4px;
+  border-radius: 0.25rem;
   overflow: hidden;
   background: #282c34;
 }
@@ -358,22 +358,22 @@ defineExpose({ open })
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 0.75rem;
   width: 100%;
 }
 .editor-buttons {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
 }
-/* el-button adds a default 12px left margin between siblings; drop it so the
-   buttons sit at the flex gap instead of 8px+12px. */
+/* el-button adds a default 0.75rem left margin between siblings; drop it so the
+   buttons sit at the flex gap instead of 0.5rem+0.75rem. */
 .editor-buttons .el-button + .el-button {
   margin-left: 0;
 }
 .editor-opts {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
 }
 </style>

@@ -3,7 +3,7 @@
     append-to-body
     :model-value="visible"
     :title="title"
-    width="400px"
+    width="25rem"
     :close-on-click-modal="false"
     @update:model-value="(v: boolean) => emit('update:visible', v)"
     @closed="emit('closed')"
@@ -68,10 +68,10 @@ const emit = defineEmits<{
 
 <style scoped>
 .generic-dialog-input2 {
-  margin-top: 8px;
+  margin-top: 0.5rem;
 }
 .generic-dialog-error {
   color: var(--el-color-danger);
-  margin-top: 8px;
+  margin-top: 0.5rem;
 }
 </style>
