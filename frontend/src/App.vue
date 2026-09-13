@@ -163,6 +163,7 @@ import ru from 'element-plus/es/locale/lang/ru'
 import AppHeader from './components/AppHeader.vue'
 import Sidebar from './components/Sidebar.vue'
 import TerminalTabContent from './components/TerminalTabContent.vue'
+import { writeClipboard } from './composables/useClipboardWrite'
 import SettingsTabContent from './components/SettingsTabContent.vue'
 import WorkspaceContent from './components/WorkspaceContent.vue'
 import FileTabContent from './components/FileTabContent.vue'
@@ -608,10 +609,18 @@ async function ensureCredentials(config: ConnectionConfig): Promise<ConnectionCo
 }
 
 let inputMenuTarget: HTMLInputElement | HTMLTextAreaElement | HTMLElement | null = null
+interface InputMenuSelection {
+  text: string
+  range?: Range
+  start?: number | null
+  end?: number | null
+}
+let inputMenuSelection: InputMenuSelection | null = null
 
 function closeInputMenu() {
   inputMenuVisible.value = false
   inputMenuTarget = null
+  inputMenuSelection = null
 }
 
 function onInputContextMenu(e: Event) {
@@ -620,16 +629,60 @@ function onInputContextMenu(e: Event) {
   }
   inputMenuTarget = target
   inputMenuReadonly.value = !!readonly
+  inputMenuSelection = captureInputMenuSelection(target, !!readonly)
   inputMenuRef.value?.openAt(x, y)
 }
 
-function inputMenuCut() {
-  const el = inputMenuTarget
-  closeInputMenu()
-  if (!el) return
-  const sel = getInputSelection(el)
-  navigator.clipboard.writeText(sel)
+function captureInputMenuSelection(target: HTMLElement, readonly: boolean): InputMenuSelection {
+  if (readonly) {
+    return { text: window.getSelection()?.toString() || target.textContent || '' }
+  }
+  if (target.isContentEditable) {
+    const selection = window.getSelection()
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0)
+      if (target.contains(range.commonAncestorContainer)) {
+        return { text: selection.toString(), range: range.cloneRange() }
+      }
+    }
+    const range = document.createRange()
+    range.selectNodeContents(target)
+    range.collapse(false)
+    return { text: '', range }
+  }
+  const input = target as HTMLInputElement | HTMLTextAreaElement
+  return {
+    text: input.value.substring(input.selectionStart ?? 0, input.selectionEnd ?? 0),
+    start: input.selectionStart,
+    end: input.selectionEnd,
+  }
+}
+
+function restoreInputMenuSelection(el: HTMLElement, selection: InputMenuSelection) {
   if (el.isContentEditable) {
+    el.focus()
+    const current = window.getSelection()
+    current?.removeAllRanges()
+    current?.addRange(selection.range!.cloneRange())
+    return
+  }
+  if (typeof selection.start === 'number' && typeof selection.end === 'number') {
+    const input = el as HTMLInputElement | HTMLTextAreaElement
+    input.focus()
+    input.setSelectionRange(selection.start, selection.end)
+  }
+}
+
+async function inputMenuCut() {
+  const el = inputMenuTarget
+  const selection = inputMenuSelection
+  closeInputMenu()
+  if (!el || !selection) return
+  if (!selection.text) return
+  const copied = await writeClipboard(selection.text)
+  if (!copied) return
+  if (el.isContentEditable) {
+    restoreInputMenuSelection(el, selection)
     const s = window.getSelection()
     if (s && s.rangeCount > 0) { s.getRangeAt(0).deleteContents() }
   } else {
@@ -640,27 +693,24 @@ function inputMenuCut() {
 
 function inputMenuCopy() {
   const el = inputMenuTarget
-  const readonly = inputMenuReadonly.value
+  const selection = inputMenuSelection
   closeInputMenu()
-  if (!el) return
-  // Read-only plain element (log-path toast): copy the live selection if any,
-  // otherwise the whole text.
-  if (readonly) {
-    const sel = window.getSelection()?.toString()
-    navigator.clipboard.writeText(sel || el.textContent || '')
-    return
-  }
-  navigator.clipboard.writeText(getInputSelection(el))
+  if (!el || !selection) return
+  if (!selection.text) return
+  void writeClipboard(selection.text)
 }
 
 function inputMenuPaste() {
   const el = inputMenuTarget
+  const selection = inputMenuSelection
   closeInputMenu()
-  if (!el) return
+  if (!el || !selection) return
   Clipboard.Text().then(text => {
     if (el.isContentEditable) {
+      restoreInputMenuSelection(el, selection)
       insertTextAtContentEditable(el, text)
     } else {
+      restoreInputMenuSelection(el, selection)
       setInputSelection(el as HTMLInputElement | HTMLTextAreaElement, text)
     }
     el.dispatchEvent(new Event('input', { bubbles: true }))
@@ -680,14 +730,6 @@ function inputMenuSelectAll() {
     (el as HTMLInputElement | HTMLTextAreaElement).select()
   }
   closeInputMenu()
-}
-
-function getInputSelection(el: HTMLElement): string {
-  if (el.isContentEditable) {
-    return window.getSelection()?.toString() || ''
-  }
-  const input = el as HTMLInputElement | HTMLTextAreaElement
-  return input.value.substring(input.selectionStart ?? 0, input.selectionEnd ?? 0)
 }
 
 function setInputSelection(el: HTMLInputElement | HTMLTextAreaElement, text: string) {

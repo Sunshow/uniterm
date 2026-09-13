@@ -94,6 +94,76 @@ document.addEventListener('contextmenu', () => {
   window.dispatchEvent(new CustomEvent('global:close-context-menus'))
 }, true)
 
+interface EditableSelectionSnapshot {
+  target: HTMLElement
+  start?: number | null
+  end?: number | null
+  range?: Range
+}
+
+const isEditableTarget = (target: EventTarget | null): target is HTMLElement => {
+  if (!(target instanceof HTMLElement)) return false
+  return target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable
+}
+
+let rightClickSelection: EditableSelectionSnapshot | null = null
+
+function captureEditableSelection(target: HTMLElement): EditableSelectionSnapshot {
+  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+    const input = target as HTMLInputElement | HTMLTextAreaElement
+    return { target, start: input.selectionStart, end: input.selectionEnd }
+  }
+  const selection = window.getSelection()
+  if (selection && selection.rangeCount > 0) {
+    const range = selection.getRangeAt(0)
+    if (target.contains(range.commonAncestorContainer)) {
+      return { target, range: range.cloneRange() }
+    }
+  }
+  return { target }
+}
+
+function restoreEditableSelection(snapshot: EditableSelectionSnapshot) {
+  const { target } = snapshot
+  target.focus()
+  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+    const input = target as HTMLInputElement | HTMLTextAreaElement
+    if (typeof snapshot.start === 'number' && typeof snapshot.end === 'number') {
+      input.setSelectionRange(snapshot.start, snapshot.end)
+    }
+    return
+  }
+  if (snapshot.range) {
+    const selection = window.getSelection()
+    selection?.removeAllRanges()
+    selection?.addRange(snapshot.range.cloneRange())
+  }
+}
+
+document.addEventListener('mousedown', (e) => {
+  if (e.button !== 2 || !isEditableTarget(e.target)) {
+    if (e.button === 0) rightClickSelection = null
+    return
+  }
+  const target = e.target
+  rightClickSelection = captureEditableSelection(target)
+  e.preventDefault()
+}, true)
+
+document.addEventListener('select', (e) => {
+  const target = e.target
+  if (rightClickSelection?.target === target &&
+      (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) {
+    const sel = target as HTMLInputElement | HTMLTextAreaElement
+    if (typeof rightClickSelection.start === 'number' &&
+        typeof rightClickSelection.end === 'number' &&
+        (sel.selectionStart !== rightClickSelection.start ||
+         sel.selectionEnd !== rightClickSelection.end)) {
+      restoreEditableSelection(rightClickSelection)
+    }
+  }
+}, true)
+
 document.addEventListener('contextmenu', (e) => {
   const target = e.target as HTMLElement
   // Read-only log-path toast: offer copy/select-all on its plain text.
@@ -109,6 +179,10 @@ document.addEventListener('contextmenu', (e) => {
   const tag = target.tagName
   if (tag === 'INPUT' || tag === 'TEXTAREA' || target.isContentEditable) {
     e.preventDefault()
+    if (rightClickSelection?.target === target) {
+      restoreEditableSelection(rightClickSelection)
+    }
+    rightClickSelection = null
     window.dispatchEvent(new CustomEvent('input:contextmenu', {
       detail: { x: e.clientX, y: e.clientY, target }
     }))
