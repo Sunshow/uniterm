@@ -8,10 +8,10 @@
         style="flex: 1"
         clearable
       >
-        <template #prefix><el-icon :size="14"><Search /></el-icon></template>
+        <template #prefix><el-icon :size="'0.875rem'"><Search /></el-icon></template>
       </el-input>
       <el-button size="small" @click="showCreate = true">
-        <Plus :size="14" /> {{ t('settings.skillsCreate') }}
+        <Plus :size="'0.875rem'" /> {{ t('settings.skillsCreate') }}
       </el-button>
     </div>
 
@@ -25,14 +25,14 @@
       class="skill-card"
       @click="openEdit(skill)"
     >
-      <BookOpen :size="18" class="skill-card-icon" />
+      <BookOpen :size="'1.125rem'" class="skill-card-icon" />
       <div class="skill-card-info">
         <div class="skill-card-title">
           <span class="skill-card-name">{{ skill.name }}</span>
         </div>
         <div class="skill-card-desc">{{ skill.description }}</div>
         <div v-if="skill.path" class="skill-card-path" @click.stop="openFolder(skill)" :title="t('settings.skillsOpenFolder')">
-          <FolderOpen :size="12" class="skill-card-path-icon" />
+          <FolderOpen :size="'0.75rem'" class="skill-card-path-icon" />
           <span class="skill-card-path-text">{{ skill.path }}</span>
         </div>
       </div>
@@ -47,10 +47,10 @@
           :title="skill.locked ? t('settings.skillsLocked') : t('settings.skillsUnlocked')"
           @click="store.toggleLocked(skill.name)"
         >
-          <el-icon :size="15"><Lock v-if="skill.locked" /><LockOpen v-else /></el-icon>
+          <el-icon :size="'0.9375rem'"><Lock v-if="skill.locked" /><LockOpen v-else /></el-icon>
         </el-button>
         <el-button link @click.stop="actionMenuRef?.toggle($event.currentTarget, skill)">
-          <el-icon :size="15"><Settings2 /></el-icon>
+          <el-icon :size="'0.9375rem'"><Settings2 /></el-icon>
         </el-button>
         <Menu ref="actionMenuRef" v-model:visible="actionMenuVisible">
           <template #default="{ current }">

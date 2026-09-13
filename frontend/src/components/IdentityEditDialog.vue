@@ -29,7 +29,7 @@
             <template #append>
               <el-tooltip :content="t('conn.selectKeyFile')" placement="top">
                 <el-button :aria-label="t('conn.selectKeyFile')" @click="selectKeyFile">
-                  <el-icon><FolderOpen :size="16" /></el-icon>
+                  <el-icon><FolderOpen :size="'1rem'" /></el-icon>
                 </el-button>
               </el-tooltip>
             </template>
@@ -43,7 +43,7 @@
         <el-form-item :label="t('conn.keyContent')">
           <template v-if="!keyContentRevealed">
             <el-button size="small" @click="keyContentRevealed = true">
-              <el-icon><Eye :size="14" /></el-icon>
+              <el-icon><Eye :size="'0.875rem'" /></el-icon>
               <span style="margin-left: 4px">{{ t('conn.keyTextReveal') }}</span>
             </el-button>
           </template>
@@ -58,11 +58,11 @@
             />
             <div class="key-content-actions">
               <el-button size="small" @click="keyContentRevealed = false">
-                <el-icon><EyeOff :size="14" /></el-icon>
+                <el-icon><EyeOff :size="'0.875rem'" /></el-icon>
                 <span style="margin-left: 4px">{{ t('conn.keyTextHide') }}</span>
               </el-button>
               <el-button size="small" @click="importKeyText">
-                <el-icon><FolderOpen :size="14" /></el-icon>
+                <el-icon><FolderOpen :size="'0.875rem'" /></el-icon>
                 <span style="margin-left: 4px">{{ t('conn.importFromFile') }}</span>
               </el-button>
             </div>

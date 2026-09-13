@@ -8,10 +8,10 @@
         :placeholder="t('db.searchTables')"
       />
       <button class="btn btn-ghost btn-icon btn-sm" :title="t('db.refreshDatabases')" @click="refreshAll">
-        <RefreshCw :size="14" />
+        <RefreshCw :size="'0.875rem'" />
       </button>
       <button class="btn btn-ghost btn-icon btn-sm" :title="t('common.more')" @click.stop="moreMenuRef?.toggle($event.currentTarget)">
-        <MoreHorizontal :size="14" />
+        <MoreHorizontal :size="'0.875rem'" />
       </button>
       <Menu ref="moreMenuRef" v-model:visible="moreMenuVisible" align="end">
         <MenuItem :class="{ disabled: !canCreateDatabase }" @click="onMoreNewDatabase">{{ t('db.newDatabase') }}</MenuItem>
@@ -32,9 +32,9 @@
           @contextmenu.prevent="onDbContextMenu($event, db.name)"
         >
           <span class="db-arrow" @click.stop="onToggleDb(db.name)">
-            <component :is="expandedDbs.has(db.name) ? ChevronDown : ChevronRight" :size="12" />
+            <component :is="expandedDbs.has(db.name) ? ChevronDown : ChevronRight" :size="'0.75rem'" />
           </span>
-          <Database class="db-icon" :size="14" />
+          <Database class="db-icon" :size="'0.875rem'" />
           <span class="db-name">{{ db.name }}</span>
         </div>
         <template v-if="expandedDbs.has(db.name)">
@@ -49,7 +49,7 @@
             @contextmenu.prevent="onTableContextMenu($event, db.name, t)"
           >
             <span class="table-icon-spacer" />
-            <component :is="t.type === 'view' ? Eye : Table2" class="table-icon" :size="14" />
+            <component :is="t.type === 'view' ? Eye : Table2" class="table-icon" :size="'0.875rem'" />
             <span class="table-name">{{ t.name }}</span>
           </div>
           <div v-if="db.tables.length === 0" class="empty-hint">

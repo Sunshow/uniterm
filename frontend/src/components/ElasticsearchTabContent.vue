@@ -6,10 +6,10 @@
         <div class="search-wrap">
           <input v-model="treeSearchQuery" class="search-input" :placeholder="t('es.searchIndices')" />
           <button class="btn btn-ghost btn-icon btn-sm" :title="t('es.refresh')" @click="loadIndices">
-            <RefreshCw :size="14" />
+            <RefreshCw :size="'0.875rem'" />
           </button>
           <button class="btn btn-ghost btn-icon btn-sm" :title="t('common.more')" @click.stop="moreMenuRef?.toggle($event.currentTarget)">
-            <MoreHorizontal :size="14" />
+            <MoreHorizontal :size="'0.875rem'" />
           </button>
           <Menu ref="moreMenuRef" v-model:visible="moreMenuVisible" align="end">
             <MenuItem @click="onMoreToggleSystem">{{ (hideSystemIndices ? '✓ ' : '') + t('es.hideSystem') }}</MenuItem>
@@ -28,7 +28,7 @@
               @contextmenu.prevent="onClusterContextMenu"
             >
               <span class="db-arrow" @click.stop="clusterExpanded = !clusterExpanded">
-                <component :is="clusterExpanded ? ChevronDown : ChevronRight" :size="12" />
+                <component :is="clusterExpanded ? ChevronDown : ChevronRight" :size="'0.75rem'" />
               </span>
               <span class="health-dot" :class="healthStatus" />
               <span class="cluster-root-name" :title="clusterTooltip">{{ clusterName }}</span>
@@ -75,7 +75,7 @@
                 @dragend="clearTabDragState"
                 @drop.prevent="onTabDrop($event, index)"
               >
-                <component :is="tab.kind === 'cluster' ? Database : Layers" :size="12" class="tab-icon" />
+                <component :is="tab.kind === 'cluster' ? Database : Layers" :size="'0.75rem'" class="tab-icon" />
                 <span class="tab-title">{{ tabTitle(tab) }}</span>
                 <button class="tab-close" :title="t('tab.close')" @click.stop="closeTab(tab.id)">×</button>
               </div>
@@ -88,7 +88,7 @@
             :title="t('tab.more')"
             @click.stop="moreTabsMenuRef?.toggle($event.currentTarget)"
           >
-            <MoreHorizontal :size="14" />
+            <MoreHorizontal :size="'0.875rem'" />
           </button>
           <Menu ref="moreTabsMenuRef" v-model:visible="moreTabsMenuVisible" align="end">
             <MenuItem
@@ -177,7 +177,7 @@
                   @click="hideSystemIndices = !hideSystemIndices"
                 >{{ (hideSystemIndices ? '✓ ' : '') + t('es.hideSystem') }}</button>
                 <button class="btn btn-default btn-sm" @click="onClusterNewIndex">
-                  <Plus :size="14" /> {{ t('es.newIndex') }}
+                  <Plus :size="'0.875rem'" /> {{ t('es.newIndex') }}
                 </button>
               </div>
               <el-table
@@ -191,7 +191,7 @@
                 <el-table-column prop="name" :label="t('es.indexName')" min-width="180" show-overflow-tooltip>
                   <template #default="{ row }">
                     <span class="object-name" @click="openIndexTab(row.name)">
-                      <Layers :size="14" class="object-icon" />
+                      <Layers :size="'0.875rem'" class="object-icon" />
                       {{ row.name }}
                     </span>
                   </template>
@@ -212,7 +212,7 @@
                       :title="t('es.deleteIndex')"
                       @click.stop="ctxDeleteIndex(row)"
                     >
-                      <Trash2 :size="14" />
+                      <Trash2 :size="'0.875rem'" />
                     </button>
                   </template>
                 </el-table-column>

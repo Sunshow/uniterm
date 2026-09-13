@@ -4,7 +4,7 @@
     <div class="drawer-resizer" @mousedown="onResizeStart"></div>
     <div class="detail-drawer-header">
       <span class="detail-drawer-title">{{ target?.name || '' }}</span>
-      <el-button link @click="$emit('close')"><el-icon><Close :size="16" /></el-icon></el-button>
+      <el-button link @click="$emit('close')"><el-icon><Close :size="'1rem'" /></el-icon></el-button>
     </div>
 
     <template v-if="mode === 'detail'">

@@ -2,7 +2,7 @@
   <div class="rdp-tab-content">
     <!-- Connecting state -->
     <div v-if="status === 'connecting'" class="rdp-overlay">
-      <el-icon class="is-loading" :size="32"><Loader /></el-icon>
+      <el-icon class="is-loading" :size="'2rem'"><Loader /></el-icon>
       <p>{{ t('rdp.connecting', { host: config?.host || '...' }) }}</p>
     </div>
 

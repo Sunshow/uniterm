@@ -307,7 +307,7 @@
                   </el-option-group>
                 </el-select>
                 <button class="btn btn-ghost btn-icon btn-sm" :title="t('theme.newTitle')" @click="openThemeEditor()">
-                  <Plus :size="14" />
+                  <Plus :size="'0.875rem'" />
                 </button>
                 <button
                   v-if="isCustomTheme(settingsStore.settings.terminal.theme)"
@@ -315,7 +315,7 @@
                   :title="t('theme.editTitle')"
                   @click="openThemeEditor(settingsStore.settings.terminal.theme)"
                 >
-                  <Pencil :size="14" />
+                  <Pencil :size="'0.875rem'" />
                 </button>
               </div>
             </div>
@@ -628,7 +628,7 @@
                 <template #append>
                   <el-tooltip :content="t('settings.browse')" placement="top">
                     <el-button :aria-label="t('settings.browse')" @click="pickLogDir">
-                      <el-icon><FolderOpen :size="16" /></el-icon>
+                      <el-icon><FolderOpen :size="'1rem'" /></el-icon>
                     </el-button>
                   </el-tooltip>
                 </template>
@@ -840,19 +840,19 @@
           </div>
           <div class="about-links">
             <a href="#" class="about-link" @click.prevent="Browser.OpenURL('https://uniterm.net')">
-              <Globe :size="14" class="about-link-icon" />
+              <Globe :size="'0.875rem'" class="about-link-icon" />
               {{ t('settings.homepage') }}
             </a>
             <a href="#" class="about-link" @click.prevent="Browser.OpenURL(locale === 'zh-CN' ? 'https://uniterm.net/guide/zh/introduction' : 'https://uniterm.net/guide/en/introduction')">
-              <BookOpen :size="14" class="about-link-icon" />
+              <BookOpen :size="'0.875rem'" class="about-link-icon" />
               {{ t('settings.userManual') }}
             </a>
             <a href="#" class="about-link" @click.prevent="Browser.OpenURL('https://github.com/ys-ll/uniterm')">
-              <svg class="about-link-icon" viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+              <svg class="about-link-icon" viewBox="0 0 16 16" width="0.875rem" height="0.875rem" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
               GitHub
             </a>
             <a href="#" class="about-link" @click.prevent="Browser.OpenURL('https://gitee.com/ys-l/uniterm')">
-              <svg class="about-link-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M11.984 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.016 0zm6.09 5.333c.328 0 .593.266.592.593v1.482a.594.594 0 0 1-.593.592H9.777c-.982 0-1.778.796-1.778 1.778v5.63c0 .327.266.592.593.592h5.63c.982 0 1.778-.796 1.778-1.778v-.296a.593.593 0 0 0-.592-.593h-4.15a.592.592 0 0 1-.592-.592v-1.482a.593.593 0 0 1 .593-.592h6.815c.327 0 .593.265.593.592v3.408a4 4 0 0 1-4 4H5.926a.593.593 0 0 1-.593-.593V9.778a4.444 4.444 0 0 1 4.445-4.444h8.296z"/></svg>
+              <svg class="about-link-icon" viewBox="0 0 24 24" width="0.875rem" height="0.875rem" fill="currentColor"><path d="M11.984 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.016 0zm6.09 5.333c.328 0 .593.266.592.593v1.482a.594.594 0 0 1-.593.592H9.777c-.982 0-1.778.796-1.778 1.778v5.63c0 .327.266.592.593.592h5.63c.982 0 1.778-.796 1.778-1.778v-.296a.593.593 0 0 0-.592-.593h-4.15a.592.592 0 0 1-.592-.592v-1.482a.593.593 0 0 1 .593-.592h6.815c.327 0 .593.265.593.592v3.408a4 4 0 0 1-4 4H5.926a.593.593 0 0 1-.593-.593V9.778a4.444 4.444 0 0 1 4.445-4.444h8.296z"/></svg>
               Gitee
             </a>
           </div>
@@ -1019,21 +1019,6 @@
         <div class="settings-group">
           <div class="setting-card">
             <div class="setting-info">
-              <div class="setting-title">{{ t('settings.aiFontSize') }}</div>
-              <div class="setting-desc">{{ t('settings.aiFontSizeDesc') }}</div>
-            </div>
-            <div class="setting-control">
-              <el-input-number
-                v-model="settingsStore.settings.ai.fontSize"
-                :min="10"
-                :max="24"
-                @change="settingsStore.save()"
-              />
-            </div>
-          </div>
-
-          <div class="setting-card">
-            <div class="setting-info">
               <div class="setting-title">{{ t('settings.maxTurns') }}</div>
               <div class="setting-desc">{{ t('settings.maxTurnsDesc') }}</div>
             </div>
@@ -1053,7 +1038,7 @@
               <div class="setting-desc">{{ t('settings.modelListDesc') }}</div>
             </div>
             <div class="setting-control">
-              <el-button @click="openNewModelForm"><Plus :size="14" /> {{ t('settings.addModel') }}</el-button>
+              <el-button @click="openNewModelForm"><Plus :size="'0.875rem'" /> {{ t('settings.addModel') }}</el-button>
             </div>
           </div>
 
@@ -1075,10 +1060,10 @@
             </div>
             <div class="model-actions">
               <el-button link @click="editModel(model)">
-                <el-icon><Pencil :size="14" /></el-icon>
+                <el-icon><Pencil :size="'0.875rem'" /></el-icon>
               </el-button>
               <el-button link type="danger" @click="removeModelConfirm(model)">
-                <el-icon><Trash2 :size="14" /></el-icon>
+                <el-icon><Trash2 :size="'0.875rem'" /></el-icon>
               </el-button>
             </div>
           </div>
@@ -1128,7 +1113,7 @@
               />
             </el-select>
             <el-button class="inline-add-btn" :title="t('conn.newProxy')" @click="modelProxyDialogVisible = true">
-              <Plus :size="14" />
+              <Plus :size="'0.875rem'" />
             </el-button>
           </div>
         </el-form-item>

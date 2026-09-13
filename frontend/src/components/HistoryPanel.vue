@@ -26,13 +26,13 @@
         <span class="history-command">{{ entry.command }}</span>
         <div v-if="selectedIds.size <= 1 && (selectedIds.has(entry.id) || hoveredId === entry.id)" class="qc-item-actions">
           <button class="btn btn-ghost btn-icon btn-sm run" @click.stop="runCommand(entry)" :title="t('quickCommands.run')">
-            <Play :size="14" />
+            <Play :size="'0.875rem'" />
           </button>
           <button class="btn btn-ghost btn-icon btn-sm paste" @click.stop="pasteCommand(entry)" :title="t('quickCommands.paste')">
-            <Clipboard :size="14" />
+            <Clipboard :size="'0.875rem'" />
           </button>
           <button class="btn btn-ghost btn-icon btn-sm" @click.stop="copyCommand(entry)" :title="t('quickCommands.copy')">
-            <Copy :size="14" />
+            <Copy :size="'0.875rem'" />
           </button>
         </div>
       </div>

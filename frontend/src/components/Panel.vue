@@ -43,8 +43,8 @@
           @click.stop="toggleMaximize"
           :title="maximizeTitle"
         >
-          <Minimize2 v-if="isMaximized" :size="14" />
-          <Maximize2 v-else :size="14" />
+          <Minimize2 v-if="isMaximized" :size="'0.875rem'" />
+          <Maximize2 v-else :size="'0.875rem'" />
         </button>
         <button
           v-if="(panel.type === 'ssh' || panel.type === 'local' || panel.type === 'wsl') && workspaceId"
@@ -53,7 +53,7 @@
           @click.stop="onBroadcastClick"
           :title="broadcastTitle"
         >
-          <Radio :size="14" />
+          <Radio :size="'0.875rem'" />
         </button>
         <button
           class="panel-ai-lock"
@@ -61,7 +61,7 @@
           @click.stop="emit('toggleAiLock', panel.id)"
           :title="isAILocked ? t('terminal.aiLockedToPanel') : t('terminal.lockAIToPanel')"
         >
-          <Sparkles :size="14" />
+          <Sparkles :size="'0.875rem'" />
         </button>
         <div class="panel-more-wrapper">
           <button
@@ -69,7 +69,7 @@
             @click.stop="toggleMoreMenu($event)"
             :title="t('terminal.more')"
           >
-            <MoreHorizontal :size="14" />
+            <MoreHorizontal :size="'0.875rem'" />
           </button>
           <Menu ref="moreMenuRef" align="end" v-model:visible="moreMenuVisible">
             <!-- ① 面板操作 -->
@@ -116,7 +116,7 @@
             </MenuItem>
           </Menu>
         </div>
-        <button class="panel-close" @click.stop="emit('close', panel.id)"><X :size="14" /></button>
+        <button class="panel-close" @click.stop="emit('close', panel.id)"><X :size="'0.875rem'" /></button>
       </div>
     </div>
     <BaseTerminal

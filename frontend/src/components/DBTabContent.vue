@@ -41,10 +41,10 @@
                   @dragend="clearDragState"
                   @drop.prevent="onDocDrop($event, index)"
                 >
-                  <Table2 v-if="doc.kind === 'table' && !doc.isView" :size="12" class="doc-tab-icon" />
-                  <Eye v-else-if="doc.kind === 'table'" :size="12" class="doc-tab-icon" />
-                  <Database v-else-if="doc.kind === 'db-objects'" :size="12" class="doc-tab-icon" />
-                  <Code2 v-else :size="12" class="doc-tab-icon" />
+                  <Table2 v-if="doc.kind === 'table' && !doc.isView" :size="'0.75rem'" class="doc-tab-icon" />
+                  <Eye v-else-if="doc.kind === 'table'" :size="'0.75rem'" class="doc-tab-icon" />
+                  <Database v-else-if="doc.kind === 'db-objects'" :size="'0.75rem'" class="doc-tab-icon" />
+                  <Code2 v-else :size="'0.75rem'" class="doc-tab-icon" />
                   <span class="doc-tab-title" :title="docTitle(doc)">{{ docTitle(doc) }}</span>
                   <span class="doc-tab-close" @click.stop="closeDoc(doc.id)">×</span>
                 </button>
@@ -57,7 +57,7 @@
               :title="t('tab.more')"
               @click.stop="docMoreMenuRef?.toggle($event.currentTarget)"
             >
-              <MoreHorizontal :size="14" />
+              <MoreHorizontal :size="'0.875rem'" />
             </button>
             <Menu ref="docMoreMenuRef" v-model:visible="docMoreMenuVisible" align="end">
               <MenuItem

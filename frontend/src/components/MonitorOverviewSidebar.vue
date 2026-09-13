@@ -50,7 +50,7 @@
         </div>
 
         <div class="expand-toggle" @click="showCores = !showCores">
-          <ChevronRight :size="12" class="chev" :class="{ open: showCores }" />
+          <ChevronRight :size="'0.75rem'" class="chev" :class="{ open: showCores }" />
           <span>{{ t('monitor.allCores') }} ({{ cpus.length }})</span>
         </div>
         <div v-if="showCores" class="detail-list">
@@ -94,7 +94,7 @@
         </div>
 
         <div class="expand-toggle" @click="showNets = !showNets">
-          <ChevronRight :size="12" class="chev" :class="{ open: showNets }" />
+          <ChevronRight :size="'0.75rem'" class="chev" :class="{ open: showNets }" />
           <span>{{ t('monitor.allNetworks') }} ({{ nets.length }})</span>
         </div>
         <div v-if="showNets" class="detail-list">
@@ -117,7 +117,7 @@
         </div>
 
         <div class="expand-toggle" @click="toggleDisks">
-          <ChevronRight :size="12" class="chev" :class="{ open: showDisks }" />
+          <ChevronRight :size="'0.75rem'" class="chev" :class="{ open: showDisks }" />
           <span>{{ t('monitor.allDisks') }} ({{ mountedDisks.length }})</span>
         </div>
         <div v-if="showDisks" class="detail-list">
@@ -148,7 +148,7 @@
 
       <!-- Open full monitor (pinned at the bottom) -->
       <button class="full-monitor-btn" @click="openFullMonitor">
-        <ExternalLink :size="14" />
+        <ExternalLink :size="'0.875rem'" />
         <span>{{ t('companion.openFullMonitor') }}</span>
       </button>
     </div>

@@ -36,12 +36,12 @@
       :title="t('startTab.defaultName') + shortcutSuffix('newConnection')"
       @click="onAddStartTab"
     >
-      <Plus :size="14" />
+      <Plus :size="'0.875rem'" />
     </button>
   </div>
   <div class="tab-more" v-if="showMore">
     <span class="tab-more-btn" :title="t('tab.more')" @click.stop="tabMoreRef?.toggle($event.currentTarget)">
-      <el-icon class="tab-more-icon"><MoreHorizontal :size="14" /></el-icon>
+      <el-icon class="tab-more-icon"><MoreHorizontal :size="'0.875rem'" /></el-icon>
     </span>
     <Menu ref="tabMoreRef" v-model:visible="tabMoreVisible" align="end">
       <MenuItem
@@ -58,7 +58,7 @@
       :title="t('startTab.defaultName') + shortcutSuffix('newConnection')"
       @click="onAddStartTab"
     >
-      <Plus :size="14" />
+      <Plus :size="'0.875rem'" />
     </button>
   </div>
 </template>

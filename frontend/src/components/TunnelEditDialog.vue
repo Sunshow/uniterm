@@ -17,7 +17,7 @@
           :class="{ active: form.mode === m.value }"
           @click="form.mode = m.value"
         >
-          <component :is="m.icon" :size="18" />
+          <component :is="m.icon" :size="'1.125rem'" />
           <span>{{ m.label }}</span>
         </button>
       </div>

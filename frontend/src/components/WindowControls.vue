@@ -22,13 +22,13 @@
   <!-- Windows/Linux: match header-btn style -->
   <div v-else class="window-controls">
       <button class="wc-btn win minimise" @click="$emit('minimise')" :aria-label="t('window.minimize')">
-        <svg viewBox="0 0 12 12" width="14" height="14"><path d="M1 5.5h10v1H1z"/></svg>
+        <svg viewBox="0 0 12 12" width="0.875rem" height="0.875rem"><path d="M1 5.5h10v1H1z"/></svg>
       </button>
       <button class="wc-btn win maximise" @click="$emit('maximise')" :aria-label="t('window.maximize')">
-        <svg v-if="isMaximised" viewBox="0 0 12 12" width="14" height="14">
+        <svg v-if="isMaximised" viewBox="0 0 12 12" width="0.875rem" height="0.875rem">
           <defs>
             <mask :id="restoreMaskId">
-              <rect width="12" height="12" fill="white"/>
+              <rect width="0.75rem" height="0.75rem" fill="white"/>
               <rect x="1" y="3.5" width="6.5" height="6.5" fill="black"/>
             </mask>
           </defs>
@@ -37,10 +37,10 @@
           <!-- 前方小矩形（左下），完整显示 -->
           <rect x="1" y="3.5" width="6.5" height="6.5" fill="none" stroke="currentColor" stroke-width="1"/>
         </svg>
-        <svg v-else viewBox="0 0 12 12" width="14" height="14"><rect x="1.5" y="1.5" width="9" height="9" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+        <svg v-else viewBox="0 0 12 12" width="0.875rem" height="0.875rem"><rect x="1.5" y="1.5" width="0.5625rem" height="0.5625rem" fill="none" stroke="currentColor" stroke-width="1"/></svg>
       </button>
       <button class="wc-btn win close" @click="$emit('close')" :aria-label="t('window.close')">
-        <svg viewBox="0 0 12 12" width="14" height="14"><path d="M2 2l8 8M10 2L2 10" stroke="currentColor" stroke-width="1.2"/></svg>
+        <svg viewBox="0 0 12 12" width="0.875rem" height="0.875rem"><path d="M2 2l8 8M10 2L2 10" stroke="currentColor" stroke-width="1.2"/></svg>
       </button>
   </div>
 </template>

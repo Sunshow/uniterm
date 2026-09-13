@@ -41,7 +41,7 @@
         <div class="perf-extras">
           <template v-if="selectedPerf === 'cpu'">
             <div class="perf-sub-toggle" @click="showCores = !showCores">
-              <ChevronRight :size="14" class="chev" :class="{ open: showCores }" />
+              <ChevronRight :size="'0.875rem'" class="chev" :class="{ open: showCores }" />
               <span>{{ t('monitor.allCores') }} ({{ cpus.length }})</span>
             </div>
             <div v-if="showCores" class="perf-sub-list">
@@ -55,7 +55,7 @@
 
           <template v-else-if="selectedPerf === 'network'">
             <div class="perf-sub-toggle" @click="showNets = !showNets">
-              <ChevronRight :size="14" class="chev" :class="{ open: showNets }" />
+              <ChevronRight :size="'0.875rem'" class="chev" :class="{ open: showNets }" />
               <span>{{ t('monitor.allNetworks') }} ({{ nets.length }})</span>
             </div>
             <div v-if="showNets" class="perf-sub-list">
@@ -69,7 +69,7 @@
 
           <template v-else-if="selectedPerf === 'disk'">
             <div class="perf-sub-toggle" @click="toggleDisks">
-              <ChevronRight :size="14" class="chev" :class="{ open: showDisks }" />
+              <ChevronRight :size="'0.875rem'" class="chev" :class="{ open: showDisks }" />
               <span>{{ t('monitor.allDisks') }} ({{ mountedDisks.length }})</span>
             </div>
             <div v-if="showDisks" class="perf-sub-list">

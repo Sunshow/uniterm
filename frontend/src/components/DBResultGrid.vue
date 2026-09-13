@@ -78,7 +78,7 @@
               :title="editLabel"
               @click.stop.prevent="emit('edit-row', row)"
             >
-              <Pencil :size="14" />
+              <Pencil :size="'0.875rem'" />
             </button>
             <button
               type="button"
@@ -86,7 +86,7 @@
               :title="deleteLabel"
               @click.stop.prevent="emit('delete-row', row)"
             >
-              <Trash2 :size="14" />
+              <Trash2 :size="'0.875rem'" />
             </button>
           </div>
         </template>

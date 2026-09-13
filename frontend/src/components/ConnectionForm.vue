@@ -10,7 +10,7 @@
           :class="{ active: category === cat.key }"
           @click="onCategorySelect(cat.key)"
         >
-          <component :is="cat.icon" :size="20" />
+          <component :is="cat.icon" :size="'1.25rem'" />
           <span>{{ cat.label }}</span>
         </div>
       </div>
@@ -26,7 +26,7 @@
             :class="{ active: isSubTypeActive(st) }"
             @click="selectType(st)"
           >
-            <component :is="st.icon" :size="18" />
+            <component :is="st.icon" :size="'1.125rem'" />
             <span>{{ st.label }}</span>
           </button>
         </div>
@@ -47,7 +47,7 @@
                   class="group-select"
                 />
                 <el-button class="new-group-btn" @click="onGroupSelect('__new__')" :title="t('conn.newGroup')">
-                  <Plus :size="14" />
+                  <Plus :size="'0.875rem'" />
                 </el-button>
               </div>
             </el-form-item>
@@ -100,7 +100,7 @@
                   <el-option v-for="id in identityStore.identities" :key="id.id" :label="`${id.name} (${id.username})`" :value="id.id" />
                 </el-select>
                 <el-button class="inline-add-btn" :title="t('conn.newIdentity')" @click="openNewIdentityDialog">
-                  <Plus :size="14" />
+                  <Plus :size="'0.875rem'" />
                 </el-button>
               </div>
             </el-form-item>
@@ -155,7 +155,7 @@
                 <template #append>
                   <el-tooltip :content="t('conn.selectKeyFile')" placement="top">
                     <el-button :aria-label="t('conn.selectKeyFile')" @click="selectKeyFile">
-                      <el-icon><FolderOpen :size="16" /></el-icon>
+                      <el-icon><FolderOpen :size="'1rem'" /></el-icon>
                     </el-button>
                   </el-tooltip>
                 </template>
@@ -164,7 +164,7 @@
             <el-form-item v-if="form.authType === 'keyText' && (form.type === 'ssh' || form.type === 'scp' || form.type === 'sftp' || form.type === 'mosh' || form.type === 'x11-desktop')" :label="t('conn.keyContent')">
               <template v-if="!keyContentRevealed">
                 <el-button size="small" @click="keyContentRevealed = true">
-                  <el-icon><Eye :size="14" /></el-icon>
+                  <el-icon><Eye :size="'0.875rem'" /></el-icon>
                   <span style="margin-left: 4px">{{ t('conn.keyTextReveal') }}</span>
                 </el-button>
               </template>
@@ -179,11 +179,11 @@
                 />
                 <div class="key-content-actions">
                   <el-button size="small" @click="keyContentRevealed = false">
-                    <el-icon><EyeOff :size="14" /></el-icon>
+                    <el-icon><EyeOff :size="'0.875rem'" /></el-icon>
                     <span style="margin-left: 4px">{{ t('conn.keyTextHide') }}</span>
                   </el-button>
                   <el-button size="small" @click="importKeyText">
-                    <el-icon><FolderOpen :size="14" /></el-icon>
+                    <el-icon><FolderOpen :size="'0.875rem'" /></el-icon>
                     <span style="margin-left: 4px">{{ t('conn.importFromFile') }}</span>
                   </el-button>
                 </div>
@@ -289,7 +289,7 @@
                 <el-input v-model="form.k8sConfigPath" placeholder="~/.kube/config">
                   <template #append>
                     <el-button @click="pickKubeconfigFile">
-                      <el-icon><FolderOpen :size="16" /></el-icon>
+                      <el-icon><FolderOpen :size="'1rem'" /></el-icon>
                     </el-button>
                   </template>
                 </el-input>
@@ -310,7 +310,7 @@
                     <el-option v-for="c in k8sContexts" :key="c.name" :value="c.name" :label="c.current ? c.name + ' (current)' : c.name" />
                   </el-select>
                   <el-button @click="reloadK8sContexts" :loading="k8sContextsLoading" :title="t('conn.k8sReloadContexts')">
-                    <el-icon><RefreshCw :size="16" /></el-icon>
+                    <el-icon><RefreshCw :size="'1rem'" /></el-icon>
                   </el-button>
                 </div>
               </el-form-item>
@@ -404,7 +404,7 @@
               <el-input v-model="form.remark" type="textarea" :rows="3" />
             </el-form-item>
             <div v-if="showAdvancedToggle" class="advanced-toggle" @click="showAdvanced = !showAdvanced">
-              <el-icon class="advanced-arrow" :class="{ expanded: showAdvanced }"><ChevronRight :size="14" /></el-icon>
+              <el-icon class="advanced-arrow" :class="{ expanded: showAdvanced }"><ChevronRight :size="'0.875rem'" /></el-icon>
               <span>{{ t('conn.advanced') }}</span>
             </div>
             <template v-if="showAdvanced">
@@ -468,12 +468,12 @@
                         :title="t('conn.expectRemoveStep')"
                         @click="removeExpectStep(idx)"
                       >
-                        <Trash2 :size="14" />
+                        <Trash2 :size="'0.875rem'" />
                       </el-button>
                     </div>
                   </div>
                   <el-button class="add-step-btn" @click="addExpectStep">
-                    <Plus :size="14" />
+                    <Plus :size="'0.875rem'" />
                     {{ t('conn.expectAddStep') }}
                   </el-button>
                   <div class="expect-help">{{ t('conn.expectVariableHint') }}</div>
@@ -586,7 +586,7 @@
                   />
                 </el-select>
                 <el-button class="inline-add-btn" :title="t('conn.newProxy')" @click="openNewProxyDialog">
-                  <Plus :size="14" />
+                  <Plus :size="'0.875rem'" />
                 </el-button>
               </div>
             </el-form-item>

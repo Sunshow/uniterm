@@ -2,7 +2,7 @@
   <div class="spice-tab-content">
     <!-- Connecting state -->
     <div v-if="status === 'connecting'" class="spice-overlay">
-      <el-icon class="is-loading" :size="32"><Loader /></el-icon>
+      <el-icon class="is-loading" :size="'2rem'"><Loader /></el-icon>
       <p>{{ t('spice.connecting', { host: config?.host || '...' }) }}</p>
     </div>
 

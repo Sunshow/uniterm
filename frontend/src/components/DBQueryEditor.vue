@@ -16,15 +16,15 @@
           @keydown.enter="generateSQL"
         />
         <button class="btn btn-default btn-sm" @click="generateSQL" :disabled="aiGenerating || !nlInput.trim()">
-          <Sparkles :size="14" :class="{ 'ai-pulse': aiGenerating }" />
+          <Sparkles :size="'0.875rem'" :class="{ 'ai-pulse': aiGenerating }" />
           {{ aiGenerating ? '...' : 'AI' }}
         </button>
         <button class="btn btn-default btn-sm" @click="historyOpen = !historyOpen">
-          <History :size="14" />
+          <History :size="'0.875rem'" />
           {{ t('db.queryHistory') }}
         </button>
         <button class="btn btn-ghost btn-icon btn-sm" :title="t('db.runSqlFile')" @click="onOpenScriptFile">
-          <FolderOpen :size="14" />
+          <FolderOpen :size="'0.875rem'" />
         </button>
         <button class="btn btn-primary btn-sm" title="Ctrl+Enter" @click="onExecute">{{ t('db.execute') }}</button>
       </div>
@@ -84,14 +84,14 @@
             v-if="tableName && !isView"
             class="btn btn-default btn-sm"
             @click="startInsertRow"
-          ><Plus :size="14" /> {{ t('db.insertRow') }}</button>
+          ><Plus :size="'0.875rem'" /> {{ t('db.insertRow') }}</button>
           <button
             ref="exportBtnRef"
             class="btn btn-ghost btn-icon btn-sm"
             :title="t('db.exportResults')"
             @click.stop="exportMenuRef?.toggle($event.currentTarget)"
           >
-            <Download :size="14" />
+            <Download :size="'0.875rem'" />
           </button>
           <Menu
             ref="exportMenuRef"

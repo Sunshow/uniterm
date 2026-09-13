@@ -23,7 +23,7 @@
           v-if="item === '...'"
           class="breadcrumb-part breadcrumb-ellipsis"
           @click.stop="onEllipsisClick"
-        ><MoreHorizontal :size="14" /></span>
+        ><MoreHorizontal :size="'0.875rem'" /></span>
         <span
           v-else-if="isWindowsPath && item === pathParts[0]"
           class="breadcrumb-part breadcrumb-drive"
@@ -47,7 +47,7 @@
         :title="t('sftp.bookmark.title')"
         @click.stop="bookmarkMenuRef?.toggle($event.currentTarget)"
       >
-        <Bookmark :size="14" :class="{ 'bookmark-active': hasCurrentPathBookmarked }" />
+        <Bookmark :size="'0.875rem'" :class="{ 'bookmark-active': hasCurrentPathBookmarked }" />
       </button>
     </template>
 
@@ -99,7 +99,7 @@
             @click.stop="onRemoveBookmark(savedPath)"
             :title="t('sftp.bookmark.remove')"
           >
-            <Trash2 :size="12" />
+            <Trash2 :size="'0.75rem'" />
           </button>
         </template>
       </MenuItem>

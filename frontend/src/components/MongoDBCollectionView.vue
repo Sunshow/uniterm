@@ -21,7 +21,7 @@
             @keydown.enter="generateFilter"
           />
           <button class="btn btn-default btn-sm" @click="generateFilter" :disabled="aiGenerating || !nlInput.trim()">
-            <Sparkles :size="14" :class="{ 'ai-pulse': aiGenerating }" />
+            <Sparkles :size="'0.875rem'" :class="{ 'ai-pulse': aiGenerating }" />
             {{ aiGenerating ? '...' : 'AI' }}
           </button>
           <button class="btn btn-primary btn-sm" title="Ctrl+Enter" @click="onExecute">{{ t('mongodb.executeQuery') }}</button>
@@ -56,7 +56,7 @@
             :placeholder="t('db.filterResults')"
           />
           <button class="btn btn-default btn-sm result-toolbar-add" @click="openNewDocument">
-            <Plus :size="14" /> {{ t('mongodb.newDocument') }}
+            <Plus :size="'0.875rem'" /> {{ t('mongodb.newDocument') }}
           </button>
         </div>
 
@@ -89,10 +89,10 @@
               <el-table-column width="80" fixed="right">
                 <template #default="{ row }">
                   <button class="btn btn-ghost btn-icon btn-sm" @click.stop="onRowDblClick(row)">
-                    <Pencil :size="14" />
+                    <Pencil :size="'0.875rem'" />
                   </button>
                   <button class="btn btn-ghost btn-icon btn-sm danger" @click.stop="deleteDocument(row)">
-                    <Trash2 :size="14" />
+                    <Trash2 :size="'0.875rem'" />
                   </button>
                 </template>
               </el-table-column>
@@ -132,7 +132,7 @@
       </div>
       <div style="margin-bottom:8px;display:flex;justify-content:flex-end">
         <button class="btn btn-default btn-sm" @click="openNewIndexDialog">
-          <Plus :size="14" /> {{ t('db.addIndex') }}
+          <Plus :size="'0.875rem'" /> {{ t('db.addIndex') }}
         </button>
       </div>
       <el-table :data="indexes" border size="small" style="width:100%" :empty-text="t('db.noData')">
@@ -151,7 +151,7 @@
         <el-table-column width="60">
           <template #default="{ row }">
             <button v-if="row.name !== '_id_'" class="btn btn-ghost btn-icon btn-sm" style="color:var(--error)" @click="dropIndex(row.name)">
-              <Trash2 :size="14" />
+              <Trash2 :size="'0.875rem'" />
             </button>
           </template>
         </el-table-column>

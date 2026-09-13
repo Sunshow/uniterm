@@ -21,14 +21,14 @@
           @change="onFileChange"
         />
         <template v-if="!uploadFile">
-          <FileUp :size="24" class="upload-icon" />
+          <FileUp :size="'1.5rem'" class="upload-icon" />
           <p class="upload-hint">{{ t('settings.skillsUploadHint') }}</p>
         </template>
         <template v-else>
-          <FileUp :size="24" class="upload-icon" />
+          <FileUp :size="'1.5rem'" class="upload-icon" />
           <p class="upload-file-name">{{ uploadFile }}</p>
           <p v-if="parseState === 'ok'" class="parse-ok">
-            <CircleCheck :size="14" /> {{ t('settings.skillsParseOk') }}
+            <CircleCheck :size="'0.875rem'" /> {{ t('settings.skillsParseOk') }}
           </p>
           <p v-else-if="parseState === 'fail'" class="parse-fail">
             {{ parseError }}

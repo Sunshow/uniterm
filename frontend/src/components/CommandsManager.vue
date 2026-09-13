@@ -8,10 +8,10 @@
         style="flex: 1"
         clearable
       >
-        <template #prefix><el-icon :size="14"><Search /></el-icon></template>
+        <template #prefix><el-icon :size="'0.875rem'"><Search /></el-icon></template>
       </el-input>
       <el-button size="small" @click="showCreate = true">
-        <Plus :size="14" /> {{ t('settings.commandsCreate') }}
+        <Plus :size="'0.875rem'" /> {{ t('settings.commandsCreate') }}
       </el-button>
     </div>
 
@@ -25,14 +25,14 @@
       class="command-card"
       @click="openEdit(cmd)"
     >
-      <Terminal :size="18" class="command-card-icon" />
+      <Terminal :size="'1.125rem'" class="command-card-icon" />
       <div class="command-card-info">
         <div class="command-card-title">
           <span class="command-card-name">{{ cmd.name }}</span>
         </div>
         <div class="command-card-desc">{{ cmd.description }}</div>
         <div v-if="cmd.path" class="command-card-path" @click.stop="openFolder(cmd)" :title="t('settings.commandsOpenFolder')">
-          <FolderOpen :size="12" class="command-card-path-icon" />
+          <FolderOpen :size="'0.75rem'" class="command-card-path-icon" />
           <span class="command-card-path-text">{{ cmd.path }}</span>
         </div>
       </div>
@@ -47,10 +47,10 @@
           :title="cmd.locked ? t('settings.commandsLocked') : t('settings.commandsUnlocked')"
           @click="store.toggleLocked(cmd.name)"
         >
-          <el-icon :size="15"><Lock v-if="cmd.locked" /><LockOpen v-else /></el-icon>
+          <el-icon :size="'0.9375rem'"><Lock v-if="cmd.locked" /><LockOpen v-else /></el-icon>
         </el-button>
         <el-button link @click.stop="actionMenuRef?.toggle($event.currentTarget, cmd)">
-          <el-icon :size="15"><Settings2 /></el-icon>
+          <el-icon :size="'0.9375rem'"><Settings2 /></el-icon>
         </el-button>
         <Menu ref="actionMenuRef" v-model:visible="actionMenuVisible">
           <template #default="{ current }">

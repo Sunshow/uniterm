@@ -251,13 +251,13 @@
 /* Root rem baseline. All UI lengths are rem-based with 1rem = 16px (the
    browser UA default; 16 = 2^4, so every integer px value converts to an
    exact decimal). index.html tags <html class="mac"> on macOS, where the
-   native baseline is 13pt (Apple HIG default) vs 12px-equivalent design
-   size here, so the whole UI scales by 13/12 = 17.3333/16 there. */
+   design baseline (12px body text) is scaled to 14px for a roomier feel
+   close to native density: 16 x 14/12 = 18.6667px. */
 html {
   font-size: 16px;
 }
 html.mac {
-  font-size: 17.3333px;
+  font-size: 18.6667px;
 }
 
 html, body, #app {

@@ -7,14 +7,14 @@
   >
     <div class="resize-handle" @mousedown="onResizeStart" />
     <div class="sidebar-header" @contextmenu.prevent="onTabStripContextMenu">
-      <button class="sidebar-tab" :class="{ active: activeView === 'connections' }" @click="activeView = 'connections'" :title="t('header.connections')"><el-icon><Network :size="14" /></el-icon></button>
-      <button v-if="tabVisible('files')" class="sidebar-tab" :class="{ active: activeView === 'files' }" @click="onFilesTabClick" :title="t('header.files')"><el-icon><FolderTree :size="14" /></el-icon></button>
-      <button v-if="tabVisible('monitor')" class="sidebar-tab" :class="{ active: activeView === 'monitor' }" @click="onMonitorTabClick" :title="t('header.monitor')"><el-icon><Activity :size="14" /></el-icon></button>
-      <button v-if="tabVisible('tunnels')" class="sidebar-tab" :class="{ active: activeView === 'tunnels' }" @click="activeView = 'tunnels'" :title="t('tunnels.tunnelsTab')"><el-icon><ArrowRightLeft :size="14" /></el-icon></button>
-      <button v-if="tabVisible('quickCommands')" class="sidebar-tab" :class="{ active: activeView === 'quickCommands' }" @click="activeView = 'quickCommands'" :title="quickCommandsTitle"><el-icon><Zap :size="14" /></el-icon></button>
-      <button v-if="tabVisible('history')" class="sidebar-tab" :class="{ active: activeView === 'history' }" @click="activeView = 'history'" :title="t('quickCommands.historyTab')"><el-icon><Clock :size="14" /></el-icon></button>
-      <button v-if="tabVisible('personalization')" class="sidebar-tab" :class="{ active: activeView === 'personalization' }" @click="activeView = 'personalization'" :title="t('sidebar.personalization')"><el-icon><Palette :size="14" /></el-icon></button>
-      <button class="icon-btn" @click="emit('toggle')" :title="t('sidebar.collapse')"><el-icon><X :size="14" /></el-icon></button>
+      <button class="sidebar-tab" :class="{ active: activeView === 'connections' }" @click="activeView = 'connections'" :title="t('header.connections')"><el-icon><Network :size="'0.875rem'" /></el-icon></button>
+      <button v-if="tabVisible('files')" class="sidebar-tab" :class="{ active: activeView === 'files' }" @click="onFilesTabClick" :title="t('header.files')"><el-icon><FolderTree :size="'0.875rem'" /></el-icon></button>
+      <button v-if="tabVisible('monitor')" class="sidebar-tab" :class="{ active: activeView === 'monitor' }" @click="onMonitorTabClick" :title="t('header.monitor')"><el-icon><Activity :size="'0.875rem'" /></el-icon></button>
+      <button v-if="tabVisible('tunnels')" class="sidebar-tab" :class="{ active: activeView === 'tunnels' }" @click="activeView = 'tunnels'" :title="t('tunnels.tunnelsTab')"><el-icon><ArrowRightLeft :size="'0.875rem'" /></el-icon></button>
+      <button v-if="tabVisible('quickCommands')" class="sidebar-tab" :class="{ active: activeView === 'quickCommands' }" @click="activeView = 'quickCommands'" :title="quickCommandsTitle"><el-icon><Zap :size="'0.875rem'" /></el-icon></button>
+      <button v-if="tabVisible('history')" class="sidebar-tab" :class="{ active: activeView === 'history' }" @click="activeView = 'history'" :title="t('quickCommands.historyTab')"><el-icon><Clock :size="'0.875rem'" /></el-icon></button>
+      <button v-if="tabVisible('personalization')" class="sidebar-tab" :class="{ active: activeView === 'personalization' }" @click="activeView = 'personalization'" :title="t('sidebar.personalization')"><el-icon><Palette :size="'0.875rem'" /></el-icon></button>
+      <button class="icon-btn" @click="emit('toggle')" :title="t('sidebar.collapse')"><el-icon><X :size="'0.875rem'" /></el-icon></button>
     </div>
 
     <template v-if="activeView === 'connections'">
@@ -28,7 +28,7 @@
         >
           <template #suffix>
             <span class="filter-trigger" :class="{ active: selectedTypeFilter !== 'all' }" @click.stop="filterMenuRef?.toggle($event.currentTarget)">
-              <el-icon><Filter :size="14" /></el-icon>
+              <el-icon><Filter :size="'0.875rem'" /></el-icon>
             </span>
             <Menu ref="filterMenuRef" align="end" v-model:visible="showFilterMenu">
               <MenuItem :class="{ active: selectedTypeFilter === 'all' }" @click="onFilterSelect('all')">{{ t('sidebar.filterAll') }}</MenuItem>
@@ -44,7 +44,7 @@
           </template>
         </el-input>
         <button class="sb-icon-btn" :title="t('header.newConnection')" @click.stop="newConnMenuRef?.toggle($event.currentTarget)">
-          <Plus :size="15" />
+          <Plus :size="'0.9375rem'" />
         </button>
         <!-- New-connection menu — Menu.vue, teleported + anchored right-edge (align=end). -->
         <Menu ref="newConnMenuRef" align="end" v-model:visible="showNewConnMenu">
@@ -77,8 +77,8 @@
           @drop.prevent="onGroupDrop('__ungrouped__', $event)"
         >
           <span class="group-arrow">
-            <el-icon v-if="expandedGroups.has('__ungrouped__')"><ChevronDown :size="14" /></el-icon>
-            <el-icon v-else><ChevronRight :size="14" /></el-icon>
+            <el-icon v-if="expandedGroups.has('__ungrouped__')"><ChevronDown :size="'0.875rem'" /></el-icon>
+            <el-icon v-else><ChevronRight :size="'0.875rem'" /></el-icon>
           </span>
           <span class="group-name">{{ t('conn.noGroup') }}</span>
           <span v-if="filteredGrouped.ungrouped.length > 0" class="group-count">{{ filteredGrouped.ungrouped.length }}</span>
@@ -104,14 +104,14 @@
             @dblclick="onItemDblClick(conn)"
             @contextmenu.prevent="onContextMenu($event, conn)"
           >
-            <span class="conn-icon"><component :is="connIcon(conn)" :size="14" /></span>
+            <span class="conn-icon"><component :is="connIcon(conn)" :size="'0.875rem'" /></span>
             <div class="conn-details">
               <span class="name">{{ conn.name }}</span>
               <span class="conn-meta">
                 <span class="host">{{ getSubtitle(conn) }}</span>
               </span>
             </div>
-            <button class="conn-more-btn" @click.stop="onConnMoreClick($event, conn)" :title="t('terminal.more')"><MoreHorizontal :size="14" /></button>
+            <button class="conn-more-btn" @click.stop="onConnMoreClick($event, conn)" :title="t('terminal.more')"><MoreHorizontal :size="'0.875rem'" /></button>
           </div>
         </template>
       </template>
@@ -138,14 +138,14 @@
           @dblclick="onItemDblClick(conn)"
           @contextmenu.prevent="onContextMenu($event, conn)"
         >
-          <span class="conn-icon"><component :is="connIcon(conn)" :size="14" /></span>
+          <span class="conn-icon"><component :is="connIcon(conn)" :size="'0.875rem'" /></span>
           <div class="conn-details">
             <span class="name">{{ conn.name }}</span>
             <span class="conn-meta">
               <span class="host">{{ getSubtitle(conn) }}</span>
             </span>
           </div>
-          <button class="conn-more-btn" @click.stop="onConnMoreClick($event, conn)" :title="t('terminal.more')"><MoreHorizontal :size="14" /></button>
+          <button class="conn-more-btn" @click.stop="onConnMoreClick($event, conn)" :title="t('terminal.more')"><MoreHorizontal :size="'0.875rem'" /></button>
         </div>
       </template>
 
@@ -218,7 +218,7 @@
               </el-option-group>
             </el-select>
             <button class="btn btn-ghost btn-icon btn-sm" :title="t('theme.newTitle')" @click="openThemeEditor()">
-              <Plus :size="14" />
+              <Plus :size="'0.875rem'" />
             </button>
             <button
               v-if="isCustomTheme(settingsStore.settings.terminal.theme)"
@@ -226,7 +226,7 @@
               :title="t('theme.editTitle')"
               @click="openThemeEditor(settingsStore.settings.terminal.theme)"
             >
-              <Pencil :size="14" />
+              <Pencil :size="'0.875rem'" />
             </button>
           </div>
         </div>

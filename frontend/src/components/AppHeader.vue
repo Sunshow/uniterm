@@ -16,7 +16,7 @@
 
     <!-- Connections button (icon only, leftmost) -->
     <button class="header-btn" @click="emit('toggle-sidebar')" :title="t('header.connections') + shortcutSuffix('toggleSidebar')">
-      <el-icon><PanelLeft :size="14" /></el-icon>
+      <el-icon><PanelLeft :size="'0.875rem'" /></el-icon>
     </button>
 
 
@@ -32,13 +32,13 @@
 
     <!-- AI button -->
     <button class="header-btn" @click="emit('toggle-ai')" :title="t('header.ai') + shortcutSuffix('focusAI')">
-      <el-icon><Bot :size="14" /></el-icon>
+      <el-icon><Bot :size="'0.875rem'" /></el-icon>
     </button>
 
     <!-- Settings button opens a dropdown menu with common settings items -->
     <div class="settings-wrap">
       <button ref="settingsBtnRef" class="header-btn" @click.stop="toggleSettingsMenu" :title="t('header.menu')">
-        <el-icon><MenuIcon :size="14" /></el-icon>
+        <el-icon><MenuIcon :size="'0.875rem'" /></el-icon>
       </button>
 
       <!-- Settings dropdown (theme / language / ai / identities / proxies / settings / check update) -->

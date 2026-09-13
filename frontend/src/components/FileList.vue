@@ -16,18 +16,18 @@
       <!-- History navigation: toolbar buttons in the flat (dual-pane) layout,
            menu entries in the compact (sidebar) layout. -->
       <button v-if="flatToolbar" class="filter-icon-btn" :disabled="!canBack" @click="emit('back')" :title="t('sftp.back')">
-        <el-icon><ChevronLeft :size="14" /></el-icon>
+        <el-icon><ChevronLeft :size="'0.875rem'" /></el-icon>
       </button>
       <button v-if="flatToolbar" class="filter-icon-btn" :disabled="!canForward" @click="emit('forward')" :title="t('sftp.forward')">
-        <el-icon><ChevronRight :size="14" /></el-icon>
+        <el-icon><ChevronRight :size="'0.875rem'" /></el-icon>
       </button>
       <button v-if="flatToolbar" class="filter-icon-btn" @click="emit('up')" :title="t('sftp.goUp')">
-        <el-icon><CornerLeftUp :size="14" /></el-icon>
+        <el-icon><CornerLeftUp :size="'0.875rem'" /></el-icon>
       </button>
       <!-- View group: refresh + hidden-files visibility. -->
       <span v-if="flatToolbar" class="toolbar-divider" />
       <button class="filter-icon-btn" @click="emit('refresh')" :title="t('sftp.refresh')">
-        <el-icon><RefreshCw :size="14" /></el-icon>
+        <el-icon><RefreshCw :size="'0.875rem'" /></el-icon>
       </button>
       <button
         v-if="flatToolbar"
@@ -36,27 +36,27 @@
         @click="toggleShowHidden"
         :title="showHidden ? t('sftp.hideHidden') : t('sftp.showHidden')"
       >
-        <el-icon><Eye :size="14" /></el-icon>
+        <el-icon><Eye :size="'0.875rem'" /></el-icon>
       </button>
       <!-- Transfer group: upload. -->
       <span v-if="flatToolbar && mode === 'remote'" class="toolbar-divider" />
       <button v-if="mode === 'remote'" class="filter-icon-btn" @click="emit('upload')" :title="t('sftp.upload')">
-        <el-icon><Upload :size="14" /></el-icon>
+        <el-icon><Upload :size="'0.875rem'" /></el-icon>
       </button>
       <!-- Create group: new file / directory / link. Flat keeps every action
            on the bar, so there is no more-menu in this layout. -->
       <span v-if="flatToolbar" class="toolbar-divider" />
       <button v-if="flatToolbar" class="filter-icon-btn" @click="doNewFile" :title="t('sftp.newFile')">
-        <el-icon><FilePlus2 :size="14" /></el-icon>
+        <el-icon><FilePlus2 :size="'0.875rem'" /></el-icon>
       </button>
       <button v-if="flatToolbar" class="filter-icon-btn" @click="doMkdir" :title="t('sftp.newDirectory')">
-        <el-icon><FolderPlus :size="14" /></el-icon>
+        <el-icon><FolderPlus :size="'0.875rem'" /></el-icon>
       </button>
       <button v-if="flatToolbar && supportsSymlink" class="filter-icon-btn" @click="doSymlink" :title="t('sftp.newLink')">
-        <el-icon><Link :size="14" /></el-icon>
+        <el-icon><Link :size="'0.875rem'" /></el-icon>
       </button>
       <button v-if="!flatToolbar" class="filter-icon-btn" @click.stop="moreMenuRef?.toggle($event.currentTarget as HTMLElement)" :title="t('sftp.more')">
-        <el-icon><MoreHorizontal :size="14" /></el-icon>
+        <el-icon><MoreHorizontal :size="'0.875rem'" /></el-icon>
       </button>
     </div>
     <PathBreadcrumb
@@ -96,9 +96,9 @@
       <el-table-column :label="t('sftp.name')" min-width="160" sortable :sort-method="sortByName" show-overflow-tooltip>
         <template #default="{ row }">
           <div class="name-cell" :draggable="true" @dragstart="onDragStart($event, row)">
-            <el-icon v-if="isSymlink(row)"><Link :size="14" /></el-icon>
-            <el-icon v-else-if="row.isDir"><Folder :size="14" /></el-icon>
-            <el-icon v-else><File :size="14" /></el-icon>
+            <el-icon v-if="isSymlink(row)"><Link :size="'0.875rem'" /></el-icon>
+            <el-icon v-else-if="row.isDir"><Folder :size="'0.875rem'" /></el-icon>
+            <el-icon v-else><File :size="'0.875rem'" /></el-icon>
             <div class="name-info">
               <span class="file-name" :class="{ selected: isSelected(row) }">{{ row.name }}</span>
             </div>
@@ -227,7 +227,7 @@
       <MenuItem v-if="supportsSymlink" @click="doSymlink">{{ t('sftp.newLink') }}</MenuItem>
       <MenuDivider />
       <MenuItem class="iconic" :class="{ active: showHidden }" @click="toggleShowHidden">
-        <el-icon><Eye :size="14" /></el-icon>
+        <el-icon><Eye :size="'0.875rem'" /></el-icon>
         {{ showHidden ? t('sftp.hideHidden') : t('sftp.showHidden') }}
       </MenuItem>
     </Menu>

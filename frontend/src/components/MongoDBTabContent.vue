@@ -10,10 +10,10 @@
             :placeholder="t('db.searchTables')"
           />
           <button class="btn btn-ghost btn-icon btn-sm" :title="t('mongodb.refresh')" @click="refreshDatabases">
-            <RefreshCw :size="14" />
+            <RefreshCw :size="'0.875rem'" />
           </button>
           <button class="btn btn-ghost btn-icon btn-sm" :title="t('common.more')" @click.stop="moreMenuRef?.toggle($event.currentTarget)">
-            <MoreHorizontal :size="14" />
+            <MoreHorizontal :size="'0.875rem'" />
           </button>
           <Menu ref="moreMenuRef" v-model:visible="moreMenuVisible" align="end">
             <MenuItem @click="onMoreNewCollection">{{ t('mongodb.newCollection') }}</MenuItem>
@@ -33,9 +33,9 @@
                 @contextmenu.prevent="onDbContextMenu($event, db)"
               >
                 <span class="db-arrow" @click.stop="toggleDb(db)">
-                  <component :is="expandedDbs.has(db) ? ChevronDown : ChevronRight" :size="12" />
+                  <component :is="expandedDbs.has(db) ? ChevronDown : ChevronRight" :size="'0.75rem'" />
                 </span>
-                <Database :size="14" class="db-icon" />
+                <Database :size="'0.875rem'" class="db-icon" />
                 <span class="db-name">{{ db }}</span>
               </div>
               <div v-if="expandedDbs.has(db)" class="child-list">
@@ -48,7 +48,7 @@
                   @contextmenu.prevent="onColContextMenu($event, db, col)"
                 >
                   <span class="table-icon-spacer" />
-                  <Layers :size="14" class="table-icon" />
+                  <Layers :size="'0.875rem'" class="table-icon" />
                   <span class="table-name">{{ col }}</span>
                 </div>
                 <div v-if="!collections[db] || collections[db].length === 0" class="empty-hint">
@@ -90,7 +90,7 @@
                   @dragend="clearTabDragState"
                   @drop.prevent="onTabDrop($event, index)"
                 >
-                  <component :is="tab.kind === 'collection' ? Layers : Database" :size="12" class="tab-icon" />
+                  <component :is="tab.kind === 'collection' ? Layers : Database" :size="'0.75rem'" class="tab-icon" />
                   <span class="tab-title">{{ tabTitle(tab) }}</span>
                   <button class="tab-close" :title="t('db.tabClose')" @click.stop="closeTab(tab.id)">×</button>
                 </div>
@@ -103,7 +103,7 @@
               :title="t('tab.more')"
               @click.stop="moreTabsMenuRef?.toggle($event.currentTarget)"
             >
-              <MoreHorizontal :size="14" />
+              <MoreHorizontal :size="'0.875rem'" />
             </button>
             <Menu ref="moreTabsMenuRef" v-model:visible="moreTabsMenuVisible" align="end">
               <MenuItem
@@ -141,7 +141,7 @@
                   :placeholder="t('db.searchTables')"
                 />
                 <button class="btn btn-default btn-sm" @click="onObjectsNewCollection(tab.dbName)">
-                  <Plus :size="14" /> {{ t('mongodb.newCollection') }}
+                  <Plus :size="'0.875rem'" /> {{ t('mongodb.newCollection') }}
                 </button>
               </div>
               <el-table
@@ -155,7 +155,7 @@
                 <el-table-column :label="t('mongodb.collection')" min-width="240" show-overflow-tooltip>
                   <template #default="{ row }">
                     <span class="object-name" @click="openCollectionTab(tab.dbName, row)">
-                      <Layers :size="14" class="object-icon" />
+                      <Layers :size="'0.875rem'" class="object-icon" />
                       {{ row }}
                     </span>
                   </template>
@@ -167,7 +167,7 @@
                       :title="t('mongodb.dropCollection')"
                       @click.stop="onCtxDropCollection({ db: tab.dbName, col: row } as CtxMenuData)"
                     >
-                      <Trash2 :size="14" />
+                      <Trash2 :size="'0.875rem'" />
                     </button>
                   </template>
                 </el-table-column>

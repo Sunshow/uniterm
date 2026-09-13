@@ -17,8 +17,8 @@
     @drop.prevent="onGrpDrop"
   >
     <span class="group-arrow">
-      <el-icon v-if="expanded.has(node.group.id)"><ChevronDown :size="14" /></el-icon>
-      <el-icon v-else><ChevronRight :size="14" /></el-icon>
+      <el-icon v-if="expanded.has(node.group.id)"><ChevronDown :size="'0.875rem'" /></el-icon>
+      <el-icon v-else><ChevronRight :size="'0.875rem'" /></el-icon>
     </span>
     <span class="group-name">{{ node.group.name }}</span>
     <span v-if="totalCount > 0" class="group-count">{{ totalCount }}</span>
@@ -56,7 +56,7 @@
       @dblclick="onItemDblClick(conn)"
       @contextmenu.prevent="onConnCtxMenu($event, conn)"
     >
-      <span class="conn-icon"><component :is="connIcon(conn)" :size="14" /></span>
+      <span class="conn-icon"><component :is="connIcon(conn)" :size="'0.875rem'" /></span>
       <div class="conn-details">
         <span class="name">{{ conn.name }}</span>
         <span class="conn-meta">
@@ -64,7 +64,7 @@
         </span>
       </div>
       <button class="conn-more-btn" @click.stop="onMoreClick($event, conn)" :title="t('terminal.more')">
-        <MoreHorizontal :size="14" />
+        <MoreHorizontal :size="'0.875rem'" />
       </button>
     </div>
   </template>

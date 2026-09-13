@@ -31,7 +31,7 @@
       <span v-else-if="!isActive && hasNotification && !tab.locked" class="tab-notification-dot" />
     </span>
     <span v-if="!editing" class="tab-name" :class="{ 'tab-disconnected': isDisconnected }" :title="tab.name" @dblclick.stop="startEdit">
-      <ArrowDownUp v-if="hasActiveTransfers" class="transfer-indicator" :size="14" title="Transferring..." />
+      <ArrowDownUp v-if="hasActiveTransfers" class="transfer-indicator" :size="'0.875rem'" title="Transferring..." />
       <span class="tab-name-text">{{ tab.name }}</span>
     </span>
     <input
@@ -48,7 +48,7 @@
     <Radio
       v-if="showBroadcastIcon"
       class="tab-broadcast-icon"
-      :size="14"
+      :size="'0.875rem'"
       :title="t('tab.unbroadcast')"
     />
     <button

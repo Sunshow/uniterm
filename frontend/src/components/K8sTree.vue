@@ -8,9 +8,9 @@
           @click="toggle(group.key)"
         >
           <span class="db-arrow">
-            <component :is="expanded.has(group.key) ? ChevronDown : ChevronRight" :size="12" />
+            <component :is="expanded.has(group.key) ? ChevronDown : ChevronRight" :size="'0.75rem'" />
           </span>
-          <component :is="groupIcon(group.key)" class="db-icon" :size="14" />
+          <component :is="groupIcon(group.key)" class="db-icon" :size="'0.875rem'" />
           <span class="db-name">{{ group.label }}</span>
         </div>
         <template v-if="expanded.has(group.key)">
@@ -22,7 +22,7 @@
             @click="$emit('update:modelValue', r.key)"
           >
             <span class="table-icon-spacer" />
-            <component :is="iconOf(r.icon)" class="table-icon" :size="14" />
+            <component :is="iconOf(r.icon)" class="table-icon" :size="'0.875rem'" />
             <span class="table-name">{{ r.label }}</span>
           </div>
           <div v-if="group.resources.length === 0" class="empty-hint">

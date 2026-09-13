@@ -2,11 +2,11 @@
   <div v-if="hasActiveTransfers" class="zmodem-transfer-panel">
     <div v-for="t in activeTransfers" :key="t.id" class="transfer-item">
       <div class="transfer-header">
-        <span class="transfer-icon"><Download v-if="t.direction === 'download'" :size="14" /><Upload v-else :size="14" /></span>
+        <span class="transfer-icon"><Download v-if="t.direction === 'download'" :size="'0.875rem'" /><Upload v-else :size="'0.875rem'" /></span>
         <span class="transfer-name">{{ t.filename }}</span>
-        <span v-if="t.status === 'completed'" class="transfer-status success"><Check :size="14" /></span>
-        <span v-else-if="t.status === 'error'" class="transfer-status error"><X :size="14" /></span>
-        <span v-else-if="t.status === 'cancelled'" class="transfer-status cancelled"><CircleOff :size="14" /></span>
+        <span v-if="t.status === 'completed'" class="transfer-status success"><Check :size="'0.875rem'" /></span>
+        <span v-else-if="t.status === 'error'" class="transfer-status error"><X :size="'0.875rem'" /></span>
+        <span v-else-if="t.status === 'cancelled'" class="transfer-status cancelled"><CircleOff :size="'0.875rem'" /></span>
       </div>
       <div v-if="t.status === 'transferring' || t.status === 'pending'" class="transfer-progress">
         <div class="progress-bar">

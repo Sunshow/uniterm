@@ -2,7 +2,7 @@
   <div class="vnc-tab-content">
     <!-- Connecting state -->
     <div v-if="status === 'connecting'" class="vnc-overlay">
-      <el-icon class="is-loading" :size="32"><Loader /></el-icon>
+      <el-icon class="is-loading" :size="'2rem'"><Loader /></el-icon>
       <p>{{ t('vnc.connecting', { host: config?.host || '...' }) }}</p>
     </div>
 

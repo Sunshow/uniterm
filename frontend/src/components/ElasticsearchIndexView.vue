@@ -60,7 +60,7 @@
             :placeholder="t('db.filterResults')"
           />
           <button class="btn btn-default btn-sm result-toolbar-add" @click="openNewDocument">
-            <Plus :size="14" /> {{ t('es.newDocument') }}
+            <Plus :size="'0.875rem'" /> {{ t('es.newDocument') }}
           </button>
         </div>
 
@@ -94,10 +94,10 @@
               <el-table-column width="80" fixed="right">
                 <template #default="{ row }">
                   <button class="btn btn-ghost btn-icon btn-sm" @click.stop="onRowDblClick(row)">
-                    <Pencil :size="14" />
+                    <Pencil :size="'0.875rem'" />
                   </button>
                   <button class="btn btn-ghost btn-icon btn-sm danger" @click.stop="deleteDocument(row)">
-                    <Trash2 :size="14" />
+                    <Trash2 :size="'0.875rem'" />
                   </button>
                 </template>
               </el-table-column>

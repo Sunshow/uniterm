@@ -89,7 +89,7 @@
             :disabled="!followSupported"
             :title="t('sftp.followPath')"
             @click="toggleFollow"
-          ><el-icon><FolderSync :size="14" /></el-icon></button>
+          ><el-icon><FolderSync :size="'0.875rem'" /></el-icon></button>
         </template>
         <template #actions-end>
           <button
@@ -97,7 +97,7 @@
             :disabled="!sessionId"
             :title="t('companion.openSftpTab')"
             @click="openStandaloneSftp"
-          ><el-icon><ExternalLink :size="14" /></el-icon></button>
+          ><el-icon><ExternalLink :size="'0.875rem'" /></el-icon></button>
         </template>
       </TransferPanel>
     </template>

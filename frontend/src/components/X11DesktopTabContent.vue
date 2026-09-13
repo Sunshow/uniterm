@@ -2,7 +2,7 @@
   <div class="x11-desktop-tab-content">
     <!-- Connecting state -->
     <div v-if="status === 'connecting'" class="x11-overlay">
-      <el-icon class="is-loading" :size="32"><Loader /></el-icon>
+      <el-icon class="is-loading" :size="'2rem'"><Loader /></el-icon>
       <p>{{ t('x11.tab.connecting') }}</p>
     </div>
 

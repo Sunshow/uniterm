@@ -9,7 +9,7 @@
         class="tn-search-input"
       />
       <button class="tn-icon-btn" :title="t('tunnels.addTunnel')" @click="addTunnel">
-        <Plus :size="15" />
+        <Plus :size="'0.9375rem'" />
       </button>
     </div>
 
@@ -37,8 +37,8 @@
           :title="statusOf(tn) === 'running' ? t('tunnels.stop') : t('tunnels.start')"
           @click.stop="toggleRun(tn)"
         >
-          <Square v-if="statusOf(tn) === 'running'" :size="13" />
-          <Play v-else :size="13" />
+          <Square v-if="statusOf(tn) === 'running'" :size="'0.8125rem'" />
+          <Play v-else :size="'0.8125rem'" />
         </button>
       </div>
 

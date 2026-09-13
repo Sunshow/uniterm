@@ -1,14 +1,14 @@
 <template>
-  <div ref="sidebarEl" class="ai-sidebar" :class="{ collapsed: !aiStore.visible, resizing: isResizing, maximized: isMaximized }" :style="{ width: sidebarWidth + 'px', '--ai-font-size': settingsStore.settings.ai.fontSize + 'px' }">
+  <div ref="sidebarEl" class="ai-sidebar" :class="{ collapsed: !aiStore.visible, resizing: isResizing, maximized: isMaximized }" :style="{ width: sidebarWidth + 'px' }">
     <div class="resize-handle" @mousedown="onResizeStart" />
     <div class="ai-header">
       <span>{{ t('ai.title') }}</span>
       <div class="ai-actions">
         <button class="ai-action-btn" @click="onNewSession" :title="t('ai.newSession')">
-          <el-icon><MessageSquarePlus :size="14" /></el-icon>
+          <el-icon><MessageSquarePlus :size="'0.875rem'" /></el-icon>
         </button>
         <button v-if="aiStore.sessions.length > 0" class="ai-action-btn" :title="t('ai.recentSessions')" @click.stop="sessionMenuRef?.toggle($event.currentTarget)" >
-          <el-icon><History :size="14" /></el-icon>
+          <el-icon><History :size="'0.875rem'" /></el-icon>
         </button>
         <Menu ref="sessionMenuRef" v-model:visible="sessionMenuVisible">
           <MenuItem
@@ -20,19 +20,19 @@
             <span class="session-item-name">{{ s.name }}</span>
             <span class="session-time">{{ formatRelativeTime(s.updatedAt) }}</span>
             <template #trailing>
-              <el-icon class="session-delete" :title="t('ai.renameSession')" @click.stop="onSessionRename(s.id); closeMenus()"><Pencil :size="14" /></el-icon>
-              <el-icon class="session-delete" @click.stop="aiStore.deleteSession(s.id); closeMenus()"><Trash2 :size="14" /></el-icon>
+              <el-icon class="session-delete" :title="t('ai.renameSession')" @click.stop="onSessionRename(s.id); closeMenus()"><Pencil :size="'0.875rem'" /></el-icon>
+              <el-icon class="session-delete" @click.stop="aiStore.deleteSession(s.id); closeMenus()"><Trash2 :size="'0.875rem'" /></el-icon>
             </template>
           </MenuItem>
         </Menu>
         <button class="ai-action-btn" @click="searchVisible = !searchVisible" :title="t('ai.search')">
-          <el-icon><Search :size="14" /></el-icon>
+          <el-icon><Search :size="'0.875rem'" /></el-icon>
         </button>
         <button class="ai-action-btn" @click="toggleMaximize" :title="isMaximized ? t('ai.restore') : t('ai.maximize')">
-          <el-icon><Shrink v-if="isMaximized" :size="14" /><Expand v-else :size="14" /></el-icon>
+          <el-icon><Shrink v-if="isMaximized" :size="'0.875rem'" /><Expand v-else :size="'0.875rem'" /></el-icon>
         </button>
         <button class="ai-action-btn" @click="onClose" :title="t('sidebar.collapse')">
-          <el-icon><X :size="14" /></el-icon>
+          <el-icon><X :size="'0.875rem'" /></el-icon>
         </button>
       </div>
     </div>
@@ -50,13 +50,13 @@
       />
       <span class="search-count" v-if="searchText">{{ currentMatchIndex + 1 }}/{{ totalMatchCount || 0 }}</span>
       <button class="search-btn" @click="onSearchPrev" :title="t('terminal.searchPrev')">
-        <ChevronUp :size="14" />
+        <ChevronUp :size="'0.875rem'" />
       </button>
       <button class="search-btn" @click="onSearchNext" :title="t('terminal.searchNext')">
-        <ChevronDown :size="14" />
+        <ChevronDown :size="'0.875rem'" />
       </button>
       <button class="search-btn" @click="closeSearch" :title="t('ai.close')">
-        <el-icon><X :size="12" /></el-icon>
+        <el-icon><X :size="'0.75rem'" /></el-icon>
       </button>
     </div>
 
@@ -166,7 +166,7 @@
             :class="{ highlighted: i === skillHighlightIndex }"
             @mousedown.prevent="onSelectItem(item)"
           >
-            <component :is="item.kind === 'command' ? Terminal : BookOpen" :size="13" class="skill-dropdown-kind-icon" />
+            <component :is="item.kind === 'command' ? Terminal : BookOpen" :size="'0.8125rem'" class="skill-dropdown-kind-icon" />
             <span class="skill-dropdown-name">/{{ item.name }}</span>
             <span v-if="item.kind === 'command' && item.argumentHint" class="skill-dropdown-args">{{ item.argumentHint }}</span>
             <span class="skill-dropdown-desc">{{ item.description }}</span>
@@ -177,7 +177,7 @@
           <div v-for="q in aiStore.queuedMessages" :key="q.id" class="queued-chip">
             <span class="queued-text">{{ q.content }}</span>
             <button class="queued-remove" :title="t('ai.queueRemove')" @click="aiStore.removeQueuedMessage(q.id)">
-              <X :size="12" />
+              <X :size="'0.75rem'" />
             </button>
           </div>
         </div>
@@ -218,7 +218,7 @@
               </Menu>
             </template>
             <button v-else class="ghost-btn model-btn add-model-btn" @click="onModelChange('__add_model__')">
-            <Plus :size="14" />
+            <Plus :size="'0.875rem'" />
             <span>{{ t('settings.addModel') }}</span>
           </button>
           </div>
@@ -245,10 +245,10 @@
               :title="busy ? t('ai.queue') : t('ai.send')"
               @click="onSend"
             >
-              <ArrowUp :size="18" />
+              <ArrowUp :size="'1.125rem'" />
             </button>
             <button v-else class="send-btn stop" :title="t('ai.stop')" @click="onStop">
-              <Square :size="15" :fill="'currentColor'" />
+              <Square :size="'0.9375rem'" :fill="'currentColor'" />
             </button>
           </div>
         </div>
@@ -1745,7 +1745,7 @@ defineExpose({ focusInput })
 }
 .ai-editable {
   padding: 0.75rem 1rem;
-  font-size: var(--ai-font-size, 0.9375rem);
+  font-size: 0.75rem;
   font-family: var(--font-ui);
   color: var(--text-primary);
   background: transparent;

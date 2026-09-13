@@ -8,10 +8,10 @@
           <el-radio-button value="light">{{ t('theme.typeLight') }}</el-radio-button>
         </el-radio-group>
         <button class="btn btn-ghost btn-icon btn-sm" :title="t('theme.importItermcolors')" @click="onImport">
-          <Upload :size="14" />
+          <Upload :size="'0.875rem'" />
         </button>
         <button class="btn btn-ghost btn-icon btn-sm" :title="t('theme.exportItermcolors')" @click="onExport">
-          <Download :size="14" />
+          <Download :size="'0.875rem'" />
         </button>
       </div>
 

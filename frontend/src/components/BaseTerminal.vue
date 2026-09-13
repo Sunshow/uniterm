@@ -36,13 +36,13 @@
       />
       <span class="search-count" v-if="searchText">{{ searchResultIndex + 1 }}/{{ searchResultCount || 0 }}</span>
       <button class="search-btn" @click="onSearchPrev" :title="t('terminal.searchPrev')">
-        <ChevronUp :size="14" />
+        <ChevronUp :size="'0.875rem'" />
       </button>
       <button class="search-btn" @click="onSearchNext" :title="t('terminal.searchNext')">
-        <ChevronDown :size="14" />
+        <ChevronDown :size="'0.875rem'" />
       </button>
       <button class="search-btn" @click="closeSearch" :title="t('terminal.searchClose')">
-        <X :size="14" />
+        <X :size="'0.875rem'" />
       </button>
     </div>
 

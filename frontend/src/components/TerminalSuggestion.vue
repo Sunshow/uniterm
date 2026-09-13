@@ -17,8 +17,8 @@
         @mouseenter="onHover(index)"
       >
         <span class="suggestion-desc">
-          <el-icon v-if="item.type === 'quick-command'"><Zap :size="12" /></el-icon>
-          <el-icon v-else-if="item.type === 'history'"><Clock :size="12" /></el-icon>
+          <el-icon v-if="item.type === 'quick-command'"><Zap :size="'0.75rem'" /></el-icon>
+          <el-icon v-else-if="item.type === 'history'"><Clock :size="'0.75rem'" /></el-icon>
         </span>
         <span v-if="item.type === 'quick-command' && item.label !== item.value" class="suggestion-label">
           <span class="qc-name">
@@ -37,7 +37,7 @@
             <span :class="{ 'match-char': item.matchIndices?.includes(charIdx) }">{{ char }}</span>
           </template>
         </span>
-        <button class="delete-btn" :class="{ visible: item.type === 'history' }" @click.stop="onRemove(item.id)"><Trash2 :size="12" /></button>
+        <button class="delete-btn" :class="{ visible: item.type === 'history' }" @click.stop="onRemove(item.id)"><Trash2 :size="'0.75rem'" /></button>
       </div>
     </div>
     <!-- AI section (fixed at bottom) -->
@@ -53,7 +53,7 @@
       @mouseenter="onHover(aiItemWithIndex.index)"
     >
       <span class="suggestion-desc">
-        <el-icon><Sparkles :size="12" /></el-icon>
+        <el-icon><Sparkles :size="'0.75rem'" /></el-icon>
       </span>
       <span class="suggestion-label">{{ aiItemWithIndex.item.label }}</span>
     </div>

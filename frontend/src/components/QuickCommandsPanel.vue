@@ -12,7 +12,7 @@
         @keydown="onListKeydown"
       />
       <button class="qc-icon-btn" :title="t('quickCommands.addCommand')" @click.stop="addMenuRef?.toggle($event.currentTarget)">
-        <Plus :size="15" />
+        <Plus :size="'0.9375rem'" />
       </button>
       <Menu ref="addMenuRef" v-model:visible="addMenuVisible" align="end">
         <MenuItem @click="onAddCommand()">{{ t('quickCommands.addCommand') }}</MenuItem>
@@ -33,8 +33,8 @@
           @drop.prevent="onGroupDrop(group.id, $event)"
         >
           <span class="qc-group-arrow">
-            <el-icon v-if="expandedGroups.has(group.id)"><ChevronDown :size="14" /></el-icon>
-            <el-icon v-else><ChevronRight :size="14" /></el-icon>
+            <el-icon v-if="expandedGroups.has(group.id)"><ChevronDown :size="'0.875rem'" /></el-icon>
+            <el-icon v-else><ChevronRight :size="'0.875rem'" /></el-icon>
           </span>
           <span class="qc-group-name">{{ group.name }}</span>
 
@@ -60,13 +60,13 @@
             </div>
             <div v-if="selectedId === cmd.id || hoveredId === cmd.id" class="qc-item-actions">
               <button class="btn btn-ghost btn-icon qc-action-btn run" @click.stop="runCommand(cmd)" :title="t('quickCommands.run')">
-                <Play :size="16" />
+                <Play :size="'1rem'" />
               </button>
               <button class="btn btn-ghost btn-icon qc-action-btn paste" @click.stop="pasteCommand(cmd)" :title="t('quickCommands.paste')">
-                <Clipboard :size="16" />
+                <Clipboard :size="'1rem'" />
               </button>
               <button class="btn btn-ghost btn-icon qc-action-btn" @click.stop="copyCommand(cmd)" :title="t('quickCommands.copy')">
-                <Copy :size="16" />
+                <Copy :size="'1rem'" />
               </button>
             </div>
           </div>
@@ -94,13 +94,13 @@
           </div>
           <div v-if="selectedId === cmd.id || hoveredId === cmd.id" class="qc-item-actions">
             <button class="btn btn-ghost btn-icon qc-action-btn run" @click.stop="runCommand(cmd)" :title="t('quickCommands.run')">
-              <Play :size="16" />
+              <Play :size="'1rem'" />
             </button>
             <button class="btn btn-ghost btn-icon qc-action-btn paste" @click.stop="pasteCommand(cmd)" :title="t('quickCommands.paste')">
-              <Clipboard :size="16" />
+              <Clipboard :size="'1rem'" />
             </button>
             <button class="btn btn-ghost btn-icon qc-action-btn" @click.stop="copyCommand(cmd)" :title="t('quickCommands.copy')">
-              <Copy :size="16" />
+              <Copy :size="'1rem'" />
             </button>
           </div>
         </div>
@@ -117,8 +117,8 @@
           @drop.prevent="onGroupDrop('__ungrouped__', $event)"
         >
           <span class="qc-group-arrow">
-            <el-icon v-if="expandedGroups.has('__ungrouped__')"><ChevronDown :size="14" /></el-icon>
-            <el-icon v-else><ChevronRight :size="14" /></el-icon>
+            <el-icon v-if="expandedGroups.has('__ungrouped__')"><ChevronDown :size="'0.875rem'" /></el-icon>
+            <el-icon v-else><ChevronRight :size="'0.875rem'" /></el-icon>
           </span>
           <span class="qc-group-name">{{ t('quickCommands.noGroup') }}</span>
         </div>
@@ -142,13 +142,13 @@
             </div>
             <div v-if="selectedId === cmd.id || hoveredId === cmd.id" class="qc-item-actions">
               <button class="btn btn-ghost btn-icon qc-action-btn run" @click.stop="runCommand(cmd)" :title="t('quickCommands.run')">
-                <Play :size="16" />
+                <Play :size="'1rem'" />
               </button>
               <button class="btn btn-ghost btn-icon qc-action-btn paste" @click.stop="pasteCommand(cmd)" :title="t('quickCommands.paste')">
-                <Clipboard :size="16" />
+                <Clipboard :size="'1rem'" />
               </button>
               <button class="btn btn-ghost btn-icon qc-action-btn" @click.stop="copyCommand(cmd)" :title="t('quickCommands.copy')">
-                <Copy :size="16" />
+                <Copy :size="'1rem'" />
               </button>
             </div>
           </div>

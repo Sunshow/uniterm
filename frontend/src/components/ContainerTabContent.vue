@@ -70,25 +70,25 @@
           <el-table-column :label="t('container.colActions')" width="172" fixed="right" class-name="k8s-action-cell">
             <template #default="{ row }">
               <button class="btn btn-ghost btn-icon btn-sm" :title="t('container.exec')" @click.stop="openExec(row)">
-                <SquareTerminal :size="14" />
+                <SquareTerminal :size="'0.875rem'" />
               </button>
               <button class="btn btn-ghost btn-icon btn-sm" :title="t('container.logs')" @click.stop="openLogs(row)">
-                <ScrollText :size="14" />
+                <ScrollText :size="'0.875rem'" />
               </button>
               <button v-if="row.state !== 'running'" class="btn btn-ghost btn-icon btn-sm" :title="t('container.start')" @click.stop="runAction(row, 'start')">
-                <Play :size="14" />
+                <Play :size="'0.875rem'" />
               </button>
               <button v-if="row.state === 'running'" class="btn btn-ghost btn-icon btn-sm" :title="t('container.stop')" @click.stop="runAction(row, 'stop')">
-                <Square :size="14" />
+                <Square :size="'0.875rem'" />
               </button>
               <button v-if="session?.runtime !== 'wslc'" class="btn btn-ghost btn-icon btn-sm" :title="t('container.restart')" @click.stop="runAction(row, 'restart')">
-                <Power :size="14" />
+                <Power :size="'0.875rem'" />
               </button>
               <button v-if="session?.runtime !== 'wslc'" class="btn btn-ghost btn-icon btn-sm" :title="t('container.rename')" @click.stop="onRename(row)">
-                <Pencil :size="14" />
+                <Pencil :size="'0.875rem'" />
               </button>
               <button class="btn btn-ghost btn-icon btn-sm danger" :title="t('container.remove')" @click.stop="onRemove(row)">
-                <Trash2 :size="14" />
+                <Trash2 :size="'0.875rem'" />
               </button>
             </template>
           </el-table-column>
@@ -121,7 +121,7 @@
           <el-table-column :label="t('container.colActions')" width="38" fixed="right" class-name="k8s-action-cell">
             <template #default="{ row }">
               <button class="btn btn-ghost btn-icon btn-sm danger" :title="t('container.removeImage')" @click.stop="onRemoveImage(row)">
-                <Trash2 :size="14" />
+                <Trash2 :size="'0.875rem'" />
               </button>
             </template>
           </el-table-column>
