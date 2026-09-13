@@ -169,11 +169,9 @@ export function acquireTerminal(
     // AFTER loadAddon — the unicode property is provided by the addon.
     terminal.unicode.activeVersion = '11'
 
-    // IME compatibility (macOS): deliver single-char input directly when an
-    // IME marks keystrokes with the phantom keyCode 229, instead of relying
-    // on xterm's racy deferred textarea diff that drops/duplicates chars
-    // under fast typing. The patch reads the setting per event, so toggling
-    // it applies to already-created terminals too.
+    // IME compatibility (macOS) is installed in attachTerminal, after
+    // terminal.open() — the patch needs textarea/_compositionHelper, which
+    // xterm only creates there.
     managed = {
       terminal,
       fitAddon,
@@ -189,11 +187,7 @@ export function acquireTerminal(
       lineOffset: 0,
       trimDispose: null,
       resizeDispose: null,
-      imeDispose: installImeCompatibilityPatch(terminal, () => {
-        const localState = useLocalStateStore()
-        // nil = unset → default enabled (the patch only installs on macOS).
-        return localState.state.imeCompatibility ?? true
-      }),
+      imeDispose: null,
     }
 
     // Track scrollback trimming so line-numbers / timestamps stay continuous
@@ -307,6 +301,16 @@ export function attachTerminal(sessionId: string, container: HTMLElement): void 
     managed.terminal.open(container)
   } else {
     container.appendChild(managed.terminal.element)
+  }
+
+  // IME compatibility (macOS): deliver single-char input directly when an
+  // IME marks keystrokes with the phantom keyCode 229, instead of relying on
+  // xterm's racy deferred textarea diff that drops chars under fast typing.
+  // Must run after open() — that is where xterm creates the textarea and the
+  // composition helper the patch hooks into; installing at construction time
+  // silently no-ops.
+  if (!managed.imeDispose) {
+    managed.imeDispose = installImeCompatibilityPatch(managed.terminal)
   }
 
   // terminal.element only exists after open(), so the padding-ring color is

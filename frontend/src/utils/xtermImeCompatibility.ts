@@ -2,24 +2,17 @@ import type { Terminal } from '@xterm/xterm'
 
 // IME compatibility patch for xterm.js on macOS (WKWebView).
 //
-// Root cause: with an IME active, WKWebView reports ordinary keystrokes as
-// keydown keyCode=229 ("composition" code) even when no real composition is
-// running. xterm records `_keyDownSeen = true` on every keydown, and its
-// `_inputEvent` fast path (`insertText` → direct delivery) requires
-// `!ev.composed || !_keyDownSeen` — so the character is diverted to
-// CompositionHelper's deferred textarea-diff fallback. That fallback races
-// under fast typing and drops or duplicates characters (the "must type
-// slowly" symptom).
+// With an IME active, WKWebView can report ordinary keystrokes as keydown
+// keyCode=229 even when no composition is active. xterm then diverts the
+// character to its deferred textarea-diff path, which can drop characters.
+// Force eligible single-character insertText events through xterm's direct
+// path and rewind the textarea so the deferred diff cannot send them twice.
 //
-// Fix: replace `core._inputEvent` with a wrapper that, when an `insertText`
-// event carries a single printable ASCII character right after a
-// keyCode-229 keydown while NO composition is actually active, temporarily
-// clears `_keyDownSeen` so the character takes the direct delivery path.
-// The guard conditions are deliberately conservative — real IME
-// composition (pinyin, kana, hangul) is never touched.
-//
-// The wrapper reads `isEnabled` on every input event, so toggling the
-// setting takes effect immediately on already-created terminals.
+// After switching a Chinese IME to English mode with Caps Lock, WKWebView can
+// also emit the input event before its corresponding keyCode-229 keydown. If
+// that input event was already delivered, the late keydown must not inject a
+// fallback. If no usable input event was delivered, the keydown fallback
+// keeps the character from being swallowed.
 
 export interface Disposable {
   dispose(): void
@@ -36,15 +29,29 @@ interface XtermCoreInternals {
   _keyDownSeen?: boolean
   _compositionHelper?: XtermCompositionHelperInternals
   textarea?: {
-    addEventListener: typeof EventTarget.prototype.addEventListener
-    removeEventListener: typeof EventTarget.prototype.removeEventListener
+    value: string
+    addEventListener: (type: string, listener: EventListener, capture?: boolean) => void
+    removeEventListener: (type: string, listener: EventListener, capture?: boolean) => void
   } | null
 }
 
 type TerminalWithCore = Terminal & { _core?: XtermCoreInternals }
 
-const PRINTABLE_ASCII = /^[\x20-\x7E]$/
+interface PendingFallback {
+  character: string
+  textareaValueBeforeKeydown: string
+  createdAt: number
+  injected: boolean
+  timeoutId: ReturnType<typeof setTimeout>
+}
 
+interface DeliveredInput {
+  character: string
+  deliveredAt: number
+}
+
+const PRINTABLE_ASCII = /^[\x20-\x7E]$/
+const LATE_EVENT_WINDOW_MS = 250
 const noopDisposable: Disposable = { dispose() {} }
 
 function isMacPlatform(): boolean {
@@ -59,20 +66,11 @@ function isCompositionActive(helper: XtermCompositionHelperInternals): boolean {
   )
 }
 
-/**
- * Installs the IME compatibility patch on the given terminal.
- *
- * Only does anything on macOS (the keyCode-229 phantom keydown behavior is
- * WKWebView-specific). The returned Disposable restores the original
- * internals; call it when the terminal is disposed.
- *
- * @param isEnabled called on each input event to decide whether the patch
- *   is active — lets the setting toggle apply without recreating terminals.
- */
-export function installImeCompatibilityPatch(
-  terminal: Terminal,
-  isEnabled: () => boolean,
-): Disposable {
+function isSameCharacter(left: string, right: string): boolean {
+  return left.toLowerCase() === right.toLowerCase()
+}
+
+export function installImeCompatibilityPatch(terminal: Terminal): Disposable {
   if (!isMacPlatform()) {
     return noopDisposable
   }
@@ -87,16 +85,97 @@ export function installImeCompatibilityPatch(
     !core.textarea ||
     typeof core.textarea.addEventListener !== 'function'
   ) {
-    // xterm internals changed shape — fail safe by not patching at all.
     return noopDisposable
   }
 
-  // Track whether the most recent keydown was the phantom keyCode 229.
-  // Capture phase so it runs before xterm's own textarea keydown listener.
   let latestKeydownWas229 = false
-  const onKeyDown = (ev: KeyboardEvent) => {
-    latestKeydownWas229 = ev.keyCode === 229
+  let textareaValueBefore229Keydown = ''
+  const pendingFallbacks: PendingFallback[] = []
+  const deliveredInputs: DeliveredInput[] = []
+
+  const removePendingFallback = (pendingFallback: PendingFallback) => {
+    const index = pendingFallbacks.indexOf(pendingFallback)
+    if (index >= 0) pendingFallbacks.splice(index, 1)
   }
+
+  const pruneLateEventRecords = () => {
+    const now = Date.now()
+    for (let index = pendingFallbacks.length - 1; index >= 0; index -= 1) {
+      const pendingFallback = pendingFallbacks[index]
+      if (now - pendingFallback.createdAt <= LATE_EVENT_WINDOW_MS) continue
+      if (!pendingFallback.injected) clearTimeout(pendingFallback.timeoutId)
+      pendingFallbacks.splice(index, 1)
+    }
+    for (let index = deliveredInputs.length - 1; index >= 0; index -= 1) {
+      if (now - deliveredInputs[index].deliveredAt <= LATE_EVENT_WINDOW_MS) continue
+      deliveredInputs.splice(index, 1)
+    }
+  }
+
+  const onKeyDown = (event: Event) => {
+    const keyboardEvent = event as KeyboardEvent
+    pruneLateEventRecords()
+
+    latestKeydownWas229 = keyboardEvent.keyCode === 229
+    const textareaValueBeforeKeydown = core.textarea?.value ?? ''
+    if (latestKeydownWas229) {
+      textareaValueBefore229Keydown = textareaValueBeforeKeydown
+    }
+
+    if (
+      keyboardEvent.keyCode !== 229 ||
+      keyboardEvent.isComposing ||
+      !keyboardEvent.getModifierState('CapsLock') ||
+      !/^[A-Za-z]$/.test(keyboardEvent.key) ||
+      keyboardEvent.ctrlKey ||
+      keyboardEvent.metaKey ||
+      keyboardEvent.altKey ||
+      isCompositionActive(helper)
+    ) {
+      return
+    }
+
+    const character = keyboardEvent.shiftKey
+      ? keyboardEvent.key
+      : keyboardEvent.key.toLowerCase()
+    const deliveredIndex = deliveredInputs.findIndex(deliveredInput =>
+      isSameCharacter(deliveredInput.character, character),
+    )
+
+    // WKWebView can emit insertText before the corresponding 229 keydown. If
+    // xterm already delivered that input, only cancel the late keydown.
+    if (deliveredIndex >= 0) {
+      deliveredInputs.splice(deliveredIndex, 1)
+      keyboardEvent.preventDefault()
+      return
+    }
+
+    keyboardEvent.preventDefault()
+    const pendingFallback: PendingFallback = {
+      character,
+      textareaValueBeforeKeydown,
+      createdAt: Date.now(),
+      injected: false,
+      timeoutId: setTimeout(() => {
+        // xterm queues a textarea-diff timeout on the same keydown. Wait one
+        // more turn so that diff can run before the fallback injects.
+        pendingFallback.timeoutId = setTimeout(() => {
+          removePendingFallback(pendingFallback)
+          if (
+            isCompositionActive(helper) ||
+            (core.textarea && core.textarea.value !== textareaValueBeforeKeydown)
+          ) {
+            return
+          }
+          pendingFallback.injected = true
+          pendingFallbacks.push(pendingFallback)
+          terminal.input(character)
+        }, 0)
+      }, 0),
+    }
+    pendingFallbacks.push(pendingFallback)
+  }
+
   core.textarea.addEventListener('keydown', onKeyDown, true)
 
   const originalInputEvent = core._inputEvent
@@ -104,38 +183,96 @@ export function installImeCompatibilityPatch(
     this: XtermCoreInternals,
     ev: InputEvent,
   ): boolean {
+    pruneLateEventRecords()
+
+    let matchingIndex = -1
+    if (ev.data) {
+      for (let index = pendingFallbacks.length - 1; index >= 0; index -= 1) {
+        if (isSameCharacter(pendingFallbacks[index].character, ev.data)) {
+          matchingIndex = index
+          break
+        }
+      }
+    }
+    const matchingFallback = matchingIndex >= 0
+      ? pendingFallbacks[matchingIndex]
+      : null
+
+    // A fallback already delivered this character; suppress the late input.
+    if (matchingFallback?.injected) {
+      if (this.textarea) {
+        this.textarea.value = matchingFallback.textareaValueBeforeKeydown
+      }
+      removePendingFallback(matchingFallback)
+      return true
+    }
+
+    if (ev.isComposing || isCompositionActive(helper)) {
+      for (let index = pendingFallbacks.length - 1; index >= 0; index -= 1) {
+        const pendingFallback = pendingFallbacks[index]
+        if (pendingFallback.injected) continue
+        clearTimeout(pendingFallback.timeoutId)
+        pendingFallbacks.splice(index, 1)
+      }
+    }
+
     const was229 = latestKeydownWas229
     latestKeydownWas229 = false
+    const shouldForceDirectPath =
+      ev.inputType === 'insertText' &&
+      Boolean(ev.data) &&
+      PRINTABLE_ASCII.test(ev.data!) &&
+      !ev.isComposing &&
+      !isCompositionActive(helper) &&
+      was229 &&
+      this._keyDownSeen === true
 
+    let result: boolean
+    if (shouldForceDirectPath) {
+      const savedKeyDownSeen = this._keyDownSeen
+      this._keyDownSeen = false
+      try {
+        result = originalInputEvent!.call(this, ev)
+      } finally {
+        if (this.textarea) {
+          this.textarea.value = textareaValueBefore229Keydown
+        }
+        this._keyDownSeen = savedKeyDownSeen
+      }
+    } else {
+      result = originalInputEvent!.call(this, ev)
+    }
+
+    // If xterm delivered this input, remember it briefly. WKWebView may send
+    // the matching 229 keydown afterward, and that keydown must not inject a
+    // second copy of the character.
     if (
-      !isEnabled() ||
-      ev.inputType !== 'insertText' ||
-      !ev.data ||
-      !PRINTABLE_ASCII.test(ev.data) ||
-      ev.isComposing ||
-      isCompositionActive(helper) ||
-      !was229 ||
-      this._keyDownSeen !== true
+      result &&
+      ev.inputType === 'insertText' &&
+      ev.data &&
+      PRINTABLE_ASCII.test(ev.data) &&
+      !ev.isComposing &&
+      !isCompositionActive(helper)
     ) {
-      return originalInputEvent!.call(this, ev)
+      deliveredInputs.push({ character: ev.data, deliveredAt: Date.now() })
+      if (matchingFallback && !matchingFallback.injected) {
+        clearTimeout(matchingFallback.timeoutId)
+        removePendingFallback(matchingFallback)
+      }
     }
 
-    // Force the direct delivery path: clear the poisoned `_keyDownSeen` for
-    // the duration of the original handler, then restore it so xterm's own
-    // keyup bookkeeping stays consistent.
-    const saved = this._keyDownSeen
-    this._keyDownSeen = false
-    try {
-      return originalInputEvent!.call(this, ev)
-    } finally {
-      this._keyDownSeen = saved
-    }
+    return result
   }
 
   core._inputEvent = patchedInputEvent
 
   return {
     dispose() {
+      for (const pendingFallback of pendingFallbacks) {
+        if (!pendingFallback.injected) clearTimeout(pendingFallback.timeoutId)
+      }
+      pendingFallbacks.length = 0
+      deliveredInputs.length = 0
       core.textarea?.removeEventListener('keydown', onKeyDown, true)
       if (core._inputEvent === patchedInputEvent) {
         core._inputEvent = originalInputEvent
