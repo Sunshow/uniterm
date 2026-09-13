@@ -54,7 +54,11 @@ defineProps<{
   flex-shrink: 0;
   margin-left: auto;
   font-size: 0.6875rem;
-  font-family: var(--font-mono);
+  /* UI font, not mono: on macOS the ⌘⌥⇧ glyphs only get their square,
+     native-looking shapes from the system font (SF Pro); mono falls back to
+     Menlo and renders them thin and text-like. Windows native menus also use
+     the UI font for shortcut hints. */
+  font-family: var(--font-ui);
   color: var(--text-muted, var(--text-disabled));
   opacity: 0.8;
 }
