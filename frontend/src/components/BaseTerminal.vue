@@ -377,6 +377,7 @@ function initZmodemService(sessionId: string) {
     onUnregister: () => zmodemStore.unregisterAbort(sessionId),
     sessionId,
     direction: zmodemDirection,
+    getDefaultDownloadDir: () => settingsStore.settings.terminal.zmodemDownloadDir,
     onTerminalRestoreState: restoring => {
       zmodemRestoringOutput = restoring
       if (!restoring) {

@@ -90,6 +90,9 @@ export interface TerminalSettings {
   // Override for the session output log directory. Empty means the
   // OS default under ~/Documents/uniTerm/logs.
   sessionLogDir: string
+  // Default local directory for files received with ZMODEM sz. Empty keeps
+  // the existing behavior of asking for a directory on every transfer.
+  zmodemDownloadDir: string
   // Filename template: %S session, %H host, %M month, %D day, %h hour, %m minute.
   sessionLogFilename: string
   // Characters that act as word boundaries for xterm.js's double-click
@@ -331,6 +334,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     cursorStyle: 'block',
     minimumContrast: 4.5,
     sessionLogDir: '',
+    zmodemDownloadDir: '',
     sessionLogFilename: '%S_%H_%M%D_%h%m.log',
     wordSeparator: '\\ :;~`!@#$%^&*()=+|[]{}\'",<>?',
     showLineNumbers: false,

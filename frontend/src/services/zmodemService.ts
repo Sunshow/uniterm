@@ -38,6 +38,7 @@ interface ActivityWatchdog {
 export interface ZmodemServiceOptions {
   sessionId: string
   direction?: 'upload' | 'download'
+  getDefaultDownloadDir?: () => string
   onComplete?: (files: string[], hint?: string) => void
   onError?: (err: string) => void
   onWarning?: (warning: string) => void
@@ -213,7 +214,8 @@ export function startZmodemService(options: ZmodemServiceOptions) {
           dialogLocks.delete(sessionId)
           notifyComplete(result.files, result.hint)
         } else {
-          const saveDir: string = await abortable(
+          const configuredDir = options.getDefaultDownloadDir?.() || ''
+          const saveDir: string = configuredDir.trim() ? configuredDir : await abortable(
             OpenDirectoryDialog().catch((err: unknown) => dialogCancelToEmpty<string>(err, '')),
             abortCtl,
           )
@@ -418,7 +420,8 @@ async function handleReceive(
   const activeOffers = new Set<Promise<void>>()
   let offerCount = 0
   let offerFailure: unknown = null
-  const sep = saveDir.includes('\\') ? '\\' : '/'
+  const windowsPath = /^[a-zA-Z]:[\\/]/.test(saveDir) || saveDir.startsWith('\\\\')
+  const sep = windowsPath ? '\\' : '/'
   let endSession!: () => void
   const sessionEnded = new Promise<void>(resolve => { endSession = resolve })
   zsession.on('session_end', () => {
@@ -456,7 +459,7 @@ async function receiveOffer(
   const details = offer.get_details()
   const filename = safeDownloadFilename(details.name, sep === '\\')
   const size = details.size || 0
-  const finalSavePath = `${saveDir}${sep}${filename}`
+  const finalSavePath = `${saveDir}${saveDir.endsWith('/') || saveDir.endsWith('\\') ? '' : sep}${filename}`
   const transferId = `${sessionId}-dl-${offerIndex}`
   store.addTransfer(sessionId, {
     id: transferId, sessionId, filename, size, transferred: 0,

@@ -190,6 +190,43 @@ describe('startZmodemService', () => {
     expect(mockSessionEndZmodem).toHaveBeenCalledWith('s1')
   })
 
+  it('uses the configured sz download directory without opening a picker', async () => {
+    const s = makeDownload([[1, 2, 3]])
+    const onComplete = vi.fn()
+
+    startZmodemService({
+      sessionId: 's1',
+      getDefaultDownloadDir: () => '/Users/test/Downloads',
+      onComplete,
+    })
+    sentryInstances[0].on_detect({ confirm: () => s.zsession })
+    await sleepTicks()
+
+    expect(mockOpenDirectoryDialog).not.toHaveBeenCalled()
+    expect(mockAppendFileBase64).toHaveBeenCalledWith(
+      '/Users/test/Downloads/large.bin',
+      'AQID',
+      0,
+    )
+    expect(onComplete).toHaveBeenCalledWith(['/Users/test/Downloads/large.bin'])
+  })
+
+  it('reads the configured sz directory when the transfer starts', async () => {
+    const s = makeDownload([[1]])
+    let configuredDir = ''
+    startZmodemService({
+      sessionId: 's1',
+      getDefaultDownloadDir: () => configuredDir,
+    })
+    configuredDir = 'C:/Downloads/'
+
+    sentryInstances[0].on_detect({ confirm: () => s.zsession })
+    await sleepTicks()
+
+    expect(mockOpenDirectoryDialog).not.toHaveBeenCalled()
+    expect(mockAppendFileBase64).toHaveBeenCalledWith('C:/Downloads/large.bin', 'AQ==', 0)
+  })
+
   it('flushes an in-flight batch once the buffer exceeds the batch size', async () => {
     vi.useFakeTimers()
     // 3 × 30KB = 90KB total → first flush at 64KB boundary, remainder at end.
