@@ -72,6 +72,7 @@ import { Plus, Play, Square } from '@lucide/vue'
 import { useTunnelStore, type Tunnel } from '../stores/tunnelStore'
 import { useConnectionStore } from '../stores/connectionStore'
 import { useI18n } from '../i18n'
+import { useTunnelCredentials } from '../composables/useTunnelCredentials'
 import TunnelEditDialog from './TunnelEditDialog.vue'
 import Menu from './Menu.vue'
 import MenuItem from './MenuItem.vue'
@@ -80,6 +81,7 @@ import MenuDivider from './MenuDivider.vue'
 const { t } = useI18n()
 const store = useTunnelStore()
 const connectionStore = useConnectionStore()
+const { resolveTunnelCredentials } = useTunnelCredentials()
 
 const searchQuery = ref('')
 
@@ -121,7 +123,11 @@ async function toggleRun(tn: Tunnel) {
   if (statusOf(tn) === 'running') {
     await store.stop(tn.id)
   } else {
-    await store.start(tn.id)
+    // Exit connection without saved credentials: prompt once for user/password
+    // and pass them inline (backend fills only empty fields). Cancel aborts.
+    const creds = await resolveTunnelCredentials(tn.sshConnId)
+    if (!creds) return
+    await store.start(tn.id, creds.user, creds.password)
   }
 }
 

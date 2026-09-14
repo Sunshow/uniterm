@@ -185,8 +185,8 @@ export const useTunnelStore = defineStore('tunnels', () => {
     save()
   }
 
-  async function start(id: string): Promise<TunnelState> {
-    const st = await StartTunnel(id)
+  async function start(id: string, user?: string, password?: string): Promise<TunnelState> {
+    const st = await StartTunnel(id, user || '', password || '')
     states.value = { ...states.value, [id]: st as TunnelState }
     return st as TunnelState
   }
