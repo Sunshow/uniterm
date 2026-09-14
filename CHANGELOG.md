@@ -41,6 +41,7 @@
 - Terminal: fixed copy-on-select writing to the clipboard when WKWebView lacks focus. (@surenwuyuwuqiu)
 - Terminal: fixed terminal device attribute queries (DA) being swallowed, so remote TUI apps' capability probing now gets a response. (@windtear)
 - Windows: rounded corners are restored on first launch, and the startup background matches the theme so it no longer flashes a black background.
+- Local shells (Windows): opening a WSL terminal or browsing WSL files no longer flashes console windows; one-shot child process spawns go through a single hidden-window entry point.
 - zsh now starts as a login shell so `.zprofile` is sourced before `.zshrc`. (@boltomli)
 - Tunnel: start failures are surfaced with actionable hints, a config test and an SSH example; error toasts include the tunnel name and a localized prefix.
 - SSH: the server's actual error is reported when keyboard-interactive auth is rejected cold. (@kxn)

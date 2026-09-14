@@ -15,7 +15,6 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
-	"syscall"
 	"time"
 
 	"github.com/UserExistsError/conpty"
@@ -24,6 +23,7 @@ import (
 	"golang.org/x/text/transform"
 
 	"github.com/ys-ll/uniterm/backend/log"
+	"github.com/ys-ll/uniterm/backend/platform"
 )
 
 const cpUTF8 = 65001
@@ -244,7 +244,7 @@ func (s *LocalSession) Connect(config ConnectionConfig) error {
 		}
 	}
 
-	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	platform.HideConsoleWindow(cmd)
 	cmd.Dir = workDir
 
 	// Elevated shell: the ConPTY lives in the elevated broker process and is
@@ -426,6 +426,7 @@ func wslRunCommand(distro, command, stdin string, timeout time.Duration) (string
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "wsl.exe", "-d", distro, "-e", "sh", "-c", command)
+	platform.HideConsoleWindow(cmd)
 	if stdin != "" {
 		cmd.Stdin = strings.NewReader(stdin)
 	}
