@@ -849,6 +849,11 @@ body::before {
   background: var(--bg-elevated);
   color: var(--text-primary);
 }
+/* Keep header labels and sort carets on one line in narrow columns; the
+   .cell's own overflow hidden + ellipsis truncates the label instead. */
+.el-table th.el-table__cell .cell {
+  white-space: nowrap;
+}
 .el-table td.el-table__cell {
   color: var(--text-primary);
 }

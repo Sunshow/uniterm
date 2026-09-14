@@ -188,7 +188,7 @@
                 class="db-result-table"
                 :empty-text="t('db.noData')"
               >
-                <el-table-column prop="name" :label="t('es.indexName')" min-width="uiPx(180)" show-overflow-tooltip>
+                <el-table-column prop="name" :label="t('es.indexName')" :min-width="uiPx(180)" show-overflow-tooltip>
                   <template #default="{ row }">
                     <span class="object-name" @click="openIndexTab(row.name)">
                       <Layers :size="'0.875rem'" class="object-icon" />
@@ -196,16 +196,16 @@
                     </span>
                   </template>
                 </el-table-column>
-                <el-table-column prop="health" :label="t('es.health')" width="uiPx(90)" />
-                <el-table-column prop="status" :label="t('es.status')" width="uiPx(90)" />
-                <el-table-column :label="t('es.docsCount')" width="uiPx(100)">
+                <el-table-column prop="health" :label="t('es.health')" :width="uiPx(90)" />
+                <el-table-column prop="status" :label="t('es.status')" :width="uiPx(90)" />
+                <el-table-column :label="t('es.docsCount')" :width="uiPx(100)">
                   <template #default="{ row }">{{ formatDocs(row.docsCount) }}</template>
                 </el-table-column>
-                <el-table-column prop="storeSize" :label="t('es.storeSize')" width="uiPx(110)" />
-                <el-table-column :label="t('es.shards')" width="uiPx(90)">
+                <el-table-column prop="storeSize" :label="t('es.storeSize')" :width="uiPx(110)" />
+                <el-table-column :label="t('es.shards')" :width="uiPx(90)">
                   <template #default="{ row }">{{ row.pri }} / {{ row.rep }}</template>
                 </el-table-column>
-                <el-table-column :label="t('common.actions')" width="uiPx(80)" align="right">
+                <el-table-column :label="t('common.actions')" :width="uiPx(80)" align="right">
                   <template #default="{ row }">
                     <button
                       class="btn btn-ghost btn-icon btn-sm danger"

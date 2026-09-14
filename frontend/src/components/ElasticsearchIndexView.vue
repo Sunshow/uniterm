@@ -81,7 +81,7 @@
                 :key="col"
                 :prop="col"
                 :label="col"
-                min-width="uiPx(120)"
+                :min-width="uiPx(120)"
                 show-overflow-tooltip
               >
                 <template #default="{ row }">
@@ -91,7 +91,7 @@
                   >{{ formatCellValue(row[col]) }}</span>
                 </template>
               </el-table-column>
-              <el-table-column width="uiPx(80)" fixed="right">
+              <el-table-column :width="uiPx(80)" fixed="right">
                 <template #default="{ row }">
                   <button class="btn btn-ghost btn-icon btn-sm" @click.stop="onRowDblClick(row)">
                     <Pencil :size="'0.875rem'" />

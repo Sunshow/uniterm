@@ -18,7 +18,7 @@
         :key="col.name"
         :prop="col.name"
         :label="colTitle(col)"
-        min-width="uiPx(110)"
+        :min-width="uiPx(110)"
         sortable="custom"
         show-overflow-tooltip
       >
@@ -65,7 +65,7 @@
       <el-table-column
         v-if="canEdit"
         :label="actionsLabel"
-        width="uiPx(88)"
+        :width="uiPx(88)"
         fixed="right"
         class-name="db-action-cell"
         :resizable="false"

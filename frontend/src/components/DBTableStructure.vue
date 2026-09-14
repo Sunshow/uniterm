@@ -19,18 +19,18 @@
         <el-table :data="schema?.columns || []" border size="small" style="width:100%">
           <el-table-column prop="name" :label="t('db.colName')" />
           <el-table-column prop="type" :label="t('db.colType')" />
-          <el-table-column :label="t('db.colNullable')" width="uiPx(80)">
+          <el-table-column :label="t('db.colNullable')" :width="uiPx(80)">
             <template #default="{ row }">
               {{ row.nullable ? 'YES' : 'NO' }}
             </template>
           </el-table-column>
           <el-table-column prop="defaultVal" :label="t('db.colDefault')" />
-          <el-table-column :label="t('db.colPrimary')" width="uiPx(50)">
+          <el-table-column :label="t('db.colPrimary')" :width="uiPx(50)">
             <template #default="{ row }">
               <span v-if="row.isPrimary">PK</span>
             </template>
           </el-table-column>
-          <el-table-column :label="t('db.colAutoIncrement')" width="uiPx(50)">
+          <el-table-column :label="t('db.colAutoIncrement')" :width="uiPx(50)">
             <template #default="{ row }">
               <span v-if="row.defaultType === 'auto'">AI</span>
             </template>
@@ -39,10 +39,10 @@
             v-if="caps?.['supportsComment']"
             prop="comment"
             :label="t('db.colComment')"
-            min-width="uiPx(120)"
+            :min-width="uiPx(120)"
             show-overflow-tooltip
           />
-          <el-table-column :label="t('db.actions')" width="uiPx(80)">
+          <el-table-column :label="t('db.actions')" :width="uiPx(80)">
             <template #default="{ row }">
               <button v-if="caps?.['supportsModifyColumn']" class="btn btn-ghost btn-icon btn-sm" :title="t('common.edit')" @click="startEditColumn(row)"><Pencil :size="'0.875rem'" /></button>
               <button class="btn btn-ghost btn-icon btn-sm danger" :title="t('common.delete')" @click="onDropColumn(row.name)"><Trash2 :size="'0.875rem'" /></button>
@@ -65,14 +65,14 @@
               {{ row.columns?.join(', ') }}
             </template>
           </el-table-column>
-          <el-table-column :label="t('db.idxType')" width="uiPx(100)">
+          <el-table-column :label="t('db.idxType')" :width="uiPx(100)">
             <template #default="{ row }">
               <span v-if="row.isPrimary" class="idx-type idx-type-pk">{{ t('db.primary') }}</span>
               <span v-else-if="row.unique" class="idx-type idx-type-uq">{{ t('db.unique') }}</span>
               <span v-else class="idx-type idx-type-idx">{{ t('db.index') }}</span>
             </template>
           </el-table-column>
-          <el-table-column :label="t('db.actions')" width="uiPx(80)">
+          <el-table-column :label="t('db.actions')" :width="uiPx(80)">
             <template #default="{ row }">
               <button class="btn btn-ghost btn-icon btn-sm danger" :title="t('common.delete')" @click="onDropIndex(row)"><Trash2 :size="'0.875rem'" /></button>
             </template>

@@ -37,7 +37,7 @@
         <template #default="{ row }">{{ evalJsonPath(row, pc.jsonPath) }}</template>
       </el-table-column>
       <el-table-column label="Age"><template #default="{ row }">{{ age(row.metadata?.creationTimestamp) }}</template></el-table-column>
-      <el-table-column :label="t('k8s.actions')" width="uiPx(66)" fixed="right" class-name="k8s-action-cell">
+      <el-table-column :label="t('k8s.actions')" :width="uiPx(66)" fixed="right" class-name="k8s-action-cell">
         <template #default="{ row }">
           <button class="btn btn-ghost btn-icon btn-sm" :title="t('k8s.actionEdit')" @click.stop="emit('open-yaml', row)">
             <Pencil :size="'0.875rem'" />

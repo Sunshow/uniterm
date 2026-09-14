@@ -94,7 +94,7 @@
         @row-dblclick="onRowDblClick"
         @row-contextmenu="onRowContextMenu"
       >
-      <el-table-column prop="name" :label="t('sftp.name')" min-width="uiPx(160)" sortable="custom" show-overflow-tooltip>
+      <el-table-column prop="name" :label="t('sftp.name')" :min-width="uiPx(220)" sortable="custom" show-overflow-tooltip>
         <template #default="{ row }">
           <div class="name-cell" :draggable="true" @dragstart="onDragStart($event, row)">
             <el-icon v-if="isSymlink(row)"><Link :size="'0.875rem'" /></el-icon>
@@ -106,32 +106,32 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="type" :label="t('sftp.type')" width="uiPx(90)" sortable="custom" show-overflow-tooltip>
+      <el-table-column prop="type" :label="t('sftp.type')" :width="uiPx(70)" sortable="custom" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ fileTypeLabel(row) }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="modTime" :label="t('sftp.modified')" width="uiPx(150)" sortable="custom" show-overflow-tooltip>
+      <el-table-column prop="modTime" :label="t('sftp.modified')" :width="uiPx(150)" sortable="custom" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ formatDate(row.modTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="size" :label="t('sftp.size')" width="uiPx(70)" align="right" sortable="custom" show-overflow-tooltip>
+      <el-table-column prop="size" :label="t('sftp.size')" :width="uiPx(70)" align="right" sortable="custom" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ row.isDir ? '-' : formatSize(row.size) }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('sftp.permission')" width="uiPx(110)" show-overflow-tooltip>
+      <el-table-column :label="t('sftp.permission')" :width="uiPx(95)" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ row.mode || '-' }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('sftp.owner')" width="uiPx(100)" show-overflow-tooltip>
+      <el-table-column :label="t('sftp.owner')" :width="uiPx(80)" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ row.owner || '-' }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('sftp.group')" width="uiPx(100)" show-overflow-tooltip>
+      <el-table-column :label="t('sftp.group')" :width="uiPx(80)" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ row.group || '-' }}</span>
         </template>
