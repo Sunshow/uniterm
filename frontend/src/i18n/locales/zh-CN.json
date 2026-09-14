@@ -322,6 +322,8 @@
   "sftp.cut": "剪切",
   "sftp.paste": "粘贴",
   "sftp.selectionStats": "已选中 {count} 项",
+  "sftp.itemCount": "{count} 个项目",
+  "sftp.selectAll": "全选",
   "sftp.newFile": "新建文件",
   "sftp.dialog.editTitle": "编辑 — {path}",
   "sftp.dialog.newFileTitle": "新建文件",

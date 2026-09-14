@@ -322,6 +322,8 @@
   "sftp.cut": "Cut",
   "sftp.paste": "Paste",
   "sftp.selectionStats": "{count} item(s) selected",
+  "sftp.itemCount": "{count} item(s)",
+  "sftp.selectAll": "Select All",
   "sftp.newFile": "New File",
   "sftp.dialog.editTitle": "Edit — {path}",
   "sftp.dialog.newFileTitle": "New File",

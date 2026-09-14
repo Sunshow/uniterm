@@ -89,11 +89,12 @@
         size="small"
         border
         :row-class-name="getRowClassName"
+        @sort-change="onSortChange"
         @row-click="onRowClick"
         @row-dblclick="onRowDblClick"
         @row-contextmenu="onRowContextMenu"
       >
-      <el-table-column :label="t('sftp.name')" min-width="uiPx(160)" sortable :sort-method="sortByName" show-overflow-tooltip>
+      <el-table-column prop="name" :label="t('sftp.name')" min-width="uiPx(160)" sortable="custom" show-overflow-tooltip>
         <template #default="{ row }">
           <div class="name-cell" :draggable="true" @dragstart="onDragStart($event, row)">
             <el-icon v-if="isSymlink(row)"><Link :size="'0.875rem'" /></el-icon>
@@ -105,17 +106,17 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column :label="t('sftp.type')" width="uiPx(90)" sortable :sort-method="sortByType" show-overflow-tooltip>
+      <el-table-column prop="type" :label="t('sftp.type')" width="uiPx(90)" sortable="custom" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ fileTypeLabel(row) }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('sftp.modified')" width="uiPx(150)" sortable :sort-method="sortByTime" show-overflow-tooltip>
+      <el-table-column prop="modTime" :label="t('sftp.modified')" width="uiPx(150)" sortable="custom" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ formatDate(row.modTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('sftp.size')" width="uiPx(70)" align="right" sortable :sort-method="sortBySize" show-overflow-tooltip>
+      <el-table-column prop="size" :label="t('sftp.size')" width="uiPx(70)" align="right" sortable="custom" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="cell-secondary">{{ row.isDir ? '-' : formatSize(row.size) }}</span>
         </template>
@@ -142,9 +143,11 @@
       :style="{ left: bandRect.x + 'px', top: bandRect.y + 'px', width: bandRect.w + 'px', height: bandRect.h + 'px' }"
     />
     </div>
-    <div v-if="selectionStats.count > 0" class="selection-bar">
-      <span class="selection-info">{{ t('sftp.selectionStats', { count: selectionStats.count }) }}</span>
-      <span v-if="selectionStats.size > 0">{{ formatSize(selectionStats.size) }}</span>
+    <!-- Always-visible footer: entry count, plus the selection stats when a
+         selection exists (kept below the table so it can never cover rows). -->
+    <div class="selection-bar">
+      <span class="selection-info">{{ itemCountText }}</span>
+      <span v-if="selectionStats.count > 0 && selectionStats.size > 0">{{ formatSize(selectionStats.size) }}</span>
     </div>
 
     <Menu ref="ctxMenuRef" v-model:visible="ctxMenuVisible" v-slot="{ current }">
@@ -158,6 +161,7 @@
           <MenuItem @click="doCopyToClipboard">{{ t('sftp.copy') }}</MenuItem>
           <MenuItem @click="doCutToClipboard">{{ t('sftp.cut') }}</MenuItem>
           <MenuItem :class="{ disabled: !clipboardCount }" @click="clipboardCount && doPaste()">{{ t('sftp.paste') }}</MenuItem>
+          <MenuItem @click="doSelectAll">{{ t('sftp.selectAll') }}</MenuItem>
           <MenuDivider />
           <MenuItem v-if="props.showSendToOther !== false" @click="doSendToOther">{{ t(sendToKey) }}</MenuItem>
           <MenuItem @click="doCopyPath">{{ t('sftp.copyPath') }}</MenuItem>
@@ -176,6 +180,7 @@
           <MenuItem @click="doCopyToClipboard">{{ t('sftp.copy') }}</MenuItem>
           <MenuItem @click="doCutToClipboard">{{ t('sftp.cut') }}</MenuItem>
           <MenuItem :class="{ disabled: !clipboardCount }" @click="clipboardCount && doPaste()">{{ t('sftp.paste') }}</MenuItem>
+          <MenuItem @click="doSelectAll">{{ t('sftp.selectAll') }}</MenuItem>
           <MenuDivider />
           <MenuItem v-if="props.showSendToOther !== false" @click="doSendToOther">{{ t(sendToKey) }}</MenuItem>
           <MenuItem @click="doCopyPath">{{ t('sftp.copyPath') }}</MenuItem>
@@ -190,6 +195,7 @@
           <MenuItem @click="doCopyToClipboard">{{ t('sftp.copy') }}</MenuItem>
           <MenuItem @click="doCutToClipboard">{{ t('sftp.cut') }}</MenuItem>
           <MenuItem :class="{ disabled: !clipboardCount }" @click="clipboardCount && doPaste()">{{ t('sftp.paste') }}</MenuItem>
+          <MenuItem @click="doSelectAll">{{ t('sftp.selectAll') }}</MenuItem>
           <MenuDivider />
           <MenuItem v-if="props.showSendToOther !== false" @click="doSendToOther">{{ t(sendToKey) }}</MenuItem>
           <MenuItem @click="doCopyPath">{{ t('sftp.copyPath') }}</MenuItem>
@@ -207,6 +213,7 @@
           <MenuItem v-if="supportsSymlink" @click="doSymlink">{{ t('sftp.newLink') }}</MenuItem>
           <MenuDivider />
           <MenuItem :class="{ disabled: !clipboardCount }" @click="clipboardCount && doPaste()">{{ t('sftp.paste') }}</MenuItem>
+          <MenuItem @click="doSelectAll">{{ t('sftp.selectAll') }}</MenuItem>
         </template>
     </Menu>
 
@@ -349,14 +356,33 @@ const selectionStats = computed(() => {
   return { count: items.length, size: totalSize }
 })
 
+// Real entries currently listed (filter applied, '..' excluded).
+const entryCount = computed(() =>
+  filteredFiles.value.reduce((n, f) => (f.name === '..' ? n : n + 1), 0))
+
+// Footer text: "{count} items" normally, "{count} items | {count} selected"
+// while a selection exists.
+const itemCountText = computed(() => {
+  const base = t('sftp.itemCount', { count: entryCount.value })
+  return selectionStats.value.count > 0
+    ? `${base} | ${t('sftp.selectionStats', { count: selectionStats.value.count })}`
+    : base
+})
+
 const filteredFiles = computed(() => {
   let list = [...props.files]
   if (!list.find(f => f.name === '..')) {
     list.unshift({ name: '..', size: 0, modTime: '', mode: '', isDir: true, isHidden: false, owner: '', group: '' })
   }
   list.sort((a, b) => {
+    // '..' is navigation, not an entry: always keep it as the first row.
     if (a.name === '..') return -1
     if (b.name === '..') return 1
+    const s = sortState.value
+    if (s) {
+      const cmp = columnSorters[s.prop](a, b)
+      return s.order === 'descending' ? -cmp : cmp
+    }
     if (a.isDir && !b.isDir) return -1
     if (!a.isDir && b.isDir) return 1
     return a.name.localeCompare(b.name)
@@ -442,6 +468,28 @@ function onListKeydown(e: KeyboardEvent) {
   const t = e.target as HTMLElement | null
   // Never hijack typing that is going somewhere else (filter box, editors).
   if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return
+  // Ctrl/Cmd + A/X/C/V mirror the clipboard context-menu actions (Explorer
+  // semantics). The clipboard behind them is the panel-scoped one, not the OS.
+  if (e.ctrlKey || e.metaKey) {
+    switch (e.key) {
+      case 'a': case 'A':
+        e.preventDefault()
+        doSelectAll()
+        return
+      case 'c': case 'C':
+        e.preventDefault()
+        doCopyToClipboard()
+        return
+      case 'x': case 'X':
+        e.preventDefault()
+        doCutToClipboard()
+        return
+      case 'v': case 'V':
+        e.preventDefault()
+        if (props.clipboardCount) doPaste()
+        return
+    }
+  }
   if (e.ctrlKey || e.metaKey || e.altKey) return
   const k = e.key
   if (k.length !== 1 || !/[\x00-\x7F]/.test(k)) return // printable single char only
@@ -519,26 +567,32 @@ function formatDate(ts: string): string {
   return d.toLocaleString()
 }
 
-function sortByName(a: FileItem, b: FileItem): number {
-  if (a.name === '..') return -1
-  if (b.name === '..') return 1
-  return a.name.localeCompare(b.name)
+// --- Header sorting ---------------------------------------------------------
+// Sorting is applied here rather than through el-table's built-in sort: el-table
+// reverses the whole comparison result for descending order, which would drag
+// the '..' parent row to the bottom. Sorting ourselves keeps '..' pinned to the
+// first row no matter the column or direction (sortable="custom" on the columns).
+type SortProp = 'name' | 'type' | 'modTime' | 'size'
+type SortOrder = 'ascending' | 'descending'
+const sortState = ref<{ prop: SortProp; order: SortOrder } | null>(null)
+
+function onSortChange({ prop, order }: { prop: SortProp; order: SortOrder | null }) {
+  sortState.value = order ? { prop, order } : null
 }
 
-function sortByTime(a: FileItem, b: FileItem): number {
-  if (a.name === '..') return -1
-  if (b.name === '..') return 1
-  const ta = a.modTime ? new Date(a.modTime).getTime() : 0
-  const tb = b.modTime ? new Date(b.modTime).getTime() : 0
-  return ta - tb
-}
-
-function sortBySize(a: FileItem, b: FileItem): number {
-  if (a.name === '..') return -1
-  if (b.name === '..') return 1
-  if (a.isDir && !b.isDir) return -1
-  if (!a.isDir && b.isDir) return 1
-  return a.size - b.size
+const columnSorters: Record<SortProp, (a: FileItem, b: FileItem) => number> = {
+  name: (a, b) => a.name.localeCompare(b.name),
+  type: (a, b) => fileTypeLabel(a).toLowerCase().localeCompare(fileTypeLabel(b).toLowerCase()),
+  modTime: (a, b) => {
+    const ta = a.modTime ? new Date(a.modTime).getTime() : 0
+    const tb = b.modTime ? new Date(b.modTime).getTime() : 0
+    return ta - tb
+  },
+  size: (a, b) => {
+    if (a.isDir && !b.isDir) return -1
+    if (!a.isDir && b.isDir) return 1
+    return a.size - b.size
+  },
 }
 
 function formatSize(bytes: number): string {
@@ -558,10 +612,6 @@ function fileTypeLabel(row: FileItem): string {
   const dot = row.name.lastIndexOf('.')
   if (dot <= 0 || dot === row.name.length - 1) return '-'
   return row.name.slice(dot + 1).toLowerCase()
-}
-
-function sortByType(a: FileItem, b: FileItem): number {
-  return fileTypeLabel(a).toLowerCase().localeCompare(fileTypeLabel(b).toLowerCase())
 }
 
 function onRowClick(row: FileItem, _column: any, event: MouseEvent) {
@@ -675,9 +725,30 @@ function doNewFile() { emit('newFile'); ctxMenuVisible.value = false; moreMenuVi
 function doMkdir() { emit('mkdir'); ctxMenuVisible.value = false; moreMenuVisible.value = false }
 function doSymlink() { emit('symlink'); ctxMenuVisible.value = false; moreMenuVisible.value = false }
 function toggleShowHidden() { showHidden.value = !showHidden.value }
-function doCopyToClipboard() { emit('copyToClipboard', [...selectedItems.value]); ctxMenuVisible.value = false }
-function doCutToClipboard() { emit('cutToClipboard', [...selectedItems.value]); ctxMenuVisible.value = false }
+// Clipboard actions take the current selection minus '..' (navigation, never
+// transferable) and no-op when nothing is selected — reachable via Ctrl+C/X
+// with an empty list, which the context menu path never hits.
+function doCopyToClipboard() {
+  const items = selectedItems.value.filter(i => i.name !== '..')
+  if (!items.length) return
+  emit('copyToClipboard', items)
+  ctxMenuVisible.value = false
+}
+function doCutToClipboard() {
+  const items = selectedItems.value.filter(i => i.name !== '..')
+  if (!items.length) return
+  emit('cutToClipboard', items)
+  ctxMenuVisible.value = false
+}
 function doPaste() { emit('paste'); ctxMenuVisible.value = false }
+
+// Select every listed entry except '..' (navigation, never selectable).
+// Respects the name filter and the hidden-files toggle: only what is
+// currently listed gets selected.
+function doSelectAll() {
+  selectedItems.value = filteredFiles.value.filter(f => f.name !== '..')
+  ctxMenuVisible.value = false
+}
 
 function getRowClassName({ row }: { row: FileItem }): string {
   const cls: string[] = []
@@ -792,7 +863,7 @@ function onTableMouseDown(e: MouseEvent) {
     bandWrapper = null
     bandRows = []
     bandJustEnded = wasBand
-    if (!wasBand && !bandDownOnRow && !additive) {
+    if (!wasBand && !bandDownOnRow && !bandAdditive) {
       // Plain click on empty space clears the selection; on a row the normal
       // row-click handler takes over. Ctrl/Cmd clicks on empty space keep it.
       selectedItems.value = []
