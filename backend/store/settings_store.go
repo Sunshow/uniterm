@@ -42,6 +42,9 @@ type TerminalSettings struct {
 	// output logs (issue #227). Empty means: use the OS-appropriate
 	// default under ~/Documents/uniTerm/logs.
 	SessionLogDir string `json:"sessionLogDir,omitempty"`
+	// ZmodemDownloadDir is the device-local default directory for files
+	// received with sz. Empty preserves the directory picker behavior.
+	ZmodemDownloadDir string `json:"zmodemDownloadDir,omitempty"`
 	// SessionLogFilename controls names for new output logs. Supported tokens:
 	// %S session name, %H host, %M month, %D day, %h hour, %m minute.
 	SessionLogFilename string `json:"sessionLogFilename,omitempty"`

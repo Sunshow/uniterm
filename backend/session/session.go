@@ -270,6 +270,7 @@ type Session interface {
 	SetOnBinaryCallback(cb func([]byte))
 	SetOnStatusChangeCallback(cb func(SessionStatus))
 	SetZmodemMode(bool)
+	EndZmodem([]byte)
 	IsZmodemMode() bool
 }
 
@@ -285,6 +286,9 @@ type baseSession struct {
 	pendingCols      int
 	pendingRows      int
 	zmodemMode       bool
+	zmodemTimer      *time.Timer
+	zmodemDeadline   time.Time
+	zmodemGeneration uint64
 	lastReadTime     atomic.Int64
 	// outputLogWriter, if non-nil, receives a copy of every byte emitted
 	// via emitData. It is set by the App layer and lives longer than any
@@ -407,8 +411,54 @@ func (s *baseSession) getInitialSize(defCols, defRows int) (int, int) {
 
 func (s *baseSession) SetZmodemMode(v bool) {
 	s.mu.Lock()
-	s.zmodemMode = v
+	s.setZmodemModeLocked(v)
 	s.mu.Unlock()
+}
+
+// EndZmodem leaves binary mode and emits terminal bytes that followed the
+// protocol's final handshake through the normal text-output path. Session
+// types with an output decoder can override this method.
+func (s *baseSession) EndZmodem(trailing []byte) {
+	s.mu.Lock()
+	s.setZmodemModeLocked(false)
+	w := s.outputLogWriter
+	cb := s.onDataCallback
+	s.mu.Unlock()
+	if w != nil && len(trailing) > 0 {
+		w(trailing)
+	}
+	if cb != nil && len(trailing) > 0 {
+		cb(trailing)
+	}
+}
+
+// This is only a final safety net for an abandoned frontend transfer. Keep it
+// longer than the frontend protocol watchdog so file-picker interaction is not
+// mistaken for a stalled transfer.
+var zmodemModeTimeout = 2 * time.Minute
+
+func (s *baseSession) setZmodemModeLocked(v bool) {
+	s.zmodemGeneration++
+	s.zmodemMode = v
+	if s.zmodemTimer != nil {
+		s.zmodemTimer.Stop()
+		s.zmodemTimer = nil
+	}
+	if !v {
+		s.zmodemDeadline = time.Time{}
+		return
+	}
+	generation := s.zmodemGeneration
+	s.zmodemDeadline = time.Now().Add(zmodemModeTimeout)
+	s.zmodemTimer = time.AfterFunc(zmodemModeTimeout, func() {
+		s.mu.Lock()
+		if s.zmodemMode && s.zmodemGeneration == generation {
+			s.zmodemMode = false
+			s.zmodemTimer = nil
+			s.zmodemDeadline = time.Time{}
+		}
+		s.mu.Unlock()
+	})
 }
 
 func (s *baseSession) IsZmodemMode() bool {
@@ -424,9 +474,12 @@ func (s *baseSession) SetOnBinaryCallback(cb func([]byte)) {
 }
 
 func (s *baseSession) emitBinary(data []byte) {
-	s.mu.RLock()
+	s.mu.Lock()
 	cb := s.onBinaryCallback
-	s.mu.RUnlock()
+	if s.zmodemMode {
+		s.setZmodemModeLocked(true)
+	}
+	s.mu.Unlock()
 	if cb != nil {
 		cb(data)
 	}

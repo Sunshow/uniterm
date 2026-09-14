@@ -642,6 +642,30 @@
 
           <div class="setting-card">
             <div class="setting-info">
+              <div class="setting-title">{{ t('settings.zmodemDownloadDir') }}</div>
+              <div class="setting-desc">{{ t('settings.zmodemDownloadDirDesc') }}</div>
+            </div>
+            <div class="setting-control">
+              <el-input
+                v-model="settingsStore.settings.terminal.zmodemDownloadDir"
+                :placeholder="t('settings.zmodemDownloadDirPlaceholder')"
+                class="dir-input"
+                @change="settingsStore.save()"
+                clearable
+              >
+                <template #append>
+                  <el-tooltip :content="t('settings.browse')" placement="top">
+                    <el-button :aria-label="t('settings.browse')" @click="pickZmodemDownloadDir">
+                      <el-icon><FolderOpen :size="'1rem'" /></el-icon>
+                    </el-button>
+                  </el-tooltip>
+                </template>
+              </el-input>
+            </div>
+          </div>
+
+          <div class="setting-card">
+            <div class="setting-info">
               <div class="setting-title">{{ t('settings.sessionLogFilename') }}</div>
               <div class="setting-desc">{{ t('settings.sessionLogFilenameDesc') }}</div>
             </div>
@@ -1536,6 +1560,18 @@ async function pickLogDir() {
     const chosen = await OpenDirectoryDialog()
     if (chosen) {
       settingsStore.settings.terminal.sessionLogDir = chosen
+      await settingsStore.save()
+    }
+  } catch (e: any) {
+    msg.error(String(e?.message ?? e))
+  }
+}
+
+async function pickZmodemDownloadDir() {
+  try {
+    const chosen = await OpenDirectoryDialog()
+    if (chosen) {
+      settingsStore.settings.terminal.zmodemDownloadDir = chosen
       await settingsStore.save()
     }
   } catch (e: any) {

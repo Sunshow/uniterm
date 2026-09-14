@@ -20,6 +20,7 @@ func TestSettingsStore_SaveLoadRoundTrip(t *testing.T) {
 	want := defaultSettings()
 	want.Language = "zh-CN"
 	want.Terminal.FontSize = 18
+	want.Terminal.ZmodemDownloadDir = filepath.Join(dir, "downloads")
 
 	if err := s.Save(want); err != nil {
 		t.Fatalf("Save: %v", err)
@@ -39,6 +40,9 @@ func TestSettingsStore_SaveLoadRoundTrip(t *testing.T) {
 	}
 	if got.Terminal.FontSize != want.Terminal.FontSize {
 		t.Errorf("Terminal.FontSize: got %d want %d", got.Terminal.FontSize, want.Terminal.FontSize)
+	}
+	if got.Terminal.ZmodemDownloadDir != want.Terminal.ZmodemDownloadDir {
+		t.Errorf("Terminal.ZmodemDownloadDir: got %q want %q", got.Terminal.ZmodemDownloadDir, want.Terminal.ZmodemDownloadDir)
 	}
 	if got.Theme != want.Theme {
 		t.Errorf("Theme: got %q want %q", got.Theme, want.Theme)

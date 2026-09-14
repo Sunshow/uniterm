@@ -45,16 +45,20 @@ const (
 
 type SSHSession struct {
 	baseSession
-	client       *ssh.Client
-	session      *ssh.Session
-	stdin        io.WriteCloser
-	stdout       io.Reader
-	stderr       io.Reader
-	quit         chan struct{}
-	quitOnce     sync.Once
-	authAnswerCh chan []byte
-	expectOutput *postLoginOutputBuffer
-	x11Forwarder *x11Forwarder
+	// outputRouteMu makes the binary/text routing decision atomic with
+	// EndZmodem. Without it, readLoop could observe binary mode, get paused,
+	// then emit post-transfer shell output as binary after EndZmodem returned.
+	outputRouteMu sync.Mutex
+	client        *ssh.Client
+	session       *ssh.Session
+	stdin         io.WriteCloser
+	stdout        io.Reader
+	stderr        io.Reader
+	quit          chan struct{}
+	quitOnce      sync.Once
+	authAnswerCh  chan []byte
+	expectOutput  *postLoginOutputBuffer
+	x11Forwarder  *x11Forwarder
 
 	// osc7 extracts injected OSC-7 cwd reports from the raw output stream
 	// (see shell_integration.go). Only used from the readLoop goroutine.
@@ -440,15 +444,17 @@ func (s *SSHSession) readLoop() {
 				TerminalCwdSink(s.id, cwd)
 			}
 			s.offerExpectOutput(cleaned)
+			s.outputRouteMu.Lock()
 			if s.IsZmodemMode() {
 				s.emitBinary(data)
 			} else if looksLikeZmodemHeader(data) {
 				log.Writef("ssh: zmodem header detected in output, switching to binary mode (may be a false positive on vim/TUI output)")
-				s.SetZmodemMode(true)
+				s.baseSession.SetZmodemMode(true)
 				s.emitBinary(data)
 			} else {
 				s.emitData(s.decodeOutput(cleaned))
 			}
+			s.outputRouteMu.Unlock()
 		}
 		if err != nil {
 			if err != io.EOF {
@@ -601,6 +607,7 @@ func (s *SSHSession) Write(data []byte) error {
 // failure, or explicit user close).
 func (s *SSHSession) Disconnect() error {
 	s.quitOnce.Do(func() {
+		s.SetZmodemMode(false)
 		close(s.quit)
 		if s.x11Forwarder != nil {
 			s.x11Forwarder.stop()
@@ -655,10 +662,14 @@ func (s *SSHSession) SetEncoding(name string) {
 
 // decodeOutput converts a chunk of remote bytes to UTF-8 using the configured
 // decoder. Partial trailing multibyte sequences are buffered until the next
-// call. Must only be called from the single readLoop goroutine.
+// call. The session lock serializes normal reads with ZMODEM trailing output.
 func (s *SSHSession) decodeOutput(data []byte) []byte {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	return s.decodeOutputLocked(data)
+}
+
+func (s *SSHSession) decodeOutputLocked(data []byte) []byte {
 	if s.decoder == nil {
 		return data
 	}
@@ -687,6 +698,34 @@ func (s *SSHSession) decodeOutput(data []byte) []byte {
 		s.decodeLeftover = src[:0]
 	}
 	return out
+}
+
+// SetZmodemMode serializes externally requested mode changes with readLoop's
+// output routing decision. Internal readLoop detection already holds this lock
+// and therefore calls baseSession.SetZmodemMode directly.
+func (s *SSHSession) SetZmodemMode(v bool) {
+	s.outputRouteMu.Lock()
+	s.baseSession.SetZmodemMode(v)
+	s.outputRouteMu.Unlock()
+}
+
+// EndZmodem leaves binary mode and runs bytes following the final ZMODEM
+// handshake through the same streaming decoder as ordinary SSH output.
+func (s *SSHSession) EndZmodem(trailing []byte) {
+	s.outputRouteMu.Lock()
+	defer s.outputRouteMu.Unlock()
+	s.mu.Lock()
+	s.setZmodemModeLocked(false)
+	decoded := append([]byte(nil), s.decodeOutputLocked(trailing)...)
+	w := s.outputLogWriter
+	cb := s.onDataCallback
+	s.mu.Unlock()
+	if w != nil && len(decoded) > 0 {
+		w(decoded)
+	}
+	if cb != nil && len(decoded) > 0 {
+		cb(decoded)
+	}
 }
 
 // encodeInput converts user keystrokes (UTF-8) to the configured encoding
