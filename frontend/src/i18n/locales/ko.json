@@ -322,6 +322,8 @@
   "sftp.cut": "잘라내기",
   "sftp.paste": "붙여넣기",
   "sftp.selectionStats": "{count} item(s) selected",
+  "sftp.itemCount": "{count} item(s)",
+  "sftp.selectAll": "Select All",
   "sftp.newFile": "새 파일",
   "sftp.dialog.editTitle": "편집 — {path}",
   "sftp.dialog.newFileTitle": "새 파일",
