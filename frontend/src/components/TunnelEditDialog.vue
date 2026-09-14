@@ -122,11 +122,13 @@ import { useTunnelStore, type TunnelMode } from '../stores/tunnelStore'
 import { useConnectionStore } from '../stores/connectionStore'
 import { useI18n } from '../i18n'
 import { msg } from '../services/message'
+import { useTunnelCredentials } from '../composables/useTunnelCredentials'
 import { TestTunnel } from '../../bindings/github.com/ys-ll/uniterm/app'
 
 const { t } = useI18n()
 const store = useTunnelStore()
 const connectionStore = useConnectionStore()
+const { resolveTunnelCredentials } = useTunnelCredentials()
 
 const props = defineProps<{
   modelValue: boolean
@@ -227,9 +229,13 @@ function formPayload() {
 async function handleTest() {
   const invalid = validate()
   if (invalid) { errorMsg.value = invalid; return }
+  // Exit connection without saved credentials: prompt for user/password and
+  // pass them inline (backend fills only empty fields). Cancel aborts the test.
+  const creds = await resolveTunnelCredentials(form.sshConnId)
+  if (!creds) return
   testing.value = true
   try {
-    const st = await TestTunnel(formPayload())
+    const st = await TestTunnel(formPayload(), creds.user, creds.password)
     if (st.status === 'running') {
       msg.success(t('tunnels.testOk'))
     } else {

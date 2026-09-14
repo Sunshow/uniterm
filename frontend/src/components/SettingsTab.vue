@@ -1260,6 +1260,7 @@ import { useCredentialStore } from '../stores/credentialStore'
 import { useIdentityStore } from '../stores/identityStore'
 import { useProxyStore } from '../stores/proxyStore'
 import { useTunnelStore } from '../stores/tunnelStore'
+import { useTunnelCredentials } from '../composables/useTunnelCredentials'
 import type { Tunnel, TunnelMode } from '../stores/tunnelStore'
 import type { Identity } from '../types/identity'
 import { Browser } from '@wailsio/runtime'
@@ -1271,6 +1272,7 @@ const syncStore = useSyncStore()
 const updateCheck = useUpdateCheck()
 const localStateStore = useLocalStateStore()
 const { t } = useI18n()
+const { resolveTunnelCredentials } = useTunnelCredentials()
 const platform = ref('')
 const isMac = computed(() => platform.value === 'darwin')
 
@@ -1942,8 +1944,12 @@ async function toggleRun(row: Tunnel) {
     await tunnelStore.stop(row.id)
     togglingTunnelId.value = undefined
   } else {
+    // Exit connection without saved credentials: prompt for user/password and
+    // pass them inline (backend fills only empty fields). Cancel aborts.
+    const creds = await resolveTunnelCredentials(row.sshConnId)
+    if (!creds) return
     togglingTunnelId.value = row.id
-    const st = await tunnelStore.start(row.id)
+    const st = await tunnelStore.start(row.id, creds.user, creds.password)
     togglingTunnelId.value = undefined
     if (st.status === 'error') {
       msg.error(st.error || t('tunnels.startFailed'))

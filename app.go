@@ -987,8 +987,34 @@ func (a *App) proxyDisabledName(id string) (string, bool) {
 	return "", false
 }
 
+// withExitCredOverride wraps a ConnResolver so the tunnel's exit connection
+// gets its empty user/password filled from inline credentials — the same
+// semantics as the TunnelSSHUser/TunnelSSHPassword handling in app_terminal.go:
+// inline values only fill EMPTY fields (never overwrite saved ones) and only on
+// the exit hop. Empty inline credentials return the resolver unchanged.
+func withExitCredOverride(resolve session.ConnResolver, exitID, user, password string) session.ConnResolver {
+	if user == "" && password == "" {
+		return resolve
+	}
+	return func(id string) (session.ConnectionConfig, bool) {
+		cfg, ok := resolve(id)
+		if !ok || id != exitID {
+			return cfg, ok
+		}
+		if cfg.User == "" && user != "" {
+			cfg.User = user
+		}
+		if cfg.Password == "" && password != "" {
+			cfg.Password = password
+		}
+		return cfg, true
+	}
+}
+
 // StartTunnel brings the tunnel with the given ID up and returns its state.
-func (a *App) StartTunnel(id string) (session.TunnelState, error) {
+// user/password carry inline credentials resolved by the frontend's credential
+// dialog for exit connections with nothing saved; they only fill empty fields.
+func (a *App) StartTunnel(id, user, password string) (session.TunnelState, error) {
 	if a.tunnelService == nil || a.tunnelStore == nil || a.connectionStore == nil {
 		return session.TunnelState{}, fmt.Errorf("tunnel service not initialized")
 	}
@@ -1010,6 +1036,7 @@ func (a *App) StartTunnel(id string) (session.TunnelState, error) {
 	if err != nil {
 		return session.TunnelState{}, err
 	}
+	resolve = withExitCredOverride(resolve, t.SSHConnID, user, password)
 	st := a.tunnelService.StartTunnel(*t, resolve)
 	// A failed start is reported through the state (Status=Error + Error text);
 	// returning a Go error here too would turn the Wails call into a rejected
@@ -1029,8 +1056,11 @@ func (a *App) StopTunnel(id string) error {
 // up under a throwaway ID through the same path as StartTunnel (SSH chain
 // dial/auth, then listener bind — for remote mode that also proves the port is
 // free on the server) and tears it down immediately. Status=Running means
-// everything bound; Error carries the reason.
-func (a *App) TestTunnel(t session.Tunnel) (session.TunnelState, error) {
+// everything bound; Error carries the reason. user/password carry inline
+// credentials resolved by the frontend's credential dialog (same override
+// semantics as StartTunnel).
+
+func (a *App) TestTunnel(t session.Tunnel, user, password string) (session.TunnelState, error) {
 	if a.tunnelService == nil || a.connectionStore == nil {
 		return session.TunnelState{}, fmt.Errorf("tunnel service not initialized")
 	}
@@ -1038,6 +1068,7 @@ func (a *App) TestTunnel(t session.Tunnel) (session.TunnelState, error) {
 	if err != nil {
 		return session.TunnelState{}, err
 	}
+	resolve = withExitCredOverride(resolve, t.SSHConnID, user, password)
 	st := a.tunnelService.TestTunnel(t, resolve)
 	return st, nil
 }
