@@ -351,6 +351,7 @@
               <div class="start-card-meta">{{ getCardSubtitle(config) }}</div>
             </div>
           </div>
+          <button class="card-fav-btn" :class="{ on: favoriteStore.isFavorite(config.id) }" :title="favoriteStore.isFavorite(config.id) ? t('sidebar.removeFromFavorites') : t('sidebar.addToFavorites')" @click.stop="favoriteStore.toggle(config.id)"><Star :size="'0.875rem'" /></button>
           <button class="card-more-btn" @click.stop="onCardMoreClick($event, config)" :title="t('terminal.more')"><MoreHorizontal :size="'1rem'" /></button>
         </div>
       </div>
