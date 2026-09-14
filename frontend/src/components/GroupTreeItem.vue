@@ -81,7 +81,8 @@
 <script setup lang="ts">
 import { inject, computed } from 'vue'
 import { ChevronDown, ChevronRight, MoreHorizontal, Star } from '@lucide/vue'
-import type { GroupTreeNode, ConnectionConfig, ConnectionGroup } from '../types/session'
+import type { ConnectionConfig, ConnectionGroup } from '../types/session'
+import type { GroupTreeNode } from '../stores/connectionStore'
 import { useFavoriteStore } from '../stores/favoriteStore'
 
 const props = defineProps<{

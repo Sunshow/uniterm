@@ -573,6 +573,7 @@ function buildNestedBlockquote(block: string): string {
 }
 
 function highlightText(html: string, query: string): string {
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   const regex = new RegExp(escaped, 'gi')
   // Split on < to isolate text from HTML tags.
   // Even-indexed segments (after join) are outside tags; odd are inside.
