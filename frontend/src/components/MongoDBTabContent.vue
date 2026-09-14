@@ -152,7 +152,7 @@
                 class="db-result-table"
                 :empty-text="t('db.noData')"
               >
-                <el-table-column :label="t('mongodb.collection')" min-width="uiPx(240)" show-overflow-tooltip>
+                <el-table-column :label="t('mongodb.collection')" :min-width="uiPx(240)" show-overflow-tooltip>
                   <template #default="{ row }">
                     <span class="object-name" @click="openCollectionTab(tab.dbName, row)">
                       <Layers :size="'0.875rem'" class="object-icon" />
@@ -160,7 +160,7 @@
                     </span>
                   </template>
                 </el-table-column>
-                <el-table-column :label="t('common.actions')" width="uiPx(80)" align="right">
+                <el-table-column :label="t('common.actions')" :width="uiPx(80)" align="right">
                   <template #default="{ row }">
                     <button
                       class="btn btn-ghost btn-icon btn-sm danger"

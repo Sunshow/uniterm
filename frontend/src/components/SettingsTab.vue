@@ -755,7 +755,7 @@
           <el-table-column :label="t('conn.authType')">
             <template #default="{ row }">{{ row.authType === 'password' ? t('conn.password') : row.authType === 'keyText' ? t('conn.keyText') : t('conn.keyPath') }}</template>
           </el-table-column>
-          <el-table-column :label="t('common.actions')" width="uiPx(160)">
+          <el-table-column :label="t('common.actions')" :width="uiPx(160)">
             <template #default="{ row }">
               <el-button size="small" @click="openIdentityDialog(row)">{{ t('common.edit') }}</el-button>
               <el-button size="small" type="danger" @click="removeIdentity(row)">{{ t('common.delete') }}</el-button>
@@ -772,11 +772,11 @@
         <el-button type="primary" @click="openProxyDialog()">{{ t('settings.addProxy') }}</el-button>
         <el-table :data="proxyStore.proxies" size="small" style="margin-top: 0.75rem">
           <el-table-column prop="name" :label="t('conn.name')" />
-          <el-table-column prop="kind" :label="t('conn.proxyType')" width="uiPx(100)" />
+          <el-table-column prop="kind" :label="t('conn.proxyType')" :width="uiPx(100)" />
           <el-table-column :label="t('settings.proxyHost')">
             <template #default="{ row }">{{ row.host }}:{{ row.port }}</template>
           </el-table-column>
-          <el-table-column :label="t('settings.enabled')" width="uiPx(80)">
+          <el-table-column :label="t('settings.enabled')" :width="uiPx(80)">
             <template #default="{ row }">
               <el-switch
                 :model-value="row.enabled !== false"
@@ -785,7 +785,7 @@
               />
             </template>
           </el-table-column>
-          <el-table-column :label="t('common.actions')" width="uiPx(160)">
+          <el-table-column :label="t('common.actions')" :width="uiPx(160)">
             <template #default="{ row }">
               <el-button size="small" @click="openProxyDialog(row)">{{ t('common.edit') }}</el-button>
               <el-button size="small" type="danger" @click="removeProxy(row)">{{ t('common.delete') }}</el-button>
@@ -802,13 +802,13 @@
         <el-button type="primary" @click="openTunnelDialog()">{{ t('tunnels.addTunnel') }}</el-button>
         <el-table :data="tunnelStore.tunnels" size="small" style="margin-top: 0.75rem">
           <el-table-column prop="name" :label="t('tunnels.name')" />
-          <el-table-column :label="t('tunnels.modeCol')" width="uiPx(100)">
+          <el-table-column :label="t('tunnels.modeCol')" :width="uiPx(100)">
             <template #default="{ row }">{{ modeName(row.mode) }}</template>
           </el-table-column>
-          <el-table-column :label="t('tunnels.listenCol')" width="uiPx(120)">
+          <el-table-column :label="t('tunnels.listenCol')" :width="uiPx(120)">
             <template #default="{ row }">:{{ effPort(row) }}</template>
           </el-table-column>
-          <el-table-column :label="t('tunnels.statusCol')" width="uiPx(120)">
+          <el-table-column :label="t('tunnels.statusCol')" :width="uiPx(120)">
             <template #default="{ row }">
               <el-switch
                 :model-value="statusOf(row.id) === 'running'"
@@ -817,7 +817,7 @@
               />
             </template>
           </el-table-column>
-          <el-table-column :label="t('common.actions')" width="uiPx(160)">
+          <el-table-column :label="t('common.actions')" :width="uiPx(160)">
             <template #default="{ row }">
               <!-- Editing a running tunnel would desync the form from what's
                    actually running; edits require a stop first. -->

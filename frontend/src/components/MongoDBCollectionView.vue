@@ -76,7 +76,7 @@
                 :key="col"
                 :prop="col"
                 :label="col"
-                min-width="uiPx(120)"
+                :min-width="uiPx(120)"
                 show-overflow-tooltip
               >
                 <template #default="{ row }">
@@ -86,7 +86,7 @@
                   >{{ formatCellValue(row[col]) }}</span>
                 </template>
               </el-table-column>
-              <el-table-column width="uiPx(80)" fixed="right">
+              <el-table-column :width="uiPx(80)" fixed="right">
                 <template #default="{ row }">
                   <button class="btn btn-ghost btn-icon btn-sm" @click.stop="onRowDblClick(row)">
                     <Pencil :size="'0.875rem'" />
@@ -143,12 +143,12 @@
           </template>
         </el-table-column>
         <el-table-column prop="type" :label="t('db.colType')" />
-        <el-table-column prop="unique" label="Unique" width="uiPx(80)">
+        <el-table-column prop="unique" label="Unique" :width="uiPx(80)">
           <template #default="{ row }">
             {{ row.unique ? '✓' : '' }}
           </template>
         </el-table-column>
-        <el-table-column width="uiPx(60)">
+        <el-table-column :width="uiPx(60)">
           <template #default="{ row }">
             <button v-if="row.name !== '_id_'" class="btn btn-ghost btn-icon btn-sm" style="color:var(--error)" @click="dropIndex(row.name)">
               <Trash2 :size="'0.875rem'" />

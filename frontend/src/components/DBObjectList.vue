@@ -25,7 +25,7 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('db.colType')" prop="type" sortable width="uiPx(100)">
+      <el-table-column :label="t('db.colType')" prop="type" sortable :width="uiPx(100)">
         <template #default="{ row }">
           {{ row.type === 'view' ? t('db.typeView') : t('db.typeTable') }}
         </template>
@@ -33,10 +33,10 @@
       <el-table-column
         :label="t('db.colComment')"
         prop="comment"
-        min-width="uiPx(160)"
+        :min-width="uiPx(160)"
         show-overflow-tooltip
       />
-      <el-table-column :label="t('db.actions')" width="uiPx(110)" align="right">
+      <el-table-column :label="t('db.actions')" :width="uiPx(110)" align="right">
         <template #default="{ row }">
           <button
             v-if="row.type === 'view'"
