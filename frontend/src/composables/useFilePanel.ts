@@ -6,7 +6,7 @@ import {
   SftpPut, SftpGet, SftpChmod, SftpSymlink,
   SftpLocalCopy, SftpLocalMove, SftpLocalRename, SftpLocalRemove, SftpLocalMkdir, SftpLocalPutContent,
   SftpCancelTransfer, SftpPauseTransfer, SftpResumeTransfer,
-  SftpRetryTransfer, SftpDismissTransfer,
+  SftpRetryTransfer, SftpDismissTransfer, SftpListLocal,
   OpenMultipleFilesDialog, OpenDirectoryDialog,
 } from '../../bindings/github.com/ys-ll/uniterm/app'
 import { Events } from '@wailsio/runtime'

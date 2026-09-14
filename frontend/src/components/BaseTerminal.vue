@@ -164,7 +164,7 @@ import {
   sanitizeLiveTerminalOutput,
 } from '../utils/terminalSanitize'
 import { useTerminalInput } from '../composables/useTerminalInput'
-import { useSuggestions, quickCommandCache } from '../composables/useSuggestions'
+import { useSuggestions } from '../composables/useSuggestions'
 import TerminalSuggestion from './TerminalSuggestion.vue'
 import TerminalGutter from './TerminalGutter.vue'
 import { startZmodemService } from '../services/zmodemService'
