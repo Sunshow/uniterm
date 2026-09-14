@@ -2,8 +2,13 @@ package session
 
 import (
 	"bytes"
+	"net"
+	"os/exec"
 	"strings"
 	"testing"
+	"time"
+
+	"golang.org/x/crypto/ssh"
 )
 
 func TestOSC7ScannerSplitAcrossChunks(t *testing.T) {
@@ -81,14 +86,27 @@ func TestOSC7ScannerSTTerminatedBeforeFollowingOSC0(t *testing.T) {
 	}
 }
 
-func TestBashBootstrapChainsUserRc(t *testing.T) {
+func TestBashBootstrapPreservesLoginStartupOrder(t *testing.T) {
 	files, args, ok := buildShellBootstrap("/bin/bash")
 	if !ok {
 		t.Fatal("bash must be supported")
 	}
 	rc := files["rcfile"]
-	if !strings.Contains(rc, "[ -f \"$HOME/.bashrc\" ] && . \"$HOME/.bashrc\"") {
-		t.Fatalf("bootstrap must source user rc first: %s", rc)
+	startupFiles := []string{"/etc/profile", "$HOME/.bash_profile", "$HOME/.bash_login", "$HOME/.profile"}
+	last := -1
+	for _, name := range startupFiles {
+		i := strings.Index(rc, name)
+		if i <= last {
+			t.Fatalf("bash login startup order is wrong for %s: %s", name, rc)
+		}
+		last = i
+	}
+	if strings.Contains(rc, "$HOME/.bashrc") {
+		t.Fatalf("login bootstrap must let the selected profile decide whether to source .bashrc: %s", rc)
+	}
+	if !strings.Contains(rc, "elif [ -r \"$HOME/.bash_login\" ]") ||
+		!strings.Contains(rc, "elif [ -r \"$HOME/.profile\" ]") {
+		t.Fatalf("bootstrap must source only the first readable user login file: %s", rc)
 	}
 	// chain, never overwrite: ours prepends, user's command survives
 	if !strings.Contains(rc, "__uniterm_osc7") || !strings.Contains(rc, "${PROMPT_COMMAND:+") {
@@ -100,6 +118,19 @@ func TestBashBootstrapChainsUserRc(t *testing.T) {
 	}
 	if len(args) < 2 || args[0] != "--rcfile" {
 		t.Fatalf("startArgs = %v", args)
+	}
+}
+
+func TestBashIntegrationCommandRunsLogoutFile(t *testing.T) {
+	cmd := bashIntegrationCommand("/tmp/uniterm-Ab12Z9")
+	if !strings.HasPrefix(cmd, "bash --rcfile /tmp/uniterm-Ab12Z9;") {
+		t.Fatalf("unexpected bash command: %s", cmd)
+	}
+	if !strings.Contains(cmd, "$HOME/.bash_logout") {
+		t.Fatalf("bash command must preserve login-shell logout behavior: %s", cmd)
+	}
+	if strings.HasPrefix(cmd, "exec ") {
+		t.Fatalf("bash command must retain an outer shell to run .bash_logout: %s", cmd)
 	}
 }
 
@@ -115,16 +146,49 @@ func TestBashBootstrapPreservesExistingPromptCommand(t *testing.T) {
 	}
 }
 
+func TestGeneratedBashBootstrapsHaveValidSyntax(t *testing.T) {
+	bash, err := exec.LookPath("bash")
+	if err != nil {
+		t.Skip("bash is not available for generated-script syntax checks")
+	}
+	sshFiles, _, ok := buildShellBootstrap("/bin/bash")
+	if !ok {
+		t.Fatal("SSH bash must be supported")
+	}
+	wslFiles, ok := buildWSLShellBootstrap("/bin/bash")
+	if !ok {
+		t.Fatal("WSL bash must be supported")
+	}
+	for name, script := range map[string]string{
+		"ssh": sshFiles["rcfile"],
+		"wsl": wslFiles["rcfile"],
+	} {
+		cmd := exec.Command(bash, "-n")
+		cmd.Stdin = strings.NewReader(script)
+		if out, err := cmd.CombinedOutput(); err != nil {
+			t.Fatalf("%s bash bootstrap has invalid syntax: %v: %s\n%s", name, err, out, script)
+		}
+	}
+}
+
 func TestZshBootstrapZDOTDIR(t *testing.T) {
 	files, args, ok := buildShellBootstrap("/usr/bin/zsh")
 	if !ok {
 		t.Fatal("zsh must be supported")
 	}
-	if files[".zshrc"] == "" || files[".zshenv"] == "" || files[".zprofile"] == "" {
-		t.Fatalf("zsh needs .zshrc + .zshenv + .zprofile in the redirected ZDOTDIR: %v", files)
+	for _, name := range []string{".zshrc", ".zshenv", ".zprofile", ".zlogin", ".zlogout"} {
+		if files[name] == "" {
+			t.Fatalf("zsh bootstrap is missing %s: %v", name, files)
+		}
 	}
 	if !strings.Contains(files[".zprofile"], "$HOME/.zprofile") {
 		t.Fatalf("redirected .zprofile must chain the user's ~/.zprofile: %s", files[".zprofile"])
+	}
+	if !strings.Contains(files[".zlogin"], "$HOME/.zlogin") {
+		t.Fatalf("redirected .zlogin must chain the user's ~/.zlogin: %s", files[".zlogin"])
+	}
+	if !strings.Contains(files[".zlogout"], "$HOME/.zlogout") {
+		t.Fatalf("redirected .zlogout must chain the user's ~/.zlogout: %s", files[".zlogout"])
 	}
 	if !strings.Contains(files[".zshrc"], "precmd_functions+=(__uniterm_osc7)") {
 		t.Fatal("zsh must append to precmd_functions, not replace")
@@ -144,10 +208,157 @@ func TestZshBootstrapZDOTDIR(t *testing.T) {
 	}
 }
 
+func TestFishBootstrapUsesLoginShell(t *testing.T) {
+	_, args, ok := buildShellBootstrap("/usr/bin/fish")
+	if !ok {
+		t.Fatal("fish must be supported")
+	}
+	if len(args) < 3 || args[0] != "-l" || args[1] != "-C" {
+		t.Fatalf("fish startArgs = %v, want login shell with -C bootstrap", args)
+	}
+}
+
+func TestWSLBootstrapKeepsIndependentStartupBehavior(t *testing.T) {
+	files, ok := buildWSLShellBootstrap("/bin/bash")
+	if !ok {
+		t.Fatal("WSL bash must be supported")
+	}
+	rc := files["rcfile"]
+	if !strings.Contains(rc, "$HOME/.bashrc") || !strings.Contains(rc, "$HOME/.bash_profile") {
+		t.Fatalf("WSL bootstrap must preserve its existing rc files: %s", rc)
+	}
+	if strings.Contains(rc, "/etc/profile") || strings.Contains(rc, "$HOME/.bash_login") {
+		t.Fatalf("SSH login emulation must not leak into WSL bootstrap: %s", rc)
+	}
+}
+
+func TestSSHRunCommandTimesOutWhileOpeningSession(t *testing.T) {
+	signer, err := ssh.ParsePrivateKey([]byte(testHostKeyPEM))
+	if err != nil {
+		t.Fatalf("parse test host key: %v", err)
+	}
+	serverConfig := &ssh.ServerConfig{NoClientAuth: true}
+	serverConfig.AddHostKey(signer)
+
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("listen: %v", err)
+	}
+	defer listener.Close()
+	releaseServer := make(chan struct{})
+	serverDone := make(chan struct{})
+	go func() {
+		defer close(serverDone)
+		serverConn, err := listener.Accept()
+		if err != nil {
+			return
+		}
+		defer serverConn.Close()
+		_, channels, requests, err := ssh.NewServerConn(serverConn, serverConfig)
+		if err != nil {
+			return
+		}
+		go ssh.DiscardRequests(requests)
+		_, ok := <-channels
+		if !ok {
+			return
+		}
+		<-releaseServer
+		// Closing the transport unblocks the pending channel-open without
+		// depending on a channel rejection completing first.
+		_ = serverConn.Close()
+	}()
+
+	clientConn, err := net.Dial("tcp", listener.Addr().String())
+	if err != nil {
+		t.Fatalf("dial test server: %v", err)
+	}
+	conn, channels, requests, err := ssh.NewClientConn(clientConn, "pipe", &ssh.ClientConfig{
+		User:            "test",
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	})
+	if err != nil {
+		t.Fatalf("create SSH client: %v", err)
+	}
+	client := ssh.NewClient(conn, channels, requests)
+
+	const timeout = 50 * time.Millisecond
+	started := time.Now()
+	_, err = sshRunCommand(client, "true", "", timeout)
+	if err == nil || !strings.Contains(err.Error(), "timed out opening SSH session") {
+		t.Fatalf("sshRunCommand error = %v, want channel-open timeout", err)
+	}
+	if elapsed := time.Since(started); elapsed > time.Second {
+		t.Fatalf("channel-open timeout took %s, want a bounded return", elapsed)
+	}
+
+	close(releaseServer)
+	select {
+	case <-serverDone:
+	case <-time.After(time.Second):
+		t.Fatal("test SSH server did not stop")
+	}
+	_ = client.Close()
+}
+
 func TestShellIntegrationUnsupportedShell(t *testing.T) {
-	for _, shell := range []string{"/bin/tcsh", "/usr/bin/ksh", ""} {
+	for _, shell := range []string{"/bin/sh", "/bin/tcsh", "/usr/bin/ksh", ""} {
 		if _, _, ok := buildShellBootstrap(shell); ok {
 			t.Fatalf("shell %q must degrade to a plain shell", shell)
 		}
+	}
+}
+
+func TestSSHIntegrationTempPathValidation(t *testing.T) {
+	valid := []string{
+		"/tmp/uniterm-Ab12Z9",
+		"/tmp/uniterm-000000",
+	}
+	for _, path := range valid {
+		if !isSSHIntegrationTempPath(path) {
+			t.Errorf("isSSHIntegrationTempPath(%q) = false, want true", path)
+		}
+	}
+
+	invalid := []string{
+		"",
+		"/tmp/uniterm-",
+		"/tmp/uniterm-short",
+		"/tmp/uniterm-Ab12Z9/child",
+		"/tmp/uniterm-Ab12Z_",
+		"/var/tmp/uniterm-Ab12Z9",
+	}
+	for _, path := range invalid {
+		if isSSHIntegrationTempPath(path) {
+			t.Errorf("isSSHIntegrationTempPath(%q) = true, want false", path)
+		}
+	}
+}
+
+func TestCleanRemoteTempPath(t *testing.T) {
+	tests := []struct {
+		name    string
+		out     string
+		want    string
+		wantErr bool
+	}{
+		{name: "plain", out: "/tmp/uniterm-Ab12Z9\n", want: "/tmp/uniterm-Ab12Z9"},
+		{name: "crlf", out: "/tmp/uniterm-Ab12Z9\r\n", want: "/tmp/uniterm-Ab12Z9"},
+		{name: "surrounded by banner", out: "Welcome\n/tmp/uniterm-Ab12Z9\nLast login\n", want: "/tmp/uniterm-Ab12Z9"},
+		{name: "embedded path rejected", out: "created /tmp/uniterm-Ab12Z9\n", wantErr: true},
+		{name: "whitespace rejected", out: " /tmp/uniterm-Ab12Z9 \n", wantErr: true},
+		{name: "multiple paths rejected", out: "/tmp/uniterm-Ab12Z9\n/tmp/uniterm-Cd34Y8\n", wantErr: true},
+		{name: "invalid suffix rejected", out: "/tmp/uniterm-Ab12Z_\n", wantErr: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := cleanRemoteTempPath(tt.out)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("cleanRemoteTempPath(%q) error = %v, wantErr %v", tt.out, err, tt.wantErr)
+			}
+			if got != tt.want {
+				t.Fatalf("cleanRemoteTempPath(%q) = %q, want %q", tt.out, got, tt.want)
+			}
+		})
 	}
 }

@@ -372,7 +372,7 @@ func wslShellIntegration(distro string) (startArgs []string, ok bool) {
 		return nil, false
 	}
 	shell = strings.TrimSpace(shell)
-	files, _, ok := buildShellBootstrap(shell)
+	files, ok := buildWSLShellBootstrap(shell)
 	if !ok {
 		return nil, false
 	}

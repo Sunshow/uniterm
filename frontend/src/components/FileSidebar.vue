@@ -87,7 +87,7 @@
             class="filter-icon-btn"
             :class="{ active: followActive }"
             :disabled="!followSupported"
-            :title="t('sftp.followPath')"
+            :title="t('sftp.followPathHint')"
             @click="toggleFollow"
           ><el-icon><FolderSync :size="'0.875rem'" /></el-icon></button>
         </template>
