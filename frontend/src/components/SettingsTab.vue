@@ -1159,7 +1159,7 @@
               <el-option
                 v-for="s in modelSelectOptions"
                 :key="s.value"
-                :label="s.value"
+                :label="s.label"
                 :value="s.value"
               />
             </el-select>
@@ -1994,7 +1994,7 @@ async function toggleRun(row: Tunnel) {
 }
 
 const showModelForm = ref(false)
-const modelSuggestions = ref<Array<{ value: string }>>([])
+const modelSuggestions = ref<Array<{ value: string; label: string }>>([])
 // Always surface the currently-set model as an option so el-select renders it
 // when editing an existing model (before any fetch) — el-select won't display a
 // bound value that has no matching option, and allow-create only creates
@@ -2003,7 +2003,7 @@ const modelSelectOptions = computed(() => {
   const opts = modelSuggestions.value.slice()
   const cur = modelForm.model?.trim()
   if (cur && !opts.some(o => o.value === cur)) {
-    opts.unshift({ value: cur })
+    opts.unshift({ value: cur, label: cur })
   }
   return opts
 })
@@ -2094,7 +2094,8 @@ async function fetchModelList() {
   try {
     const models = await FetchModels(modelForm.apiKey, modelForm.baseURL, modelForm.protocol, modelForm.proxyId || '')
     modelSuggestions.value = (models || []).map(m => ({
-      value: m.display_name || m.id
+      value: m.id,
+      label: m.display_name || m.id
     }))
     msg.success(t('settings.fetchModelsSuccess', { count: modelSuggestions.value.length }))
   } catch (e: any) {
