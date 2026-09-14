@@ -296,12 +296,30 @@
               </el-form-item>
 
               <el-form-item v-else :label="t('conn.k8sConfigInline')">
-                <SyntaxEditor
-                  :model-value="form.k8sConfigInline ?? ''"
-                  lang="yaml"
-                  class="kubeconfig-editor"
-                  @update:model-value="form.k8sConfigInline = $event"
-                />
+                <template v-if="!k8sConfigRevealed">
+                  <el-button size="small" @click="k8sConfigRevealed = true">
+                    <el-icon><Eye :size="'0.875rem'" /></el-icon>
+                    <span style="margin-left: 0.25rem">{{ t('conn.k8sConfigReveal') }}</span>
+                  </el-button>
+                </template>
+                <template v-else>
+                  <SyntaxEditor
+                    :model-value="form.k8sConfigInline ?? ''"
+                    lang="yaml"
+                    class="kubeconfig-editor"
+                    @update:model-value="form.k8sConfigInline = $event"
+                  />
+                  <div class="key-content-actions">
+                    <el-button size="small" @click="k8sConfigRevealed = false">
+                      <el-icon><EyeOff :size="'0.875rem'" /></el-icon>
+                      <span style="margin-left: 0.25rem">{{ t('conn.k8sConfigHide') }}</span>
+                    </el-button>
+                    <el-button size="small" @click="importKubeconfigText">
+                      <el-icon><FolderOpen :size="'0.875rem'" /></el-icon>
+                      <span style="margin-left: 0.25rem">{{ t('conn.importFromFile') }}</span>
+                    </el-button>
+                  </div>
+                </template>
               </el-form-item>
 
               <el-form-item :label="t('conn.k8sContext')">
@@ -677,7 +695,7 @@ import { useIdentityStore } from '../stores/identityStore'
 import { useProxyStore } from '../stores/proxyStore'
 import { useI18n } from '../i18n'
 import type { ConnectionConfig, PostLoginExpectStep } from '../types/session'
-import { OpenFileDialog, OpenPrivateKeyFile, GetPlatform, ListSerialPorts, TestConnection } from '../../bindings/github.com/ys-ll/uniterm/app'
+import { OpenFileDialog, OpenPrivateKeyFile, OpenKubeconfigFile, GetPlatform, ListSerialPorts, TestConnection } from '../../bindings/github.com/ys-ll/uniterm/app'
 import { ElInput } from 'element-plus'
 import { msg } from '../services/message'
 import { Plus, Trash2, ChevronDown, ChevronRight, FolderOpen, Eye, EyeOff, RefreshCw, Terminal, Monitor, Database, DatabaseZap, Layers, DatabaseSearch, SquareTerminal, Zap, Laptop, LaptopMinimal, Cable, FolderUp, Folders, FileUp, HardDrive, Cloud, Globe, MonitorCloud, MonitorSmartphone, Boxes, ShipWheel, AppWindow, ArrowLeftRight, CircleCheck, CircleX } from '@lucide/vue'
@@ -704,6 +722,10 @@ const proxyStore = useProxyStore()
 // hitting the temporal dead zone (a late declaration there caused a ReferenceError
 // that blanked the whole form in dev).
 const keyContentRevealed = ref(false)
+// Gates the inline kubeconfig paste area, mirroring keyContentRevealed: hidden
+// behind a single "show" button so a stored kubeconfig isn't dumped on screen
+// the moment the form opens.
+const k8sConfigRevealed = ref(false)
 
 onMounted(() => {
   identityStore.load()
@@ -1367,6 +1389,9 @@ function resetForm() {
   // editing an existing connection or creating a new one, so a prior reveal
   // can't leak the previous connection's PEM into a fresh edit.
   keyContentRevealed.value = false
+  // Same for the inline kubeconfig area — a stored kubeconfig is sensitive
+  // material just like a private key.
+  k8sConfigRevealed.value = false
   form.id = ''
   form.name = ''
   form.remark = ''
@@ -1513,6 +1538,18 @@ async function importKeyText() {
     if (content) {
       form.keyContent = content
       keyContentRevealed.value = true
+    }
+  } catch (e: any) {
+    msg.error(backendErrorText(e))
+  }
+}
+
+async function importKubeconfigText() {
+  try {
+    const content = await OpenKubeconfigFile()
+    if (content) {
+      form.k8sConfigInline = content
+      k8sConfigRevealed.value = true
     }
   } catch (e: any) {
     msg.error(backendErrorText(e))
