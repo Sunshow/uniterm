@@ -1580,6 +1580,29 @@ func looksLikePrivateKeyPEM(data []byte) bool {
 	return true
 }
 
+// OpenKubeconfigFile opens the kubeconfig picker, reads the selected file and
+// returns its text for pasting into the inline kubeconfig field. The content is
+// parsed as a kubeconfig before returning so obviously wrong files are rejected
+// up front; full connection validity is still checked when a context is loaded.
+func (a *App) OpenKubeconfigFile() (string, error) {
+	path, err := a.app.Dialog.OpenFile().SetTitle("Select Kubeconfig").PromptForSingleSelection()
+	if err != nil {
+		return "", err
+	}
+	if path == "" {
+		// Picker cancelled — nothing to import.
+		return "", nil
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "", fmt.Errorf("read kubeconfig: %w", err)
+	}
+	if _, err := k8s.ParseBytes(data); err != nil {
+		return "", utils.UserErr("invalid_kubeconfig")
+	}
+	return string(data), nil
+}
+
 // OpenFileDialogFiltered is like OpenFileDialog but restricts the picker to
 // a single extension filter (e.g. for importing a specific file format).
 func (a *App) OpenFileDialogFiltered(title, filterDisplayName, filterPattern string) (string, error) {
