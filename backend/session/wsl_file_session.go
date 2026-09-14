@@ -16,6 +16,8 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/ys-ll/uniterm/backend/platform"
 )
 
 // The wsl.localhost 9P share cannot report Linux symbolic links: they surface
@@ -192,6 +194,7 @@ func (s *WSLFileSession) resolveHome(ctx context.Context, distro string) string 
 
 func (s *WSLFileSession) probeHome(ctx context.Context, distro string) (string, bool) {
 	cmd := exec.CommandContext(ctx, "wsl.exe", "-d", distro, "--", "sh", "-c", "echo $HOME")
+	platform.HideConsoleWindow(cmd)
 	out, err := cmd.Output()
 	if err != nil {
 		return "", false
@@ -388,7 +391,9 @@ func (s *WSLFileSession) enrichListing(files []FileItem, dir string) {
 	if len(files) == 0 {
 		return
 	}
-	out, err := exec.Command("wsl.exe", "-d", s.distro, "--", "ls", "-lAn", dir).Output()
+	cmd := exec.Command("wsl.exe", "-d", s.distro, "--", "ls", "-lAn", dir)
+	platform.HideConsoleWindow(cmd)
+	out, err := cmd.Output()
 	if err != nil {
 		return
 	}
@@ -414,6 +419,7 @@ func (s *WSLFileSession) resolveSymlinkDirs(dir string, names []string) map[stri
 		paths[i] = path.Join(dir, n)
 	}
 	cmd := exec.Command("wsl.exe", "-d", s.distro, "--", "sh", "-c", testDirScript(paths))
+	platform.HideConsoleWindow(cmd)
 	out, err := cmd.Output()
 	if err != nil {
 		return nil
@@ -424,7 +430,9 @@ func (s *WSLFileSession) resolveSymlinkDirs(dir string, names []string) map[stri
 // readlinkTarget resolves p when it is a symbolic link, returning its
 // canonical absolute target. Non-links (or wsl failures) yield an error.
 func (s *WSLFileSession) readlinkTarget(p string) (string, error) {
-	out, err := exec.Command("wsl.exe", "-d", s.distro, "--", "sh", "-c", readlinkFollowScript(p)).Output()
+	cmd := exec.Command("wsl.exe", "-d", s.distro, "--", "sh", "-c", readlinkFollowScript(p))
+	platform.HideConsoleWindow(cmd)
+	out, err := cmd.Output()
 	if err != nil {
 		return "", err
 	}
@@ -441,7 +449,9 @@ func (s *WSLFileSession) readlinkTarget(p string) (string, error) {
 // directory name is invalid"), so any path it will open must be canonical
 // first. Errors mean the path's parent chain is broken.
 func (s *WSLFileSession) canonicalPath(p string) (string, error) {
-	out, err := exec.Command("wsl.exe", "-d", s.distro, "--", "readlink", "-f", p).Output()
+	cmd := exec.Command("wsl.exe", "-d", s.distro, "--", "readlink", "-f", p)
+	platform.HideConsoleWindow(cmd)
+	out, err := cmd.Output()
 	if err != nil {
 		return "", err
 	}
@@ -527,7 +537,9 @@ func (s *WSLFileSession) MakeDir(dir string) error {
 // wslSymlinkCmd builds the wsl.exe invocation that creates a symbolic link
 // inside the distro (the wsl.localhost UNC share cannot create Linux links).
 func wslSymlinkCmd(distro, target, linkPath string) *exec.Cmd {
-	return exec.Command("wsl.exe", "-d", distro, "--", "ln", "-s", target, linkPath)
+	cmd := exec.Command("wsl.exe", "-d", distro, "--", "ln", "-s", target, linkPath)
+	platform.HideConsoleWindow(cmd)
+	return cmd
 }
 
 // Symlink creates a symbolic link inside the WSL distro. The link path is a

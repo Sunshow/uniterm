@@ -12,6 +12,7 @@ import (
 	"unicode/utf16"
 	"unsafe"
 
+	"github.com/ys-ll/uniterm/backend/platform"
 	"github.com/ys-ll/uniterm/backend/session"
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
@@ -223,7 +224,7 @@ func findClink() string {
 
 func listWSLDistros() ([]string, error) {
 	cmd := exec.Command("wsl.exe", "-l", "-q")
-	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	platform.HideConsoleWindow(cmd)
 	out, err := cmd.Output()
 	if err != nil {
 		return nil, nil
