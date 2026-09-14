@@ -75,7 +75,7 @@
             <div v-if="showDisks" class="perf-sub-list">
               <div v-if="diskLoading" class="perf-sub-empty">{{ t('monitor.loading') }}</div>
               <div v-for="d in mountedDisks" v-else :key="d.name + d.mountPoint" class="perf-sub-row">
-                <span class="sub-name" :title="d.name">{{ d.mountPoint || d.name }}</span>
+                <span class="sub-name" :title="d.mountPoint || d.name">{{ d.mountPoint || d.name }}</span>
                 <div class="sub-bar"><div class="sub-fill" :style="{ width: fmtWidth(d.usage) }" /></div>
                 <span class="sub-val">{{ d.used }} / {{ d.total }}</span>
               </div>
