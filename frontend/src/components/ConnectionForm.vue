@@ -153,16 +153,19 @@
             <el-form-item v-if="form.authType === 'key' && (form.type === 'ssh' || form.type === 'scp' || form.type === 'sftp' || form.type === 'mosh' || form.type === 'x11-desktop')" :label="t('conn.keyPath')">
               <el-input v-model="form.keyPath" :placeholder="t('conn.keyPathPlaceholder')">
                 <template #append>
-                  <el-tooltip :content="t('conn.selectKeyFile')" placement="top">
-                    <el-button :aria-label="t('conn.selectKeyFile')" @click="selectKeyFile">
-                      <el-icon><FolderOpen :size="'1rem'" /></el-icon>
-                    </el-button>
-                  </el-tooltip>
-                  <el-tooltip :content="t('conn.useDefaultKey')" placement="top">
-                    <el-button :aria-label="t('conn.useDefaultKey')" @click="useDefaultKeyPath">
-                      <el-icon><KeyRound :size="16" /></el-icon>
-                    </el-button>
-                  </el-tooltip>
+                  <div class="key-path-actions">
+                    <el-tooltip :content="t('conn.selectKeyFile')" placement="top">
+                      <el-button :aria-label="t('conn.selectKeyFile')" @click="selectKeyFile">
+                        <el-icon><FolderOpen :size="'1rem'" /></el-icon>
+                      </el-button>
+                    </el-tooltip>
+                    <span class="key-path-divider" aria-hidden="true"></span>
+                    <el-tooltip :content="t('conn.useDefaultKey')" placement="top">
+                      <el-button :aria-label="t('conn.useDefaultKey')" @click="useDefaultKeyPath">
+                        <el-icon><KeyRound :size="'1rem'" /></el-icon>
+                      </el-button>
+                    </el-tooltip>
+                  </div>
                 </template>
               </el-input>
             </el-form-item>
@@ -700,7 +703,7 @@ import { useIdentityStore } from '../stores/identityStore'
 import { useProxyStore } from '../stores/proxyStore'
 import { useI18n } from '../i18n'
 import type { ConnectionConfig, PostLoginExpectStep } from '../types/session'
-import { OpenFileDialog, OpenPrivateKeyFile, OpenKubeconfigFile, GetPlatform, ListSerialPorts, TestConnection, GetDefaultSSHKeyPath } from '../../bindings/github.com/ys-ll/uniterm/app'
+import { OpenFileDialog, OpenPrivateKeyFile, OpenKubeconfigFile, GetPlatform, ListSerialPorts, TestConnection, GetDefaultSSHKeyPaths } from '../../bindings/github.com/ys-ll/uniterm/app'
 import { ElInput } from 'element-plus'
 import { msg } from '../services/message'
 import { Plus, Trash2, ChevronRight, FolderOpen, Eye, EyeOff, RefreshCw, CircleCheck, CircleX, KeyRound } from '@lucide/vue'
@@ -1469,15 +1472,20 @@ async function selectKeyFile() {
   }
 }
 
-// Fill the key path with the local default private key (~/.ssh/id_ed25519 or
-// ~/.ssh/id_rsa, etc.). The backend resolves the home directory and prefers an
-// existing standard key so one click covers the common case.
+// Fill the key path with a local default private key (~/.ssh/id_ed25519,
+// ~/.ssh/id_rsa, etc.). The backend resolves the home directory and returns
+// only the standard keys that exist, in preference order. Repeated clicks
+// cycle through them (wrapping around); if the field holds a non-default path
+// the first click resets it to the preferred default.
 async function useDefaultKeyPath() {
   try {
-    const p = await GetDefaultSSHKeyPath()
-    if (p) form.keyPath = p
+    const paths = await GetDefaultSSHKeyPaths()
+    if (!paths?.length) return
+    const current = form.keyPath.trim()
+    const idx = paths.indexOf(current)
+    form.keyPath = idx >= 0 ? paths[(idx + 1) % paths.length] : paths[0]
   } catch (e) {
-    console.error('default key path:', e)
+    console.error('default key paths:', e)
   }
 }
 
@@ -1738,6 +1746,27 @@ function onConnect() {
 </script>
 
 <style scoped>
+/* Key-path field: the folder-picker and use-default buttons share one append
+   slot. Element Plus styles a single append button with `margin: 0 -20px` to
+   cancel the slot's padding; with two buttons that negative margin makes them
+   overlap each other, so neutralise it and let the pair flow side by side. */
+.key-path-actions {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  margin: 0 -20px;
+}
+.key-path-actions :deep(.el-button) {
+  margin: 0;
+}
+/* Thin vertical divider between the two append buttons, slightly inset so it
+   reads as a separator rather than a border of either button. */
+.key-path-divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 6px 0;
+  background: var(--el-input-border-color);
+}
 /* Inline kubeconfig YAML editor (replaces the former plain textarea). */
 .kubeconfig-editor {
   height: 8.75rem;
