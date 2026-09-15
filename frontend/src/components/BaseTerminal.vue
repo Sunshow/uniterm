@@ -339,6 +339,7 @@ let zmodemStartTimer: ReturnType<typeof setTimeout> | null = null
 let zmodemDirection: 'upload' | 'download' | undefined = undefined
 let zmodemCancellingUntil = 0
 let zmodemRestoringOutput = false
+let zmodemCompletionPending = false
 const zmodemDeferredOutput: string[] = []
 let exporting = false
 
@@ -382,6 +383,11 @@ function initZmodemService(sessionId: string) {
       zmodemRestoringOutput = restoring
       if (!restoring) {
         for (const data of zmodemDeferredOutput.splice(0)) renderTerminalData(data)
+        if (zmodemCompletionPending) {
+          zmodemCompletionPending = false
+          void disposeZmodemService(sessionId, true, false)
+          initZmodemService(sessionId)
+        }
       }
     },
     onWarning: warning => {
@@ -406,10 +412,17 @@ function initZmodemService(sessionId: string) {
       }
       zmodemStore.clearTransfers(sessionId)
       zmodemDirection = undefined
-      void disposeZmodemService(sessionId, true, false)
-      initZmodemService(sessionId)
+      if (zmodemRestoringOutput) {
+        // Keep the binary listener alive until finishTransfer has drained any
+        // prompt event queued concurrently with the backend mode handoff.
+        zmodemCompletionPending = true
+      } else {
+        void disposeZmodemService(sessionId, true, false)
+        initZmodemService(sessionId)
+      }
     },
     onError: (err) => {
+      zmodemCompletionPending = false
       terminal?.write(`\r\n\x1b[31mZmodem error: ${err}\x1b[0m\r\n`)
       zmodemStore.clearTransfers(sessionId)
       zmodemDirection = undefined
@@ -424,6 +437,7 @@ async function disposeZmodemService(sessionId: string, resetDirection = true, en
   const serviceDisposed = service?.dispose()
   zmodemService = null
   isZmodemStarting = false
+  zmodemCompletionPending = false
   if (resetDirection) {
     zmodemDirection = undefined
   }
