@@ -13,7 +13,7 @@
         <button class="db-tab" :class="{ active: tab === 'json' }" @click="tab = 'json'">JSON</button>
       </div>
 
-      <div v-show="tab === 'struct'" class="detail-body" @contextmenu="copyMenu.onContextMenu">
+      <div v-show="tab === 'struct'" class="detail-body" @contextmenu="onCopyContextMenu">
         <div v-if="detailError" class="detail-section">
           <div class="detail-row"><span class="detail-value">{{ detailError }}</span></div>
         </div>
@@ -33,7 +33,7 @@
         <div class="json-actions">
           <el-button size="small" @click="copyRaw">{{ t('container.copy') }}</el-button>
         </div>
-        <pre class="json-body" @contextmenu="copyMenu.onContextMenu">{{ prettyRaw }}</pre>
+        <pre class="json-body" @contextmenu="onCopyContextMenu">{{ prettyRaw }}</pre>
       </div>
     </template>
 

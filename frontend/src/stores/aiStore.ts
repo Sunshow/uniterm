@@ -3,7 +3,6 @@ import { ref, computed, reactive, watch } from 'vue'
 import type { AIMessage, ExecutionMode, AISession, AIAgentStatus } from '../types/ai'
 import { SaveAISessions, LoadAISessions } from '../../bindings/github.com/ys-ll/uniterm/app'
 import { useLocalStateStore } from './localStateStore'
-import { Events } from '@wailsio/runtime'
 import { t } from '../i18n'
 
 /**

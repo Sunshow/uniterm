@@ -60,6 +60,8 @@ func ProbeConnection(config ConnectionConfig) (string, error) {
 		return probeRedis(config)
 	case "mongodb":
 		return probeMongo(config)
+	case "elasticsearch":
+		return probeElasticsearch(config)
 	case "database":
 		// redis/mongodb/elasticsearch are stored as type "database" with a
 		// dbType discriminator (mirroring the SQL family). Route them to their

@@ -1015,7 +1015,6 @@ onMounted(() => {
 
   // Initialize terminal input handling for SSH
   if (props.mode === 'ssh') {
-    const smartOn = settingsStore.settings.terminal.smartCompletion ?? true
     terminalInput = useTerminalInput(terminal, {
       mode: props.mode,
       sessionId: props.sessionId,
@@ -1056,11 +1055,6 @@ onMounted(() => {
     // may hold stale dimensions from the previous container.
     ;[50, 150, 300, 600, 1000, 2000].forEach(d => setTimeout(() => {
       if (!terminal) return
-      const el = terminalRef.value
-      const inDOM = el ? document.contains(el) : false
-      const hasXterm = el?.querySelector('.xterm') ? true : false
-      const kids = el?.children.length ?? 0
-      const rect = el?.getBoundingClientRect()
       getFitAddon()?.fit()
       const sessionId = props.sessionId
       if (sessionId && terminal.cols > 0 && terminal.rows > 0) {
@@ -1658,7 +1652,6 @@ watch(() => props.sessionId, (newId, oldId) => {
     // cursor position tracking returns {0,0}, pinning the suggestion
     // popup to the top-left corner.
     if (props.mode === 'ssh') {
-      const smartOn = settingsStore.settings.terminal.smartCompletion ?? true
       terminalInput = useTerminalInput(terminal, {
         mode: props.mode,
         sessionId: newId,

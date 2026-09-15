@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { reactive, watch } from 'vue'
 import { useI18n } from '../i18n'
 import { ElMessage } from 'element-plus'
 import { useProxyStore } from '../stores/proxyStore'

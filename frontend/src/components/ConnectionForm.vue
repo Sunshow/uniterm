@@ -51,7 +51,7 @@
                 </el-button>
               </div>
             </el-form-item>
-            <el-form-item v-if="form.type === 'database' && form.dbType === 'redis'" :label="t('conn.redisMode')">
+            <el-form-item v-if="form.type === 'redis'" :label="t('conn.redisMode')">
               <el-radio-group v-model="form.redisMode">
                 <el-radio-button value="standalone">{{ t('conn.redisModeStandalone') }}</el-radio-button>
                 <el-radio-button value="sentinel">{{ t('conn.redisModeSentinel') }}</el-radio-button>
@@ -429,7 +429,7 @@
             <el-form-item v-if="form.type === 'database'" :label="t('db.params')">
               <el-input v-model="form.dbParams" :placeholder="defaultParamsHint" style="width:100%" />
             </el-form-item>
-<el-form-item v-if="form.type === 'database' && form.dbType === 'redis'" :label="t('conn.redisKeySeparator')">
+<el-form-item v-if="form.type === 'redis'" :label="t('conn.redisKeySeparator')">
               <el-input v-model="form.redisKeySeparator" style="width: 10.0rem" />
             </el-form-item>
             <el-form-item v-if="form.type === 'ssh' || form.type === 'telnet' || form.type === 'mosh' || form.type === 'local' || form.type === 'wsl'" :label="t('conn.postLoginScript')">
@@ -702,13 +702,14 @@ import type { ConnectionConfig, PostLoginExpectStep } from '../types/session'
 import { OpenFileDialog, OpenPrivateKeyFile, OpenKubeconfigFile, GetPlatform, ListSerialPorts, TestConnection } from '../../bindings/github.com/ys-ll/uniterm/app'
 import { ElInput } from 'element-plus'
 import { msg } from '../services/message'
-import { Plus, Trash2, ChevronDown, ChevronRight, FolderOpen, Eye, EyeOff, RefreshCw, Terminal, Monitor, Database, DatabaseZap, Layers, DatabaseSearch, SquareTerminal, Zap, Laptop, LaptopMinimal, Cable, FolderUp, Folders, FileUp, HardDrive, Cloud, Globe, MonitorCloud, MonitorSmartphone, Boxes, ShipWheel, AppWindow, ArrowLeftRight, CircleCheck, CircleX } from '@lucide/vue'
+import { Plus, Trash2, ChevronRight, FolderOpen, Eye, EyeOff, RefreshCw, CircleCheck, CircleX } from '@lucide/vue'
 import { listContexts } from '../services/k8sClient'
 import SyntaxEditor from './SyntaxEditor.vue'
 import type { K8sContextInfo } from '../types/k8s'
 import IdentityEditDialog from './IdentityEditDialog.vue'
 import ProxyEditDialog from './ProxyEditDialog.vue'
 import { isSqlDbType } from '../utils/quickConnect'
+import { CATEGORY_META, CATEGORY_ORDER, CONNECTION_TYPES, connectionTypeFormLabel, connectionTypeInfo, defaultPortFor } from '../utils/connectionTypes'
 import { getShellLabel as getShellLabelBase } from '../utils/shellLabel'
 import { backendErrorText } from '../utils/backendError'
 import type { Identity } from '../types/identity'
@@ -755,59 +756,29 @@ interface SubTypeInfo {
   icon: any
 }
 
-const categories = computed(() => [
-  { key: 'terminal', label: t('conn.categoryTerminal'), icon: SquareTerminal },
-  { key: 'filetransfer', label: t('conn.categoryFileTransfer'), icon: FolderUp },
-  { key: 'remote', label: t('conn.categoryRemote'), icon: Monitor },
-  { key: 'sql', label: t('db.categorySQL'), icon: Database },
-  { key: 'nosql', label: t('db.categoryNoSQL'), icon: DatabaseZap },
-  { key: 'container', label: t('conn.categoryContainer'), icon: Boxes },
-])
+// Category sidebar and subtype cards derive from the connectionTypes registry.
+const categories = computed(() => CATEGORY_ORDER.map(key => ({
+  key,
+  label: t(CATEGORY_META[key].labelKey),
+  icon: CATEGORY_META[key].icon,
+})))
 
-const allSubTypes = computed((): Record<string, SubTypeInfo[]> => ({
-  terminal: [
-    { type: 'ssh', label: 'SSH', icon: SquareTerminal },
-    { type: 'telnet', label: 'Telnet', icon: Terminal },
-    { type: 'mosh', label: 'Mosh', icon: Zap },
-    { type: 'local', label: t('conn.localTerminal'), icon: Laptop },
-    ...(isWindows.value ? [{ type: 'wsl', label: 'WSL', icon: LaptopMinimal }] : []),
-    { type: 'serial', label: t('serial.title'), icon: Cable },
-    { type: 'tcp', label: 'TCP', icon: ArrowLeftRight },
-  ],
-  filetransfer: [
-    { type: 'sftp', label: 'SFTP', icon: Folders },
-    { type: 'scp', label: 'SCP', icon: FileUp },
-    { type: 'ftp', label: 'FTP', icon: FolderUp },
-    { type: 'smb', label: 'SMB', icon: HardDrive },
-    { type: 's3', label: 'S3', icon: Cloud },
-    { type: 'webdav', label: 'WebDAV', icon: Globe },
-  ],
-  remote: [
-    ...(isWindows.value ? [{ type: 'rdp', label: 'RDP', icon: Monitor }] : []),
-    { type: 'vnc', label: 'VNC', icon: MonitorSmartphone },
-    { type: 'spice', label: 'SPICE', icon: MonitorCloud },
-    { type: 'x11-desktop', label: 'X11 Desktop', icon: AppWindow },
-  ],
-  sql: [
-    { type: 'database', dbType: 'mysql', label: 'MySQL', icon: Database },
-    { type: 'database', dbType: 'postgres', label: 'PostgreSQL', icon: Database },
-    { type: 'database', dbType: 'oracle', label: 'Oracle', icon: Database },
-    { type: 'database', dbType: 'sqlserver', label: 'SQL Server', icon: Database },
-    { type: 'database', dbType: 'rqlite', label: 'rqlite', icon: Database },
-  ],
-  nosql: [
-    { type: 'database', dbType: 'redis', label: 'Redis', icon: DatabaseZap },
-    { type: 'database', dbType: 'mongodb', label: 'MongoDB', icon: Layers },
-    { type: 'database', dbType: 'elasticsearch', label: 'Elasticsearch', icon: DatabaseSearch },
-  ],
-  container: [
-    { type: 'k8s', label: 'Kubernetes', icon: ShipWheel },
-    { type: 'container', containerRuntime: 'docker', label: 'Docker', icon: Boxes },
-    { type: 'container', containerRuntime: 'podman', label: 'Podman', icon: Boxes },
-    { type: 'container', containerRuntime: 'nerdctl', label: 'nerdctl', icon: Boxes },
-    ...(isWindows.value ? [{ type: 'container', containerRuntime: 'wslc', label: 'WSLC', icon: Boxes }] : []),
-  ],
-}))
+const allSubTypes = computed((): Record<string, SubTypeInfo[]> => {
+  const groups: Record<string, SubTypeInfo[]> = {}
+  for (const cat of CATEGORY_ORDER) groups[cat] = []
+  for (const info of CONNECTION_TYPES) {
+    if (info.formHidden) continue
+    if (info.windowsOnly && !isWindows.value) continue
+    groups[info.category].push({
+      type: info.type,
+      dbType: info.dbType,
+      containerRuntime: info.containerRuntime,
+      label: connectionTypeFormLabel(info, t),
+      icon: info.icon,
+    })
+  }
+  return groups
+})
 
 const currentSubTypes = computed(() => allSubTypes.value[category.value] || allSubTypes.value.terminal)
 
@@ -974,19 +945,11 @@ function onDialogOpened() {
 
 const isEdit = computed(() => !!props.editConfig?.id)
 
-const TERMINAL_TYPES = ['ssh', 'telnet', 'mosh', 'local', 'wsl', 'serial']
-const REMOTE_TYPES = ['rdp', 'vnc', 'spice', 'x11-desktop']
-const FILETRANSFER_TYPES = ['sftp', 'scp', 'ftp', 'ssh', 'smb', 'webdav', 's3']
-
-// SQL-family dbTypes fall under the "SQL数据库" top-level category; anything
-// else with type 'database' falls under "NoSQL数据库" (see isSqlDbType).
+// Category comes from the connectionTypes registry; only the discriminated
+// 'database' type needs the dbType check (SQL vs NoSQL).
 const category = computed(() => {
-  if (TERMINAL_TYPES.includes(form.type)) return 'terminal'
-  if (FILETRANSFER_TYPES.includes(form.type)) return 'filetransfer'
-  if (REMOTE_TYPES.includes(form.type)) return 'remote'
   if (form.type === 'database') return isSqlDbType(form.dbType) ? 'sql' : 'nosql'
-  if (form.type === 'k8s' || form.type === 'container') return 'container'
-  return 'terminal'
+  return connectionTypeInfo(form.type)?.category || 'terminal'
 })
 
 const sshConnections = computed(() =>
@@ -1005,10 +968,10 @@ const showAdvancedToggle = computed(() =>
 )
 
 const isRedisSentinel = computed(() =>
-  form.type === 'database' && form.dbType === 'redis' && form.redisMode === 'sentinel'
+  form.type === 'redis' && form.redisMode === 'sentinel'
 )
 const isElasticsearch = computed(() =>
-  form.type === 'database' && form.dbType === 'elasticsearch'
+  form.type === 'elasticsearch'
 )
 const isEsApiKey = computed(() =>
   isElasticsearch.value && form.authType === 'apikey'
@@ -1071,9 +1034,7 @@ const form = reactive<ConnectionConfig>({
   encoding: 'utf-8',
   backspaceKey: 'del',
   telnetNegotiationMode: 'active' as 'active' | 'passive',
-  telnetLocalEcho: false,
   telnetSendMode: 'character' as 'character' | 'line',
-  telnetNewlineMode: 'cr' as 'cr' | 'crlf',
   localEcho: false,
   newlineMode: 'cr' as 'cr' | 'crlf',
   shellPath: '',
@@ -1181,12 +1142,6 @@ const groupTreeData = computed<TreeOption[]>(() => {
   ]
 })
 
-const selectedGroupName = computed(() => {
-  if (!form.groupId) return ''
-  const g = connectionStore.groups.find(g => g.id === form.groupId)
-  return g?.name || form.groupId
-})
-
 // New group dialog
 const showNewGroupDialog = ref(false)
 const newGroupName = ref('')
@@ -1253,7 +1208,7 @@ watch(() => props.editConfig, (config) => {
     // Backfill legacy ES auth: older versions stored the auth type in a dedicated
     // `esAuthType` ('basic'|'apikey') and the key in `esApiKey`. Both now live in
     // the shared `authType` ('password'|'apikey') and `password` fields.
-    if (form.type === 'database' && form.dbType === 'elasticsearch') {
+    if (form.type === 'elasticsearch') {
       const legacy = config as any
       const legacyType = legacy?.esAuthType
       if (legacyType) {
@@ -1329,20 +1284,13 @@ watch(() => form.type, (newType) => {
     postLoginMode.value = 'script'
   }
   if (isEdit.value) return
-  if (newType === 'ssh') form.port = 22
-  else if (newType === 'telnet') form.port = 23
-  else if (newType === 'mosh') form.port = 22
-  else if (newType === 'x11-desktop') form.port = 22
-  else if (newType === 'rdp') form.port = 3389
-  else if (newType === 'vnc') form.port = 5900
-  else if (newType === 'spice') form.port = 5900
-  else if (newType === 'database') form.port = 3306
-  else if (newType === 'sftp') form.port = 22
-  else if (newType === 'scp') form.port = 22
-  else if (newType === 'ftp') form.port = 21
-  else if (newType === 'smb') form.port = 445
-  else if (newType === 'tcp') form.port = 23
-  if (REMOTE_TYPES.includes(newType) || newType === 'database') {
+  const port = defaultPortFor(newType)
+  if (port !== undefined) form.port = port
+  if (newType === 'elasticsearch') {
+    // ES shares the common `authType` field; default to 'password' unless an API key was already chosen.
+    form.authType = form.authType === 'apikey' ? 'apikey' : 'password'
+  }
+  if (['rdp', 'vnc', 'spice', 'x11-desktop'].includes(newType) || newType === 'database') {
     form.authType = 'password'
   }
   // The shell ("terminal type") is specific to local/wsl; always reset to the
@@ -1358,21 +1306,11 @@ watch(() => form.type, (newType) => {
   }
 })
 
-// Auto-switch default port when changing database type
+// Auto-switch default port when changing SQL database subtype
 watch(() => form.dbType, (newType) => {
   if (isEdit.value) return
-  if (newType === 'mysql') form.port = 3306
-  else if (newType === 'postgres') form.port = 5432
-  else if (newType === 'rqlite') form.port = 4001
-  else if (newType === 'oracle') form.port = 1521
-  else if (newType === 'sqlserver') form.port = 1433
-  else if (newType === 'redis') form.port = 6379
-  else if (newType === 'mongodb') form.port = 27017
-  else if (newType === 'elasticsearch') {
-    form.port = 9200
-    // ES shares the common `authType` field; default to 'password' unless an API key was already chosen.
-    form.authType = form.authType === 'apikey' ? 'apikey' : 'password'
-  }
+  const port = defaultPortFor('database', newType)
+  if (port !== undefined) form.port = port
 })
 
 // Clear the identity reference when switching away from the identity auth
@@ -1447,9 +1385,7 @@ function resetForm() {
   form.encoding = 'utf-8'
   form.backspaceKey = 'del'
   form.telnetNegotiationMode = 'active'
-  form.telnetLocalEcho = false
   form.telnetSendMode = 'character'
-  form.telnetNewlineMode = 'cr'
   form.localEcho = false
   form.newlineMode = 'cr'
   form.shellPath = ''
@@ -1484,10 +1420,6 @@ function resetForm() {
 watch(selectedGroupId, (val) => {
   form.groupId = val === '__none__' ? undefined : (val || undefined)
 })
-
-function onNodeClick(data: any) {
-  // el-tree-select auto-closes and syncs via v-model
-}
 
 function onGroupSelect(value: string | undefined) {
   if (value === '__new__') {
@@ -1642,7 +1574,7 @@ function normalizeForm(): ConnectionConfig {
   } else {
     normalized.postLoginScript = ''
   }
-  const redisSentinel = normalized.type === 'database' && normalized.dbType === 'redis' && normalized.redisMode === 'sentinel'
+  const redisSentinel = normalized.type === 'redis' && normalized.redisMode === 'sentinel'
   if (redisSentinel) {
     if (!normalized.redisSentinels?.trim()) throw new Error(t('conn.redisSentinelsRequired'))
     if (!normalized.redisMasterName?.trim()) throw new Error(t('conn.redisMasterNameRequired'))
@@ -1656,7 +1588,7 @@ function normalizeForm(): ConnectionConfig {
   if (normalized.type === 'database' && normalized.dbType === 'postgres' && !normalized.dbName?.trim()) {
     throw new Error(t('db.pgDbNameRequired'))
   }
-  if (normalized.type === 'database' && normalized.dbType === 'elasticsearch' && normalized.authType === 'apikey' && !normalized.password?.trim()) {
+  if (normalized.type === 'elasticsearch' && normalized.authType === 'apikey' && !normalized.password?.trim()) {
     throw new Error(t('conn.esApiKeyRequired'))
   }
   if (!normalized.name.trim()) {

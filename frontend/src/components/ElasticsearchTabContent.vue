@@ -293,7 +293,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
-import { RefreshCw, Layers, Code2, MoreHorizontal, ChevronRight, ChevronDown, Database, Plus, Trash2 } from '@lucide/vue'
+import { RefreshCw, Layers, MoreHorizontal, ChevronRight, ChevronDown, Database, Plus, Trash2 } from '@lucide/vue'
 import { useI18n } from '../i18n'
 import { msg } from '../services/message'
 import { ElMessageBox } from 'element-plus'

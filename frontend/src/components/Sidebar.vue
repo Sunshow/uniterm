@@ -30,17 +30,7 @@
             <span class="filter-trigger" :class="{ active: selectedTypeFilter !== 'all' }" @click.stop="filterMenuRef?.toggle($event.currentTarget)">
               <el-icon><Filter :size="'0.875rem'" /></el-icon>
             </span>
-            <Menu ref="filterMenuRef" align="end" v-model:visible="showFilterMenu">
-              <MenuItem :class="{ active: selectedTypeFilter === 'all' }" @click="onFilterSelect('all')">{{ t('sidebar.filterAll') }}</MenuItem>
-              <MenuSubmenu v-for="grp in filterGroups" :key="grp.key" :label="grp.label">
-                <MenuItem
-                  v-for="it in grp.items"
-                  :key="it.key"
-                  :class="{ active: selectedTypeFilter === it.key }"
-                  @click="onFilterSelect(it.key)"
-                >{{ it.label }}</MenuItem>
-              </MenuSubmenu>
-            </Menu>
+            <TypeFilterMenu ref="filterMenuRef" align="end" v-model="selectedTypeFilter" />
           </template>
         </el-input>
         <button class="sb-icon-btn" :title="t('header.newConnection')" @click.stop="newConnMenuRef?.toggle($event.currentTarget)">
@@ -354,96 +344,39 @@
     </Menu>
 
     <!-- Connection context menu -->
-    <Menu ref="menuRef" v-model:visible="menuVisible">
-      <!-- Terminal -->
-      <MenuItem v-if="selectedConn && selectedConn.type === 'ssh'" @click="doConnect">{{ t('sidebar.connectSSH') }}</MenuItem>
-      <MenuSubmenu
-        v-if="selectedConn && selectedConn.type === 'ssh' && workspaceTabs.length"
-        :label="t('sidebar.connectToWorkspace')"
-      >
-        <MenuItem v-for="workspace in workspaceTabs" :key="workspace.id" @click="doConnectToWorkspace(workspace.id)">
-          {{ workspace.name }}
-        </MenuItem>
-      </MenuSubmenu>
-      <MenuItem v-if="selectedConn && selectedConn.type === 'telnet'" @click="doConnect">{{ t('sidebar.connectTelnet') }}</MenuItem>
-      <MenuItem v-if="selectedConn && selectedConn.type === 'mosh'" @click="doConnect">{{ t('sidebar.connectMosh') }}</MenuItem>
-      <MenuItem v-if="selectedConn && selectedConn.type === 'local'" @click="doConnect">{{ t('sidebar.connectLocal') }}</MenuItem>
-      <MenuItem v-if="selectedConn && selectedConn.type === 'wsl'" @click="doConnect">{{ t('sidebar.connectWsl') }}</MenuItem>
-      <MenuItem v-if="selectedConn && selectedConn.type === 'serial'" @click="emit('connectSerial')">{{ t('sidebar.connectSerial') }}</MenuItem>
-      <MenuItem v-if="selectedConn && selectedConn.type === 'tcp'" @click="doConnect">{{ t('sidebar.connectTcp') }}</MenuItem>
-      <!-- File Transfer -->
-      <MenuItem v-if="selectedConn && selectedConn.type === 'ssh'" @click="doConnectSFTP">{{ t(connectFileMenuKey(selectedConn)) }}</MenuItem>
-      <MenuItem v-if="selectedConn && selectedConn.type === 'wsl'" @click="doConnectWslFile">{{ t('sidebar.connectWslFile') }}</MenuItem>
-      <MenuItem v-if="selectedConn && selectedConn.type === 'ftp'" @click="doConnectFTP">{{ t('sidebar.connectFtp') }}</MenuItem>
-      <MenuItem v-if="selectedConn && selectedConn.type === 'smb'" @click="doConnectSMB">{{ t('sidebar.connectSmb') }}</MenuItem>
-      <MenuItem v-if="selectedConn && selectedConn.type === 's3'" @click="doConnectS3">{{ t('sidebar.connectS3') }}</MenuItem>
-      <MenuItem v-if="selectedConn && selectedConn.type === 'webdav'" @click="doConnectWebDAV">{{ t('sidebar.connectWebdav') }}</MenuItem>
-      <!-- Remote Desktop -->
-      <MenuItem v-if="selectedConn && selectedConn.type === 'rdp'" @click="doConnectRDP">{{ t('sidebar.connectRDP') }}</MenuItem>
-      <MenuItem v-if="selectedConn && selectedConn.type === 'vnc'" @click="doConnectVNC">{{ t('sidebar.connectVNC') }}</MenuItem>
-      <MenuItem v-if="selectedConn && selectedConn.type === 'spice'" @click="doConnectSPICE">{{ t('sidebar.connectSPICE') }}</MenuItem>
-      <MenuItem v-if="selectedConn && selectedConn.type === 'x11-desktop'" @click="doConnectX11Desktop">{{ t('sidebar.connectX11Desktop') }}</MenuItem>
-      <!-- Database & Monitor -->
-      <MenuItem v-if="selectedConn && selectedConn.type === 'database'" @click="doConnectDB">{{ t('db.connectDB') }}</MenuItem>
-      <MenuItem v-if="selectedConn && selectedConn.type === 'k8s'" @click="doConnectK8s">{{ t('sidebar.connectK8s') }}</MenuItem>
-      <MenuItem v-if="selectedConn && selectedConn.type === 'container'" @click="doConnect">{{ t('sidebar.connectContainer') }}</MenuItem>
-      <MenuItem v-if="selectedConn && selectedConn.type === 'ssh'" @click="doConnectMonitor">{{ t('sidebar.connectMonitor') }}</MenuItem>
-      <MenuItem v-if="selectedConn && isConnOpen(selectedConn.id)" @click="doLocateSession">{{ t('sidebar.locateSession') }}</MenuItem>
-      <MenuDivider />
-      <MenuItem :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doEdit()">{{ t('sidebar.edit') }}</MenuItem>
-      <MenuItem @click="doDuplicate">{{ t('sidebar.duplicate') }}</MenuItem>
-      <MenuItem v-if="selectedConn" @click="doToggleFavorite">{{ favoriteStore.isFavorite(selectedConn.id) ? t('sidebar.removeFromFavorites') : t('sidebar.addToFavorites') }}</MenuItem>
-      <MenuDivider />
-      <MenuItem @click="doChangeGroup">{{ t('conn.moveTo') }}</MenuItem>
-      <MenuItem @click="doNewGroup(selectedGroupParentId())">{{ t('conn.newGroupTitle') }}</MenuItem>
-      <MenuDivider />
-      <MenuItem class="danger" @click="doDelete">{{ t('sidebar.delete') }}</MenuItem>
-    </Menu>
+    <ConnectionContextMenu
+      ref="menuRef"
+      :config="selectedConn"
+      :targets="ctxTargets"
+      v-model:visible="menuVisible"
+      @connect="onCtxConnect"
+      @connect-to-workspace="onCtxConnectToWorkspace"
+      @edit="doEdit"
+      @change-group="(targets: ConnectionConfig[]) => openChangeGroupFor(targets.map(c => c.id))"
+      @new-group="() => doNewGroup(selectedGroupParentId())"
+      @delete="onCtxDelete"
+    />
 
     <!-- Group context menu -->
-    <Menu ref="groupMenuRef" v-model:visible="groupMenuVisible">
-      <MenuItem @click="doNewGroup(selectedGroupParentId())">{{ t('conn.newGroupTitle') }}</MenuItem>
-      <MenuItem @click="doNewConnInGroup">{{ t('sidebar.newConnection') }}</MenuItem>
-      <template v-if="selectedGroup && selectedGroup.id !== '__ungrouped__'">
-        <MenuDivider />
-        <MenuItem @click="doRenameGroup">{{ t('conn.renameGroup') }}</MenuItem>
-        <MenuItem @click="doChangeParentGroup">{{ t('conn.moveTo') }}</MenuItem>
-        <MenuDivider />
-        <MenuItem class="danger" @click="doDeleteGroup">{{ t('conn.deleteGroup') }}</MenuItem>
-      </template>
-    </Menu>
+    <GroupContextMenu
+      ref="groupMenuRef"
+      :group="selectedGroup"
+      v-model:visible="groupMenuVisible"
+      @new-group="() => { if (selectedGroup) doNewGroup(selectedGroup.id) }"
+      @new-connection="doNewConnInGroup"
+      @rename="doRenameGroup"
+      @change-parent="doChangeParentGroup"
+      @delete-group="doDeleteGroup"
+    />
 
     <!-- Empty area context menu -->
     <Menu ref="emptyAreaMenuRef" v-model:visible="emptyAreaMenuVisible">
       <MenuItem @click="doNewGroup()">{{ t('conn.newGroupTitle') }}</MenuItem>
     </Menu>
 
-    <!-- Delete group dialog -->
-    <el-dialog append-to-body v-model="showDeleteGroupDialog" :title="t('conn.deleteGroupTitle')" width="28.125rem">
-      <p>{{ deleteGroupPromptText }}</p>
-      <template #footer>
-        <el-button @click="showDeleteGroupDialog = false">{{ t('conn.deleteGroupCancel') }}</el-button>
-        <el-button type="warning" @click="confirmDeleteGroup('move-out', 'move-up')">{{ t('conn.deleteGroupMoveUp') }}</el-button>
-        <el-button type="danger" @click="confirmDeleteGroup('delete-connections', 'delete-all')">{{ t('conn.deleteGroupDeleteAll') }}</el-button>
-      </template>
-    </el-dialog>
+    <DeleteGroupDialog v-model:visible="showDeleteGroupDialog" :group="selectedGroup" @confirm="confirmDeleteGroup" />
 
-    <!-- Rename group dialog -->
-    <el-dialog append-to-body v-model="showRenameGroupDialog" :title="t('conn.renameGroup')" width="22.5rem">
-      <el-form @submit.prevent="confirmRenameGroup">
-        <el-form-item :label="t('conn.groupName')">
-          <el-input
-            v-model="renameGroupName"
-            :placeholder="t('conn.groupNamePlaceholder')"
-            @keyup.enter="confirmRenameGroup"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="showRenameGroupDialog = false">{{ t('conn.cancel') }}</el-button>
-        <el-button type="primary" @click="confirmRenameGroup">{{ t('conn.save') }}</el-button>
-      </template>
-    </el-dialog>
+    <RenameGroupDialog v-model:visible="showRenameGroupDialog" :name="selectedGroup?.name || ''" @confirm="confirmRenameGroup" />
 
     <!-- Move to dialog -->
     <el-dialog append-to-body v-model="showChangeGroupDialog" :title="t('conn.group')" width="25rem">
@@ -462,75 +395,21 @@
       </template>
     </el-dialog>
 
-    <!-- Standalone new group dialog -->
-    <el-dialog append-to-body v-model="showNewGroupDialog" :title="t('conn.newGroupTitle')" width="25rem">
-      <el-form label-width="5rem" @submit.prevent="confirmNewGroup">
-        <el-form-item :label="t('conn.groupName')">
-          <el-input
-            v-model="newGroupName"
-            :placeholder="t('conn.groupNamePlaceholder')"
-            @keyup.enter="confirmNewGroup"
-          />
-        </el-form-item>
-        <el-form-item :label="t('conn.parentGroup')">
-          <el-tree-select
-            v-model="newGroupParentId"
-            :data="groupTreeData"
-            :render-after-expand="false"
-            check-strictly
-            clearable
-            :placeholder="t('conn.noGroup')"
-            style="width:100%"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="showNewGroupDialog = false">{{ t('conn.cancel') }}</el-button>
-        <el-button type="primary" @click="confirmNewGroup">{{ t('conn.save') }}</el-button>
-      </template>
-    </el-dialog>
+    <NewGroupDialog v-model:visible="showNewGroupDialog" :parent-id="newGroupParentId" @confirm="confirmNewGroup" />
 
-    <!-- New group dialog (for change group flow) -->
-    <el-dialog append-to-body v-model="showChangeNewGroupDialog" :title="t('conn.newGroupTitle')" width="25rem">
-      <el-form label-width="5rem" @submit.prevent="confirmChangeNewGroup">
-        <el-form-item :label="t('conn.groupName')">
-          <el-input
-            v-model="changeNewGroupName"
-            :placeholder="t('conn.groupNamePlaceholder')"
-            @keyup.enter="confirmChangeNewGroup"
-          />
-        </el-form-item>
-        <el-form-item :label="t('conn.parentGroup')">
-          <el-tree-select
-            v-model="changeNewGroupParentId"
-            :data="groupTreeData"
-            :render-after-expand="false"
-            check-strictly
-            clearable
-            :placeholder="t('conn.noGroup')"
-            style="width:100%"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="showChangeNewGroupDialog = false">{{ t('conn.cancel') }}</el-button>
-        <el-button type="primary" @click="confirmChangeNewGroup">{{ t('conn.save') }}</el-button>
-      </template>
-    </el-dialog>
+    <NewGroupDialog v-model:visible="showChangeNewGroupDialog" :parent-id="changeNewGroupParentId" @confirm="confirmChangeNewGroup" />
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, watch, nextTick, provide } from 'vue'
-import { X, ChevronRight, ChevronDown, Filter, Check, Network, Zap, Clock, Plus, Palette, SquareTerminal, Terminal, FolderUp, Folders, FileUp, HardDrive, Cloud, Globe, Monitor, MonitorCloud, MonitorSmartphone, Database, DatabaseZap, Layers, DatabaseSearch, Activity, Laptop, LaptopMinimal, Cable, Pencil, MoreHorizontal, FolderTree, ShipWheel, Boxes, AppWindow, ArrowLeftRight, ArrowRightLeft, Star } from '@lucide/vue'
-import { ElMessageBox } from 'element-plus'
-import { msg } from '../services/message'
+import { X, ChevronRight, ChevronDown, Filter, Check, Network, Zap, Clock, Plus, Palette, SquareTerminal, Activity, Pencil, MoreHorizontal, FolderTree, ArrowRightLeft, Star } from '@lucide/vue'
 import { getShellLabel as getShellLabelBase } from '../utils/shellLabel'
 import { useConnectionStore } from '../stores/connectionStore'
 import { useFavoriteStore } from '../stores/favoriteStore'
 import type { GroupTreeNode } from '../stores/connectionStore'
 import { usePanelStore } from '../stores/panelStore'
-import { useTabStore } from '../stores/tabStore'
 import { useSettingsStore } from '../stores/settingsStore'
 import { useI18n } from '../i18n'
 import ConnectionForm from './ConnectionForm.vue'
@@ -546,11 +425,16 @@ import CustomThemeEditor from './CustomThemeEditor.vue'
 import GroupTreeItem from './GroupTreeItem.vue'
 import Menu from './Menu.vue'
 import MenuItem from './MenuItem.vue'
-import MenuSubmenu from './MenuSubmenu.vue'
 import MenuDivider from './MenuDivider.vue'
 import type { ConnectionConfig, ConnectionGroup } from '../types/session'
-import { parseQuickConnect, formatConnSubtitle, getConnectionTypeKey, getTypeCategory, formatTypeFilterLabel, getTypeFilterCatalog, isWindows } from '../utils/quickConnect'
-import { connectFileMenuKey } from '../utils/fileTransferUtils'
+import { parseQuickConnect, formatConnSubtitle, matchTypeFilter } from '../utils/quickConnect'
+import ConnectionContextMenu from './ConnectionContextMenu.vue'
+import { connectionTypeIcon } from '../utils/connectionTypes'
+import GroupContextMenu from './GroupContextMenu.vue'
+import TypeFilterMenu from './TypeFilterMenu.vue'
+import RenameGroupDialog from './RenameGroupDialog.vue'
+import NewGroupDialog from './NewGroupDialog.vue'
+import DeleteGroupDialog from './DeleteGroupDialog.vue'
 import { FONT_OPTIONS, FONT_WEIGHT_OPTIONS, LANGUAGE_OPTIONS, FOLLOW_APP_THEME, SIDEBAR_TAB_DEFAULTS, SIDEBAR_TAB_ORDER } from '../types/settings'
 import { formatFontFamily, normalizeFontFamilyValue } from '../utils/formatFontFamily'
 import { useTerminalThemeOptions } from '../composables/useTerminalThemeOptions'
@@ -561,12 +445,11 @@ import { formatKeyBinding } from '../composables/useKeyboardShortcuts'
 defineProps<{
   visible: boolean
 }>()
-const emit = defineEmits(['connect', 'connectToWorkspace', 'connectOnly', 'connectSftp', 'connectWslFile', 'connectFtp', 'connectSmb', 'connectWebdav', 'connectS3', 'connectRdp', 'connectVnc', 'connectSpice', 'connectX11Desktop', 'connectDB', 'connectMonitor', 'connectSerial', 'connectK8s', 'toggle'])
+const emit = defineEmits(['connect', 'connectToWorkspace', 'connectOnly', 'toggle'])
 const connectionStore = useConnectionStore()
 const favoriteStore = useFavoriteStore()
 const settingsStore = useSettingsStore()
 const panelStore = usePanelStore()
-const tabStore = useTabStore()
 const companionStore = useCompanionStore()
 const { t } = useI18n()
 const isMacPlatform = /Mac|iPhone|iPad/.test(navigator.userAgent)
@@ -575,8 +458,6 @@ const quickCommandsTitle = computed(() => {
   const shortcut = binding ? formatKeyBinding(binding, isMacPlatform) : ''
   return shortcut ? `${t('quickCommands.quickCommandsTab')} (${shortcut})` : t('quickCommands.quickCommandsTab')
 })
-const workspaceTabs = computed(() => tabStore.tabs.filter(tab => tab.type === 'workspace'))
-
 // Connection ids that currently have an open panel/session (panel.config.id).
 // Reactive over the panelStore map, so it updates as panels open/close.
 const openPanelConnIds = computed<Set<string>>(() => {
@@ -686,6 +567,7 @@ watch(showForm, (val) => {
 const searchQuery = ref('')
 const searchInputRef = ref<any>(null)
 const selectedTypeFilter = ref('all')
+const filterMenuRef = ref<InstanceType<typeof TypeFilterMenu> | null>(null)
 const focusedId = ref<string | null>(null)
 
 function focusSearch() {
@@ -699,82 +581,6 @@ function focusSearch() {
       el.select()
     }
   })
-}
-
-// ── Type filter ──
-const TYPE_LABELS: Record<string, string> = {
-  ssh: 'SSH',
-  telnet: 'Telnet',
-  mosh: 'Mosh',
-  rdp: 'RDP',
-  vnc: 'VNC',
-  spice: 'SPICE',
-  local: 'Local',
-  sftp: 'SFTP',
-  ftp: 'FTP',
-  smb: 'SMB',
-  s3: 'S3',
-  webdav: 'WebDAV',
-  monitor: 'Monitor',
-  k8s: 'Kubernetes',
-  'database:mysql': 'MySQL',
-  'database:postgres': 'PostgreSQL',
-  'database:rqlite': 'rqlite',
-  'database:oracle': 'Oracle',
-  'database:sqlserver': 'SQL Server',
-  'database:redis': 'Redis',
-  'database:mongodb': 'MongoDB',
-  'database:elasticsearch': 'Elasticsearch',
-}
-
-// Label for a filter value (type / `database:<db>` / `container:<runtime>`).
-function filterTypeLabel(key: string): string {
-  return TYPE_LABELS[key] || formatTypeFilterLabel(key)
-}
-
-// Two-level filter menu: categories (in the same order/names as the
-// new-connection form) → concrete types present in connections.
-const filterGroups = computed(() => {
-  const connKeys = new Set(connectionStore.connections.map(c => getConnectionTypeKey(c)))
-  const catalog = getTypeFilterCatalog(t, isWindows)
-  const catalogKeys = new Set(catalog.flatMap(g => g.items.map(i => i.key)))
-
-  // Present-but-uncataloged types (e.g. legacy sftp / monitor that aren't in
-  // the new-connection form) are still filterable, appended under their category.
-  const extras = new Map<string, { key: string; label: string }[]>()
-  for (const k of connKeys) {
-    if (catalogKeys.has(k)) continue
-    const cat = getTypeCategory(k)
-    if (!extras.has(cat)) extras.set(cat, [])
-    extras.get(cat)!.push({ key: k, label: filterTypeLabel(k) })
-  }
-
-  return catalog
-    .map(g => ({
-      key: g.key,
-      label: g.label,
-      items: [...g.items.filter(i => connKeys.has(i.key)), ...(extras.get(g.key) || [])],
-    }))
-    .filter(g => g.items.length > 0)
-})
-
-function matchTypeFilter(conn: ConnectionConfig, filter: string): boolean {
-  if (filter === 'all') return true
-  if (filter.startsWith('database:')) {
-    return conn.type === 'database' && conn.dbType === filter.slice('database:'.length)
-  }
-  if (filter.startsWith('container:')) {
-    return conn.type === 'container' && (conn.containerRuntime || 'docker') === filter.slice('container:'.length)
-  }
-  return conn.type === filter
-}
-
-const showFilterMenu = ref(false)
-const filterMenuRef = ref<InstanceType<typeof Menu> | null>(null)
-
-function onFilterSelect(val: string) {
-  selectedTypeFilter.value = val
-  showFilterMenu.value = false
 }
 
 // ── Expand/collapse state ──
@@ -1129,19 +935,7 @@ function onListKeydown(e: KeyboardEvent) {
       for (const id of ids) {
         const c = connectionStore.connections.find(c => c.id === id)
         if (c) {
-          if (c.type === 'database') {
-            emit('connectDB', c)
-          } else if (c.type === 'rdp') {
-            emit('connectRdp', c)
-          } else if (c.type === 'vnc') {
-            emit('connectVnc', c)
-          } else if (c.type === 'spice') {
-            emit('connectSpice', c)
-          } else if (c.type === 'x11-desktop') {
-            emit('connectX11Desktop', c)
-          } else {
-            emit('connect', c)
-          }
+          emit('connect', c)
         }
       }
       selectedIds.value = new Set()
@@ -1149,10 +943,6 @@ function onListKeydown(e: KeyboardEvent) {
   }
 }
 
-function findConnById(id: string | null): ConnectionConfig | undefined {
-  if (!id) return undefined
-  return connectionStore.connections.find(c => c.id === id)
-}
 
 // ── Drag & drop ──
 const dragOverGroupId = ref<string | null>(null)
@@ -1387,19 +1177,7 @@ function onLocateConnection(e: Event) {
 
 function onItemDblClick(conn: ConnectionConfig) {
   selectedIds.value = new Set()
-  if (conn.type === 'database') {
-    emit('connectDB', conn)
-  } else if (conn.type === 'rdp') {
-    emit('connectRdp', conn)
-  } else if (conn.type === 'vnc') {
-    emit('connectVnc', conn)
-  } else if (conn.type === 'spice') {
-    emit('connectSpice', conn)
-  } else if (conn.type === 'x11-desktop') {
-    emit('connectX11Desktop', conn)
-  } else {
-    emit('connect', conn)
-  }
+  emit('connect', conn)
 }
 
 // ── Context menu helper ──
@@ -1419,7 +1197,7 @@ function getSelectedConnectionIds(): string[] {
 // ── Connection context menu ──
 const menuVisible = ref(false)
 const selectedConn = ref<ConnectionConfig | null>(null)
-const menuRef = ref<InstanceType<typeof Menu> | null>(null)
+const menuRef = ref<InstanceType<typeof ConnectionContextMenu> | null>(null)
 
 function onContextMenu(e: MouseEvent, conn: ConnectionConfig) {
   e.stopPropagation()
@@ -1447,255 +1225,63 @@ function closeMenu() {
   menuVisible.value = false
 }
 
-function doConnect() {
-  const ids = getSelectedConnectionIds()
-  // Collect connections before any state changes
-  const conns = ids.map(id => connectionStore.connections.find(c => c.id === id)).filter(Boolean) as ConnectionConfig[]
-  selectedIds.value = new Set()
-  closeMenu()
-  // Emit sequentially — each onConnect runs async but tabs/panels are created synchronously
-  for (const c of conns) {
-    emit('connect', c)
-  }
-}
 
-function doConnectToWorkspace(workspaceId: string) {
-  const ids = getSelectedConnectionIds()
-  const conns = ids
-    .map(id => connectionStore.connections.find(c => c.id === id))
-    .filter((conn): conn is ConnectionConfig => conn?.type === 'ssh')
-  selectedIds.value = new Set()
-  closeMenu()
-  for (const config of conns) {
-    emit('connectToWorkspace', { config, workspaceId })
-  }
-}
 
-function doConnectSFTP() {
-  const ids = getSelectedConnectionIds()
-  const conns = ids.map(id => connectionStore.connections.find(c => c.id === id)).filter(Boolean) as ConnectionConfig[]
-  selectedIds.value = new Set()
-  closeMenu()
-  for (const c of conns) {
-    emit('connectSftp', c)
-  }
-}
 
 // Open the WSL distro's file manager in a standalone tab (wsl-file session).
-function doConnectWslFile() {
-  const ids = getSelectedConnectionIds()
-  const conns = ids.map(id => connectionStore.connections.find(c => c.id === id)).filter(Boolean) as ConnectionConfig[]
-  selectedIds.value = new Set()
-  closeMenu()
-  for (const c of conns) {
-    emit('connectWslFile', c)
-  }
-}
 
-function doConnectFTP() {
-  const ids = getSelectedConnectionIds()
-  const conns = ids.map(id => connectionStore.connections.find(c => c.id === id)).filter(Boolean) as ConnectionConfig[]
-  selectedIds.value = new Set()
-  closeMenu()
-  for (const c of conns) {
-    emit('connectFtp', c)
-  }
-}
 
-function doConnectSMB() {
-  const ids = getSelectedConnectionIds()
-  const conns = ids.map(id => connectionStore.connections.find(c => c.id === id)).filter(Boolean) as ConnectionConfig[]
-  selectedIds.value = new Set()
-  closeMenu()
-  for (const c of conns) {
-    emit('connectSmb', c)
-  }
-}
 
-function doConnectWebDAV() {
-  const ids = getSelectedConnectionIds()
-  const conns = ids.map(id => connectionStore.connections.find(c => c.id === id)).filter(Boolean) as ConnectionConfig[]
-  selectedIds.value = new Set()
-  closeMenu()
-  for (const c of conns) {
-    emit('connectWebdav', c)
-  }
-}
 
-function doConnectS3() {
-  const ids = getSelectedConnectionIds()
-  const conns = ids.map(id => connectionStore.connections.find(c => c.id === id)).filter(Boolean) as ConnectionConfig[]
-  selectedIds.value = new Set()
-  closeMenu()
-  for (const c of conns) {
-    emit('connectS3', c)
-  }
-}
 
-function doConnectMonitor() {
-  const ids = getSelectedConnectionIds()
-  const conns = ids.map(id => connectionStore.connections.find(c => c.id === id)).filter(Boolean) as ConnectionConfig[]
-  selectedIds.value = new Set()
-  closeMenu()
-  for (const c of conns) {
-    emit('connectMonitor', c)
-  }
-}
 
 // Whether the given connection id currently has an open panel/session.
-function isConnOpen(id: string): boolean {
-  return openPanelConnIds.value.has(id)
-}
 
-// Switch to the existing tab/session hosting this connection instead of opening a new one.
-function doLocateSession() {
-  closeMenu()
-  const id = selectedConn.value?.id
-  if (!id) return
-  for (const p of panelStore.panels.values()) {
-    if (p.config?.id !== id) continue
-    const tab = tabStore.tabs.find(t => t.id === p.tabId)
-    if (!tab) continue
-    tabStore.setActiveTab(tab.id)
-    if (tab.type === 'workspace') {
-      tabStore.setActivePanel(tab.id, p.id)
-    }
-    break
+
+
+
+
+
+
+
+// Resolved multi-select targets for the shared context menu (always includes
+// the right-clicked connection).
+const ctxTargets = computed<ConnectionConfig[]>(() => {
+  const conns = getSelectedConnectionIds()
+    .map(id => connectionStore.connections.find(c => c.id === id))
+    .filter(Boolean) as ConnectionConfig[]
+  if (conns.length > 0) return conns
+  return selectedConn.value ? [selectedConn.value] : []
+})
+
+function onCtxConnect(targets: ConnectionConfig[], kind?: 'file' | 'wsl-file' | 'monitor') {
+  for (const c of targets) {
+    emit('connect', c, kind)
   }
 }
 
-function doConnectRDP() {
-  const ids = getSelectedConnectionIds()
-  const conns = ids.map(id => connectionStore.connections.find(c => c.id === id)).filter(Boolean) as ConnectionConfig[]
-  selectedIds.value = new Set()
-  closeMenu()
-  for (const c of conns) {
-    emit('connectRdp', c)
+function onCtxConnectToWorkspace(targets: ConnectionConfig[], workspaceId: string) {
+  for (const c of targets) {
+    if (c.type !== 'ssh') continue
+    emit('connectToWorkspace', { config: c, workspaceId })
   }
 }
 
-function doConnectVNC() {
-  const ids = getSelectedConnectionIds()
-  const conns = ids.map(id => connectionStore.connections.find(c => c.id === id)).filter(Boolean) as ConnectionConfig[]
-  selectedIds.value = new Set()
-  closeMenu()
-  for (const c of conns) {
-    emit('connectVnc', c)
-  }
-}
-
-function doConnectSPICE() {
-  const ids = getSelectedConnectionIds()
-  const conns = ids.map(id => connectionStore.connections.find(c => c.id === id)).filter(Boolean) as ConnectionConfig[]
-  selectedIds.value = new Set()
-  closeMenu()
-  for (const c of conns) {
-    emit('connectSpice', c)
-  }
-}
-
-function doConnectX11Desktop() {
-  const ids = getSelectedConnectionIds()
-  const conns = ids.map(id => connectionStore.connections.find(c => c.id === id)).filter(Boolean) as ConnectionConfig[]
-  selectedIds.value = new Set()
-  closeMenu()
-  for (const c of conns) {
-    emit('connectX11Desktop', c)
-  }
-}
-
-function doConnectDB() {
-  const ids = getSelectedConnectionIds()
-  const conns = ids.map(id => connectionStore.connections.find(c => c.id === id)).filter(Boolean) as ConnectionConfig[]
-  selectedIds.value = new Set()
-  closeMenu()
-  for (const c of conns) {
-    emit('connectDB', c)
-  }
-}
-
-function doConnectK8s() {
-  const ids = getSelectedConnectionIds()
-  const conns = ids.map(id => connectionStore.connections.find(c => c.id === id)).filter(Boolean) as ConnectionConfig[]
-  selectedIds.value = new Set()
-  closeMenu()
-  for (const c of conns) {
-    emit('connectK8s', c)
-  }
-}
-
-function doEdit() {
-  if (selectedConn.value) {
-    editConfig.value = { ...selectedConn.value }
-    showForm.value = true
-  }
-  closeMenu()
-}
-
-function doToggleFavorite() {
-  const id = selectedConn.value?.id
-  closeMenu()
-  if (!id) return
-  favoriteStore.toggle(id)
-}
-
-function doDuplicate() {
-  const ids = getSelectedConnectionIds()
-  const conns = ids.map(id => connectionStore.connections.find(c => c.id === id)).filter(Boolean) as ConnectionConfig[]
-  selectedIds.value = new Set()
-  closeMenu()
-  for (const c of conns) {
-    const dupName = generateDuplicateName(c.name)
-    const dup: ConnectionConfig = {
-      ...c,
-      id: `conn-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-      name: dupName
-    }
-    connectionStore.add(dup)
-  }
-}
-
-function generateDuplicateName(name: string): string {
-  const match = name.match(/^(.*)\s*\((\d+)\)$/)
-  const base = match ? match[1].trim() : name
-  const re = new RegExp('^' + escapeRegex(base) + '\s*\(\d+\)$')
-  let maxNum = 0
-  for (const c of connectionStore.connections) {
-    if (c.name === base || re.test(c.name)) {
-      const m = c.name.match(/\((\d+)\)$/)
-      if (m) {
-        maxNum = Math.max(maxNum, parseInt(m[1], 10))
-      } else {
-        maxNum = Math.max(maxNum, 0)
-      }
-    }
-  }
-  return `${base} (${maxNum + 1})`
-}
-
-function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
-async function doDelete() {
-  closeMenu()
-  const ids = getSelectedConnectionIds()
-  try {
-    await ElMessageBox.confirm(
-      t('sidebar.deleteConfirm', { count: ids.length }),
-      t('sidebar.delete'),
-      { confirmButtonText: t('sftp.dialog.confirm'), cancelButtonText: t('sftp.dialog.cancel'), type: 'warning' }
-    )
-  } catch {
-    return
-  }
-  connectionStore.removeMany(ids)
+function onCtxDelete(targets: ConnectionConfig[]) {
+  connectionStore.removeMany(targets.map(c => c.id))
   selectedIds.value = new Set()
 }
+
+function doEdit(config: ConnectionConfig) {
+  editConfig.value = { ...config }
+  showForm.value = true
+}
+
+
+
 
 // ── Standalone new group ──
 const showNewGroupDialog = ref(false)
-const newGroupName = ref('')
 
 const newConnGroupId = ref<string | undefined>(undefined)
 const newGroupParentId = ref<string | undefined>(undefined)
@@ -1734,7 +1320,6 @@ function doNewGroup(parentGroupId?: string) {
   closeMenu()
   closeGroupMenu()
   closeEmptyAreaMenu()
-  newGroupName.value = ''
   // Clear the parent first, then render the explicitly-passed group. Callers
   // decide what to pass; empty-area creation passes nothing, so it defaults
   // to "None" instead of carrying over a previously-selected group.
@@ -1746,28 +1331,14 @@ function selectedGroupParentId(): string | undefined {
   return (selectedGroup.value && selectedGroup.value.id !== '__ungrouped__') ? selectedGroup.value.id : undefined
 }
 
-async function confirmNewGroup() {
-  const name = newGroupName.value.trim()
-  if (!name) return
-  showNewGroupDialog.value = false
-  const parentId = newGroupParentId.value === '__none__' ? undefined : newGroupParentId.value
-  newGroupParentId.value = undefined
-  newGroupName.value = ''
+async function confirmNewGroup(name: string, parentId: string | undefined) {
   // save in background, don't block dialog close
-  connectionStore.addGroup(name, parentId)
+  await connectionStore.addGroup(name, parentId)
 }
 
 // ── Move to (unified dialog for connections and groups) ──
 const changeDialogMode = ref<'connections' | 'group'>('connections')
 
-function onChangeGroupSelect(value: string | undefined) {
-  if (value === '__new__') {
-    showChangeGroupDialog.value = false
-    changeNewGroupName.value = ''
-    changeNewGroupParentId.value = undefined
-    showChangeNewGroupDialog.value = true
-  }
-}
 
 function doChangeParentGroup() {
   closeMenu()
@@ -1782,7 +1353,6 @@ function doChangeParentGroup() {
 const showChangeGroupDialog = ref(false)
 const changeGroupTargetId = ref<string | undefined>(undefined)
 const showChangeNewGroupDialog = ref(false)
-const changeNewGroupName = ref('')
 const changeNewGroupParentId = ref<string | undefined>(undefined)
 const externalChangeGroupIds = ref<string[]>([])
 
@@ -1810,23 +1380,6 @@ function getChangeGroupIds(): string[] {
   return getSelectedConnectionIds()
 }
 
-function doChangeGroup() {
-  closeMenu()
-  changeDialogMode.value = 'connections'
-  const ids = getSelectedConnectionIds()
-  const groups = new Set(ids.map(id => {
-    const c = connectionStore.connections.find(c => c.id === id)
-    return c?.groupId || '__none__'
-  }))
-  if (groups.size === 1) {
-    const g = [...groups][0]
-    changeGroupTargetId.value = g === '__none__' ? undefined : g
-  } else {
-    changeGroupTargetId.value = undefined
-  }
-  showChangeGroupDialog.value = true
-}
-
 async function confirmChangeGroup() {
   if (changeDialogMode.value === 'group') {
     if (selectedGroup.value && selectedGroup.value.id !== '__ungrouped__') {
@@ -1839,7 +1392,6 @@ async function confirmChangeGroup() {
   const val = changeGroupTargetId.value
   if (val === '__new__') {
     showChangeNewGroupDialog.value = true
-    changeNewGroupName.value = ''
     return
   }
   const groupId = val === '__none__' ? undefined : val
@@ -1851,14 +1403,8 @@ async function confirmChangeGroup() {
   externalChangeGroupIds.value = []
 }
 
-async function confirmChangeNewGroup() {
-  const name = changeNewGroupName.value.trim()
-  if (!name) return
-  showChangeNewGroupDialog.value = false
-  const parentId = changeNewGroupParentId.value === '__none__' ? undefined : changeNewGroupParentId.value
+async function confirmChangeNewGroup(name: string, parentId: string | undefined) {
   const group = await connectionStore.addGroup(name, parentId)
-  changeNewGroupParentId.value = undefined
-  changeNewGroupName.value = ''
   const ids = getChangeGroupIds()
   if (ids.length > 0) {
     connectionStore.setConnectionsGroup(ids, group.id)
@@ -1877,7 +1423,7 @@ watch(showChangeGroupDialog, (open) => {
 // ── Group context menu ──
 const groupMenuVisible = ref(false)
 const selectedGroup = ref<ConnectionGroup | null>(null)
-const groupMenuRef = ref<InstanceType<typeof Menu> | null>(null)
+const groupMenuRef = ref<InstanceType<typeof GroupContextMenu> | null>(null)
 
 function onGroupContextMenu(e: MouseEvent, group: ConnectionGroup) {
   e.stopPropagation()
@@ -1910,31 +1456,20 @@ function onVirtualGroupContextMenu(e: MouseEvent) {
 
 // ── Rename group ──
 const showRenameGroupDialog = ref(false)
-const renameGroupName = ref('')
 
 function doRenameGroup() {
-  closeGroupMenu()
-  renameGroupName.value = selectedGroup.value?.name || ''
+  if (!selectedGroup.value) return
   showRenameGroupDialog.value = true
 }
 
-function confirmRenameGroup() {
-  const name = renameGroupName.value.trim()
-  if (!name || !selectedGroup.value) return
+function confirmRenameGroup(name: string) {
+  if (!selectedGroup.value) return
   connectionStore.renameGroup(selectedGroup.value.id, name)
-  showRenameGroupDialog.value = false
 }
 
 // ── Delete group ──
 const showDeleteGroupDialog = ref(false)
 
-const deleteGroupPromptText = computed(() => {
-  const g = selectedGroup.value
-  if (!g) return ''
-  const connCount = connectionStore.connections.filter(c => c.groupId === g.id).length
-  const childCount = connectionStore.groups.filter(cg => cg.parentId === g.id).length
-  return t('conn.deleteGroupPrompt', { name: g.name, connCount, childCount })
-})
 
 function doDeleteGroup() {
   closeGroupMenu()
@@ -1948,8 +1483,10 @@ function doDeleteGroup() {
   showDeleteGroupDialog.value = true
 }
 
-async function confirmDeleteGroup(connAction: 'delete-connections' | 'move-out', childAction: 'move-up' | 'delete-all' = 'move-up') {
+async function confirmDeleteGroup(connAction: 'delete-connections' | 'move-out') {
   if (selectedGroup.value) {
+    // Deleting the connections too implies deleting nested child groups.
+    const childAction = connAction === 'delete-connections' ? 'delete-all' : 'move-up'
     await connectionStore.deleteGroup(selectedGroup.value.id, connAction, childAction)
   }
   showDeleteGroupDialog.value = false
@@ -1979,8 +1516,6 @@ function onNewConnCommand(cmd: string) {
     } else {
       openNewForm()
     }
-  } else if (cmd === 'new-serial') {
-    emit('connectSerial')
   } else if (cmd === 'new-group') {
     newGroupParentId.value = undefined
     showNewGroupDialog.value = true
@@ -2005,30 +1540,7 @@ function getSubtitle(conn: ConnectionConfig): string {
 }
 
 function connIcon(conn: ConnectionConfig) {
-  switch (conn.type) {
-    case 'ssh': return SquareTerminal
-    case 'telnet': return Terminal
-    case 'mosh': return Zap
-    case 'local': return Laptop
-    case 'wsl': return LaptopMinimal
-    case 'serial': return Cable
-    case 'tcp': return ArrowLeftRight
-    case 'sftp': return Folders
-    case 'scp': return FileUp
-    case 'ftp': return FolderUp
-    case 'smb': return HardDrive
-    case 's3': return Cloud
-    case 'webdav': return Globe
-    case 'rdp': return Monitor
-    case 'vnc': return MonitorSmartphone
-    case 'spice': return MonitorCloud
-    case 'x11-desktop': return AppWindow
-    case 'database': return conn.dbType === 'redis' ? DatabaseZap : conn.dbType === 'mongodb' ? Layers : conn.dbType === 'elasticsearch' ? DatabaseSearch : Database
-    case 'monitor': return Activity
-    case 'k8s': return ShipWheel
-    case 'container': return Boxes
-    default: return SquareTerminal
-  }
+  return connectionTypeIcon(conn) || SquareTerminal
 }
 
 
@@ -2065,17 +1577,7 @@ function onConnectFromForm(config: ConnectionConfig) {
   }
   showForm.value = false
   editConfig.value = undefined
-  if (config.type === 'database') {
-    emit('connectDB', config)
-  } else if (config.type === 'rdp') {
-    emit('connectRdp', config)
-  } else if (config.type === 'vnc') {
-    emit('connectVnc', config)
-  } else if (config.type === 'x11-desktop') {
-    emit('connectX11Desktop', config)
-  } else {
-    emit('connect', config)
-  }
+  emit('connect', config)
 }
 
 // ── Lifecycle ──

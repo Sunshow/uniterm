@@ -721,7 +721,6 @@ const hashHighlightIndex = ref(0)
 const skillQuery = ref('')
 const skillDropdownVisible = ref(false)
 const skillHighlightIndex = ref(0)
-const activeSkillChip = ref<string | null>(null)
 
 const hashMatchingPanels = computed(() => {
   const src = hashDropdownVisible.value && !hashQuery.value
@@ -932,17 +931,6 @@ function onSelectItem(item: SlashItem) {
     return
   }
   onSelectCommand(item.name)
-}
-
-function findLastHashIndex(text: string): number {
-  for (let i = text.length - 1; i >= 0; i--) {
-    if (text[i] === '#') {
-      if (i === 0 || /[\s,;:.(\{\[]/.test(text[i - 1])) {
-        return i
-      }
-    }
-  }
-  return -1
 }
 
 // Detect an active #query at the caret. Works on the DOM text node the caret

@@ -285,7 +285,7 @@ async function linuxMaximise() {
       const screens = await Screens.GetAll()
       const current = screens.find((s: { isCurrent: boolean }) => s.isCurrent) || screens[0]
       if (current) {
-        Window.SetMaxSize(current.width, current.height)
+        Window.SetMaxSize(current.Size.Width, current.Size.Height)
       }
     } catch {
       // Fallback: set large max size to disable any constraint

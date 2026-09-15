@@ -150,7 +150,7 @@
       <span v-if="selectionStats.count > 0 && selectionStats.size > 0">{{ formatSize(selectionStats.size) }}</span>
     </div>
 
-    <Menu ref="ctxMenuRef" v-model:visible="ctxMenuVisible" v-slot="{ current }">
+    <Menu ref="ctxMenuRef" v-model:visible="ctxMenuVisible">
         <template v-if="menuType === 'file'">
           <MenuItem @click="doEdit">{{ t('sftp.edit') }}</MenuItem>
           <MenuItem @click="doEditExternal">{{ t('sftp.editExternal') }}</MenuItem>
@@ -346,7 +346,6 @@ const moreMenuRef = ref<InstanceType<typeof Menu> | null>(null)
 const moreMenuVisible = ref(false)
 const tableRef = ref<any>(null)
 
-const targetSide = computed(() => props.mode === 'local' ? t('sftp.remote') : t('sftp.local'))
 const sendToKey = computed(() => props.mode === 'local' ? 'sftp.sendToRemote' : 'sftp.sendToLocal')
 const flatToolbar = computed(() => props.toolbarLayout === 'flat')
 

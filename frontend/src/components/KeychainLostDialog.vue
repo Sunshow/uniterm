@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { useI18n } from '../i18n'
 
-const props = defineProps<{ visible: boolean }>()
+defineProps<{ visible: boolean }>()
 const emit = defineEmits<{ (e: 'update:visible', v: boolean): void; (e: 'done'): void }>()
 const { t } = useI18n()
 

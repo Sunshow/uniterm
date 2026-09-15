@@ -10,17 +10,7 @@
         <el-icon><Filter :size="'0.875rem'" /></el-icon>
         <span>{{ filterDisplay }}</span>
       </span>
-      <Menu ref="filterMenuRef" align="start" v-model:visible="showFilterMenu">
-        <MenuItem :class="{ active: selectedTypeFilter === 'all' }" @click="onFilterSelect('all')">{{ t('sidebar.filterAll') }}</MenuItem>
-        <MenuSubmenu v-for="grp in filterGroups" :key="grp.key" :label="grp.label">
-          <MenuItem
-            v-for="it in grp.items"
-            :key="it.key"
-            :class="{ active: selectedTypeFilter === it.key }"
-            @click="onFilterSelect(it.key)"
-          >{{ it.label }}</MenuItem>
-        </MenuSubmenu>
-      </Menu>
+      <TypeFilterMenu ref="filterMenuRef" align="start" v-model="selectedTypeFilter" />
       <el-input
         ref="searchInputRef"
         v-model="searchQuery"
@@ -91,32 +81,7 @@
           >
             <div class="start-card-top">
               <div class="start-card-icon" :class="config.type">
-                <el-icon v-if="config.type === 'ssh'"><SquareTerminal :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'telnet'"><Terminal :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'mosh'"><Zap :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'local'"><Laptop :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'wsl'"><LaptopMinimal :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'serial'"><Cable :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'tcp'"><ArrowLeftRight :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'sftp'"><Folders :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'scp'"><FileUp :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'ftp'"><FolderUp :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'smb'"><HardDrive :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 's3'"><Cloud :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'webdav'"><Globe :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'rdp'"><Monitor :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'vnc'"><MonitorSmartphone :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'spice'"><MonitorCloud :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'x11-desktop'"><AppWindow :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'database'">
-                  <DatabaseZap v-if="config.dbType === 'redis'" :size="'1.75rem'" />
-                  <Layers v-else-if="config.dbType === 'mongodb'" :size="'1.75rem'" />
-                  <DatabaseSearch v-else-if="config.dbType === 'elasticsearch'" :size="'1.75rem'" />
-                  <Database v-else :size="'1.75rem'" />
-                </el-icon>
-                <el-icon v-else-if="config.type === 'k8s'"><ShipWheel :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'container'"><Boxes :size="'1.75rem'" /></el-icon>
-                <el-icon v-else><Server :size="'1.75rem'" /></el-icon>
+                <el-icon><component :is="connTypeIcon(config) || Server" :size="'1.75rem'" /></el-icon>
               </div>
               <div>
                 <div class="start-card-name">{{ config.name }}</div>
@@ -146,32 +111,7 @@
           >
             <div class="start-card-top">
               <div class="start-card-icon" :class="config.type">
-                <el-icon v-if="config.type === 'ssh'"><SquareTerminal :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'telnet'"><Terminal :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'mosh'"><Zap :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'local'"><Laptop :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'wsl'"><LaptopMinimal :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'serial'"><Cable :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'tcp'"><ArrowLeftRight :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'sftp'"><Folders :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'scp'"><FileUp :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'ftp'"><FolderUp :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'smb'"><HardDrive :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 's3'"><Cloud :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'webdav'"><Globe :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'rdp'"><Monitor :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'vnc'"><MonitorSmartphone :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'spice'"><MonitorCloud :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'x11-desktop'"><AppWindow :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'database'">
-                  <DatabaseZap v-if="config.dbType === 'redis'" :size="'1.75rem'" />
-                  <Layers v-else-if="config.dbType === 'mongodb'" :size="'1.75rem'" />
-                  <DatabaseSearch v-else-if="config.dbType === 'elasticsearch'" :size="'1.75rem'" />
-                  <Database v-else :size="'1.75rem'" />
-                </el-icon>
-                <el-icon v-else-if="config.type === 'k8s'"><ShipWheel :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'container'"><Boxes :size="'1.75rem'" /></el-icon>
-                <el-icon v-else><Server :size="'1.75rem'" /></el-icon>
+                <el-icon><component :is="connTypeIcon(config) || Server" :size="'1.75rem'" /></el-icon>
               </div>
               <div>
                 <div class="start-card-name">{{ config.name }}</div>
@@ -239,32 +179,7 @@
           >
             <div class="start-card-top">
               <div class="start-card-icon" :class="config.type">
-                <el-icon v-if="config.type === 'ssh'"><SquareTerminal :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'telnet'"><Terminal :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'mosh'"><Zap :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'local'"><Laptop :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'wsl'"><LaptopMinimal :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'serial'"><Cable :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'tcp'"><ArrowLeftRight :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'sftp'"><Folders :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'scp'"><FileUp :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'ftp'"><FolderUp :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'smb'"><HardDrive :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 's3'"><Cloud :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'webdav'"><Globe :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'rdp'"><Monitor :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'vnc'"><MonitorSmartphone :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'spice'"><MonitorCloud :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'x11-desktop'"><AppWindow :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'database'">
-                  <DatabaseZap v-if="config.dbType === 'redis'" :size="'1.75rem'" />
-                  <Layers v-else-if="config.dbType === 'mongodb'" :size="'1.75rem'" />
-                  <DatabaseSearch v-else-if="config.dbType === 'elasticsearch'" :size="'1.75rem'" />
-                  <Database v-else :size="'1.75rem'" />
-                </el-icon>
-                <el-icon v-else-if="config.type === 'k8s'"><ShipWheel :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'container'"><Boxes :size="'1.75rem'" /></el-icon>
-                <el-icon v-else><Server :size="'1.75rem'" /></el-icon>
+                <el-icon><component :is="connTypeIcon(config) || Server" :size="'1.75rem'" /></el-icon>
               </div>
               <div>
                 <div class="start-card-name">{{ config.name }}</div>
@@ -319,32 +234,7 @@
         >
           <div class="start-card-top">
             <div class="start-card-icon" :class="config.type">
-              <el-icon v-if="config.type === 'ssh'"><SquareTerminal :size="'1.75rem'" /></el-icon>
-              <el-icon v-else-if="config.type === 'telnet'"><Terminal :size="'1.75rem'" /></el-icon>
-              <el-icon v-else-if="config.type === 'mosh'"><Zap :size="'1.75rem'" /></el-icon>
-              <el-icon v-else-if="config.type === 'local'"><Laptop :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'wsl'"><LaptopMinimal :size="'1.75rem'" /></el-icon>
-              <el-icon v-else-if="config.type === 'serial'"><Cable :size="'1.75rem'" /></el-icon>
-                <el-icon v-else-if="config.type === 'tcp'"><ArrowLeftRight :size="'1.75rem'" /></el-icon>
-              <el-icon v-else-if="config.type === 'sftp'"><Folders :size="'1.75rem'" /></el-icon>
-              <el-icon v-else-if="config.type === 'scp'"><FileUp :size="'1.75rem'" /></el-icon>
-              <el-icon v-else-if="config.type === 'ftp'"><FolderUp :size="'1.75rem'" /></el-icon>
-              <el-icon v-else-if="config.type === 'smb'"><HardDrive :size="'1.75rem'" /></el-icon>
-              <el-icon v-else-if="config.type === 's3'"><Cloud :size="'1.75rem'" /></el-icon>
-              <el-icon v-else-if="config.type === 'webdav'"><Globe :size="'1.75rem'" /></el-icon>
-              <el-icon v-else-if="config.type === 'rdp'"><Monitor :size="'1.75rem'" /></el-icon>
-              <el-icon v-else-if="config.type === 'vnc'"><MonitorSmartphone :size="'1.75rem'" /></el-icon>
-              <el-icon v-else-if="config.type === 'spice'"><MonitorCloud :size="'1.75rem'" /></el-icon>
-              <el-icon v-else-if="config.type === 'x11-desktop'"><AppWindow :size="'1.75rem'" /></el-icon>
-              <el-icon v-else-if="config.type === 'database'">
-                <DatabaseZap v-if="config.dbType === 'redis'" :size="'1.75rem'" />
-                <Layers v-else-if="config.dbType === 'mongodb'" :size="'1.75rem'" />
-                <DatabaseSearch v-else-if="config.dbType === 'elasticsearch'" :size="'1.75rem'" />
-                <Database v-else :size="'1.75rem'" />
-              </el-icon>
-              <el-icon v-else-if="config.type === 'k8s'"><ShipWheel :size="'1.75rem'" /></el-icon>
-              <el-icon v-else-if="config.type === 'container'"><Boxes :size="'1.75rem'" /></el-icon>
-              <el-icon v-else><Server :size="'1.75rem'" /></el-icon>
+              <el-icon><component :is="connTypeIcon(config) || Server" :size="'1.75rem'" /></el-icon>
             </div>
             <div>
               <div class="start-card-name">{{ config.name }}</div>
@@ -382,117 +272,52 @@
       <span class="empty-icon">📋</span>
       <p>{{ t('startTab.noConnections') }}</p>
     </div>
-
-    <!-- Context menu -->
-    <Menu ref="contextMenuRef" v-model:visible="contextMenuVisible">
-      <!-- Terminal -->
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'ssh'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnect(contextMenuConfig, $event)">{{ t('sidebar.connectSSH') }}</MenuItem>
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'telnet'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnect(contextMenuConfig, $event)">{{ t('sidebar.connectTelnet') }}</MenuItem>
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'mosh'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnect(contextMenuConfig, $event)">{{ t('sidebar.connectMosh') }}</MenuItem>
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'local'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnect(contextMenuConfig, $event)">{{ t('sidebar.connectLocal') }}</MenuItem>
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'wsl'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnect(contextMenuConfig, $event)">{{ t('sidebar.connectWsl') }}</MenuItem>
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'serial'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnectSerial(contextMenuConfig, $event)">{{ t('sidebar.connectSerial') }}</MenuItem>
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'tcp'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnect(contextMenuConfig, $event)">{{ t('sidebar.connectTcp') }}</MenuItem>
-      <!-- File Transfer -->
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'ssh'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnectSftp(contextMenuConfig)">{{ t(connectFileMenuKey(contextMenuConfig)) }}</MenuItem>
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'wsl'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnectWslFile(contextMenuConfig)">{{ t('sidebar.connectWslFile') }}</MenuItem>
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'ftp'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnectFtp(contextMenuConfig)">{{ t('sidebar.connectFtp') }}</MenuItem>
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'smb'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnectSmb(contextMenuConfig)">{{ t('sidebar.connectSmb') }}</MenuItem>
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 's3'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnectS3(contextMenuConfig)">{{ t('sidebar.connectS3') }}</MenuItem>
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'webdav'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnectWebdav(contextMenuConfig)">{{ t('sidebar.connectWebdav') }}</MenuItem>
-      <!-- Remote Desktop -->
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'rdp'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnectRdp(contextMenuConfig)">{{ t('sidebar.connectRDP') }}</MenuItem>
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'vnc'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnectVnc(contextMenuConfig)">{{ t('sidebar.connectVNC') }}</MenuItem>
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'spice'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnectSpice(contextMenuConfig)">{{ t('sidebar.connectSPICE') }}</MenuItem>
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'x11-desktop'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnectX11Desktop(contextMenuConfig)">{{ t('sidebar.connectX11Desktop') }}</MenuItem>
-      <!-- Database & Monitor -->
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'database'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnectDb(contextMenuConfig)">{{ t('db.connectDB') }}</MenuItem>
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'k8s'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnectK8s(contextMenuConfig)">{{ t('sidebar.connectK8s') }}</MenuItem>
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'container'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnect(contextMenuConfig, $event)">{{ t('sidebar.connectContainer') }}</MenuItem>
-      <MenuItem v-if="contextMenuConfig && contextMenuConfig.type === 'ssh'" :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doConnectMonitor(contextMenuConfig)">{{ t('sidebar.connectMonitor') }}</MenuItem>
-      <MenuDivider />
-      <MenuItem :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doEditConnection(contextMenuConfig)">{{ t('sidebar.edit') }}</MenuItem>
-      <MenuItem @click="doChangeGroupBulk">{{ t('conn.moveTo') }}</MenuItem>
-      <MenuItem :class="{ disabled: selectedIds.size > 1 }" @click="selectedIds.size <= 1 && doDuplicate(contextMenuConfig)">{{ t('sidebar.duplicate') }}</MenuItem>
-      <MenuItem v-if="contextMenuConfig" @click="doToggleFavorite(contextMenuConfig)">{{ favoriteStore.isFavorite(contextMenuConfig.id) ? t('sidebar.removeFromFavorites') : t('sidebar.addToFavorites') }}</MenuItem>
-      <MenuDivider />
-      <MenuItem class="danger" @click="doDeleteBulk">{{ t('sidebar.delete') }}</MenuItem>
-    </Menu>
-
-    <!-- Group context menu -->
-    <Menu ref="groupMenuRef" v-model:visible="groupMenuVisible">
-      <MenuItem @click="doNewGroupFromCtx">{{ t('conn.newGroupTitle') }}</MenuItem>
-      <MenuItem @click="doNewConnInGroup">{{ t('sidebar.newConnection') }}</MenuItem>
-      <MenuDivider />
-      <MenuItem @click="doRenameGroup">{{ t('conn.renameGroup') }}</MenuItem>
-      <MenuItem @click="doChangeGroupParent">{{ t('conn.moveTo') }}</MenuItem>
-      <MenuDivider />
-      <MenuItem class="danger" @click="doDeleteGroup">{{ t('conn.deleteGroup') }}</MenuItem>
-    </Menu>
-
     </div>
 
-    <!-- Rename group dialog -->
-    <el-dialog append-to-body v-model="showRenameGroupDialog" :title="t('conn.renameGroup')" width="22.5rem">
-      <el-form @submit.prevent="confirmRenameGroup">
-        <el-form-item :label="t('conn.groupName')">
-          <el-input
-            v-model="renameGroupName"
-            :placeholder="t('conn.groupNamePlaceholder')"
-            @keyup.enter="confirmRenameGroup"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="showRenameGroupDialog = false">{{ t('conn.cancel') }}</el-button>
-        <el-button type="primary" @click="confirmRenameGroup">{{ t('conn.save') }}</el-button>
-      </template>
-    </el-dialog>
+    <!-- Context menu -->
+    <ConnectionContextMenu
+      ref="contextMenuRef"
+      :config="contextMenuConfig"
+      :targets="ctxTargets"
+      v-model:visible="contextMenuVisible"
+      @connect="onCtxConnect"
+      @connect-to-workspace="onCtxConnectToWorkspace"
+      @edit="doEditConnection"
+      @change-group="onCtxChangeGroup"
+      @new-group="openNewGroupDialog"
+      @delete="onCtxDelete"
+    />
 
-    <!-- New group dialog -->
-    <el-dialog append-to-body v-model="showNewGroupDialog" :title="t('conn.newGroupTitle')" width="25rem">
-      <el-form label-width="5rem" @submit.prevent="doAddGroup">
-        <el-form-item :label="t('conn.groupName')">
-          <el-input
-            v-model="newGroupDialogName"
-            :placeholder="t('conn.groupNamePlaceholder')"
-            @keyup.enter="doAddGroup"
-          />
-        </el-form-item>
-        <el-form-item :label="t('conn.parentGroup')">
-          <el-tree-select
-            v-model="newGroupParentId"
-            :data="groupTreeData"
-            :render-after-expand="false"
-            check-strictly
-            clearable
-            :placeholder="t('conn.noGroup')"
-            style="width:100%"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="showNewGroupDialog = false">{{ t('conn.cancel') }}</el-button>
-        <el-button type="primary" @click="doAddGroup">{{ t('conn.save') }}</el-button>
-      </template>
-    </el-dialog>
+    <!-- Group context menu -->
+    <GroupContextMenu
+      ref="groupMenuRef"
+      :group="groupContextTarget"
+      v-model:visible="groupMenuVisible"
+      @new-group="doNewGroupFromCtx"
+      @new-connection="doNewConnInGroup"
+      @rename="doRenameGroup"
+      @change-parent="doChangeGroupParent"
+      @delete-group="doDeleteGroup"
+    />
 
-    <!-- Delete group dialog -->
-    <el-dialog append-to-body v-model="showDeleteGroupDialog" :title="t('conn.deleteGroupTitle')" width="28.125rem">
-      <p>{{ deleteGroupPromptText }}</p>
-      <template #footer>
-        <el-button @click="showDeleteGroupDialog = false">{{ t('conn.deleteGroupCancel') }}</el-button>
-        <el-button type="warning" @click="confirmDeleteGroup('move-out')">{{ t('conn.deleteGroupMoveUp') }}</el-button>
-        <el-button type="danger" @click="confirmDeleteGroup('delete-connections')">{{ t('conn.deleteGroupDeleteAll') }}</el-button>
-      </template>
-    </el-dialog>
+    <RenameGroupDialog v-model:visible="showRenameGroupDialog" :name="groupContextTarget?.name || ''" @confirm="onRenameGroupConfirm" />
+
+    <NewGroupDialog v-model:visible="showNewGroupDialog" :parent-id="newGroupParentId" @confirm="onAddGroupConfirm" />
+
+    <DeleteGroupDialog v-model:visible="showDeleteGroupDialog" :group="deleteGroupTarget" @confirm="confirmDeleteGroup" />
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
-import { ElMessageBox } from 'element-plus'
-import { msg } from '../services/message'
+import Menu from './Menu.vue'
+import TypeFilterMenu from './TypeFilterMenu.vue'
+import ConnectionContextMenu from './ConnectionContextMenu.vue'
+import GroupContextMenu from './GroupContextMenu.vue'
+import RenameGroupDialog from './RenameGroupDialog.vue'
+import NewGroupDialog from './NewGroupDialog.vue'
+import DeleteGroupDialog from './DeleteGroupDialog.vue'
 import type { StartTab } from '../types/workspace'
 import type { ConnectionConfig, ConnectionGroup } from '../types/session'
 import { useConnectionStore } from '../stores/connectionStore'
@@ -501,14 +326,11 @@ import { useTabStore } from '../stores/tabStore'
 import { useSettingsStore } from '../stores/settingsStore'
 import { useI18n } from '../i18n'
 import { GetRecentConnections } from '../../bindings/github.com/ys-ll/uniterm/app'
-import { formatConnSubtitle, getConnectionTypeKey, getTypeCategory, formatTypeFilterLabel, getTypeFilterCatalog, isWindows } from '../utils/quickConnect'
-import { connectFileMenuKey } from '../utils/fileTransferUtils'
+import { formatConnSubtitle, formatTypeFilterLabel, matchTypeFilter } from '../utils/quickConnect'
+import { connectionTypeIcon as connTypeIcon, connectionTypeLabel as connTypeLabel } from '../utils/connectionTypes'
 import { getShellLabel as getShellLabelBase } from '../utils/shellLabel'
-import Menu from './Menu.vue'
 import MenuItem from './MenuItem.vue'
-import MenuSubmenu from './MenuSubmenu.vue'
-import MenuDivider from './MenuDivider.vue'
-import { Filter, Plus, Laptop, LaptopMinimal, Cable, SquareTerminal, Terminal, Database, DatabaseZap, Layers, DatabaseSearch, Monitor, MonitorSmartphone, MonitorCloud, FolderUp, Folders, FileUp, HardDrive, Cloud, Globe, Server, Folder, FolderOpen, Zap, MoreHorizontal, ChevronDown, ShipWheel, Boxes, AppWindow, ArrowLeftRight, Star } from '@lucide/vue'
+import { Filter, Plus, Laptop, Server, Folder, FolderOpen, Zap, MoreHorizontal, ChevronDown, Star } from '@lucide/vue'
 
 const props = defineProps<{
   tab: StartTab
@@ -516,6 +338,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   connect: [config: ConnectionConfig, keepOpen?: boolean]
+  'connect-to-workspace': [payload: { configs: ConnectionConfig[]; workspaceId: string }]
   'new-connection': [payload?: { host?: string; groupId?: string; type?: string }]
   'local-terminal': [shellPath: string, keepOpen?: boolean]
   'close-self': [tabId: string]
@@ -601,67 +424,15 @@ const searchQuery = ref('')
 const selectedTypeFilter = ref('all')
 const searchInputRef = ref<HTMLInputElement>()
 
-const TYPE_LABELS: Record<string, string> = {
-  ssh: 'SSH', telnet: 'Telnet', mosh: 'Mosh', rdp: 'RDP', vnc: 'VNC', spice: 'SPICE',
-  local: 'Local', sftp: 'SFTP', ftp: 'FTP', smb: 'SMB', s3: 'S3', webdav: 'WebDAV', monitor: 'Monitor',
-  k8s: 'Kubernetes',
-  'database:mysql': 'MySQL', 'database:postgres': 'PostgreSQL', 'database:rqlite': 'rqlite',
-  'database:oracle': 'Oracle', 'database:sqlserver': 'SQL Server', 'database:redis': 'Redis',
-  'database:mongodb': 'MongoDB', 'database:elasticsearch': 'Elasticsearch',
-}
-
-// Two-level filter menu: categories (in the same order/names as the
-// new-connection form) → concrete types present in connections.
-const filterGroups = computed(() => {
-  const connKeys = new Set(connectionStore.connections.map(c => getConnectionTypeKey(c)))
-  const catalog = getTypeFilterCatalog(t, isWindows)
-  const catalogKeys = new Set(catalog.flatMap(g => g.items.map(i => i.key)))
-
-  // Present-but-uncataloged types (e.g. legacy sftp / monitor that aren't in
-  // the new-connection form) are still filterable, appended under their category.
-  const extras = new Map<string, { key: string; label: string }[]>()
-  for (const k of connKeys) {
-    if (catalogKeys.has(k)) continue
-    const cat = getTypeCategory(k)
-    if (!extras.has(cat)) extras.set(cat, [])
-    extras.get(cat)!.push({ key: k, label: TYPE_LABELS[k] || formatTypeFilterLabel(k) })
-  }
-
-  return catalog
-    .map(g => ({
-      key: g.key,
-      label: g.label,
-      items: [...g.items.filter(i => connKeys.has(i.key)), ...(extras.get(g.key) || [])],
-    }))
-    .filter(g => g.items.length > 0)
-})
-
 const filterDisplay = computed(() => {
   if (selectedTypeFilter.value === 'all') return t('sidebar.filterAll')
-  return TYPE_LABELS[selectedTypeFilter.value] || formatTypeFilterLabel(selectedTypeFilter.value)
+  return connTypeLabel(selectedTypeFilter.value) || formatTypeFilterLabel(selectedTypeFilter.value)
 })
 
-function matchTypeFilter(conn: ConnectionConfig, filter: string): boolean {
-  if (filter === 'all') return true
-  if (filter.startsWith('database:')) {
-    return conn.type === 'database' && conn.dbType === filter.slice('database:'.length)
-  }
-  if (filter.startsWith('container:')) {
-    return conn.type === 'container' && (conn.containerRuntime || 'docker') === filter.slice('container:'.length)
-  }
-  return conn.type === filter
-}
-
-const showFilterMenu = ref(false)
-const filterMenuRef = ref<InstanceType<typeof Menu> | null>(null)
+const filterMenuRef = ref<InstanceType<typeof TypeFilterMenu> | null>(null)
 
 const shellMenuRef = ref<InstanceType<typeof Menu> | null>(null)
 const shellMenuVisible = ref(false)
-
-function onFilterSelect(val: string) {
-  selectedTypeFilter.value = val
-  showFilterMenu.value = false
-}
 
 // ── Shell label helper ──
 function getShellLabel(path: string): string {
@@ -785,10 +556,6 @@ const groupCards = computed(() => {
   return { groups, ungroupedCount, isGroupView, currentGroupId: props.tab.groupId }
 })
 
-function getGroupName(groupId: string): string {
-  if (groupId === '__ungrouped__') return t('conn.noGroup')
-  return connectionStore.groups.find(g => g.id === groupId)?.name || ''
-}
 
 // ── Navigation ──
 function onCardClick(config: ConnectionConfig, e: MouseEvent, prefix = 'conn:') {
@@ -1163,28 +930,16 @@ function onGroupContextMenu(e: MouseEvent, groupId: string, groupName: string) {
 }
 
 const showRenameGroupDialog = ref(false)
-const renameGroupName = ref('')
+const showNewGroupDialog = ref(false)
+const newGroupParentId = ref<string | undefined>(undefined)
 
 function doRenameGroup() {
-  closeGroupContextMenu()
   if (!groupContextTarget.value) return
-  renameGroupName.value = groupContextTarget.value.name
+  closeGroupContextMenu()
   showRenameGroupDialog.value = true
 }
 
-function confirmRenameGroup() {
-  const name = renameGroupName.value.trim()
-  if (!name || !groupContextTarget.value) return
-  connectionStore.renameGroup(groupContextTarget.value.id, name)
-  showRenameGroupDialog.value = false
-}
-
-const showNewGroupDialog = ref(false)
-const newGroupDialogName = ref('')
-const newGroupParentId = ref<string | undefined>(undefined)
-
 function openNewGroupDialog() {
-  newGroupDialogName.value = ''
   // Pre-set parent to current group if in a group view
   newGroupParentId.value = (props.tab.viewMode === 'group' && props.tab.groupId && props.tab.groupId !== '__ungrouped__')
     ? props.tab.groupId
@@ -1192,41 +947,10 @@ function openNewGroupDialog() {
   showNewGroupDialog.value = true
 }
 
-async function doAddGroup() {
-  const name = newGroupDialogName.value.trim()
-  if (!name) return
-  showNewGroupDialog.value = false
-  const parentId = newGroupParentId.value === '__none__' ? undefined : newGroupParentId.value
-  newGroupDialogName.value = ''
-  newGroupParentId.value = undefined
-  connectionStore.addGroup(name, parentId)
-}
-
-// Tree data for change parent dialog
-interface TreeOption {
-  value: string
-  label: string
-  children?: TreeOption[]
-}
-const groupTreeData = computed<TreeOption[]>(() => {
-  function buildTree(nodes: any[]): TreeOption[] {
-    return nodes.map((node: any) => ({
-      value: node.group.id,
-      label: node.group.name,
-      children: node.children.length > 0 ? buildTree(node.children) : undefined,
-    }))
-  }
-  return [
-    { value: '__none__', label: t('conn.noGroup') },
-    ...buildTree(connectionStore.groupedConnections.roots),
-  ]
-})
-
 // Group context menu: New Group (child of current)
 function doNewGroupFromCtx() {
   if (!groupContextTarget.value) return
   closeGroupContextMenu()
-  newGroupDialogName.value = ''
   newGroupParentId.value = groupContextTarget.value.id
   showNewGroupDialog.value = true
 }
@@ -1238,15 +962,14 @@ function doNewConnInGroup() {
   emit('new-connection', { groupId: groupContextTarget.value.id })
 }
 
-// Group context menu: Change Parent Group
-const showChangeParentDialog = ref(false)
-const changeParentTargetId = ref<string | undefined>(undefined)
-
 function doChangeGroupParent() {
   if (!groupContextTarget.value) return
   closeGroupContextMenu()
   emit('change-group-parent', groupContextTarget.value.id)
 }
+
+const showDeleteGroupDialog = ref(false)
+const deleteGroupTarget = ref<ConnectionGroup | null>(null)
 
 async function doDeleteGroup() {
   if (!groupContextTarget.value) return
@@ -1261,16 +984,6 @@ async function doDeleteGroup() {
   deleteGroupTarget.value = g
   showDeleteGroupDialog.value = true
 }
-
-const showDeleteGroupDialog = ref(false)
-const deleteGroupTarget = ref<ConnectionGroup | null>(null)
-const deleteGroupPromptText = computed(() => {
-  const g = deleteGroupTarget.value
-  if (!g) return ''
-  const connCount = connectionStore.connections.filter(c => c.groupId === g.id).length
-  const childCount = connectionStore.groups.filter(cg => cg.parentId === g.id).length
-  return t('conn.deleteGroupPrompt', { name: g.name, connCount, childCount })
-})
 
 async function confirmDeleteGroup(action: 'delete-connections' | 'move-out') {
   if (deleteGroupTarget.value) {
@@ -1296,81 +1009,58 @@ onUnmounted(() => {
 })
 
 // Context menu actions
-function doConnect(config: ConnectionConfig, e: MouseEvent) { closeContextMenu(); emit('connect', config, e.ctrlKey || e.metaKey) }
-function doConnectSerial(config: ConnectionConfig, e: MouseEvent) { closeContextMenu(); emit('connect', config, e.ctrlKey || e.metaKey) }
-function doConnectSftp(config: ConnectionConfig) { closeContextMenu(); window.dispatchEvent(new CustomEvent('app:connect-sftp', { detail: config })) }
-function doConnectWslFile(config: ConnectionConfig) { closeContextMenu(); window.dispatchEvent(new CustomEvent('app:connect-wsl-file', { detail: config })) }
-function doConnectMonitor(config: ConnectionConfig) { closeContextMenu(); window.dispatchEvent(new CustomEvent('app:connect-monitor', { detail: config })) }
-function doConnectRdp(config: ConnectionConfig) { closeContextMenu(); window.dispatchEvent(new CustomEvent('app:connect-rdp', { detail: config })) }
-function doConnectVnc(config: ConnectionConfig) { closeContextMenu(); window.dispatchEvent(new CustomEvent('app:connect-vnc', { detail: config })) }
-function doConnectSpice(config: ConnectionConfig) { closeContextMenu(); window.dispatchEvent(new CustomEvent('app:connect-spice', { detail: config })) }
-function doConnectDb(config: ConnectionConfig) { closeContextMenu(); window.dispatchEvent(new CustomEvent('app:connect-db', { detail: config })) }
-function doConnectK8s(config: ConnectionConfig) { closeContextMenu(); window.dispatchEvent(new CustomEvent('app:connect-k8s', { detail: config })) }
-function doConnectFtp(config: ConnectionConfig) { closeContextMenu(); window.dispatchEvent(new CustomEvent('app:connect-ftp', { detail: config })) }
-function doConnectSmb(config: ConnectionConfig) { closeContextMenu(); window.dispatchEvent(new CustomEvent('app:connect-smb', { detail: config })) }
-function doConnectS3(config: ConnectionConfig) { closeContextMenu(); window.dispatchEvent(new CustomEvent('app:connect-s3', { detail: config })) }
-function doConnectWebdav(config: ConnectionConfig) { closeContextMenu(); window.dispatchEvent(new CustomEvent('app:connect-webdav', { detail: config })) }
-function doConnectX11Desktop(config: ConnectionConfig) { closeContextMenu(); window.dispatchEvent(new CustomEvent('app:connect-x11-desktop', { detail: config })) }
+// Resolved multi-select targets for the shared context menu (always includes
+// the right-clicked connection).
+const ctxTargets = computed<ConnectionConfig[]>(() => {
+  const conns = getSelectedConnectionIds()
+    .map(id => connectionStore.connections.find(c => c.id === id))
+    .filter(Boolean) as ConnectionConfig[]
+  if (conns.length > 0) return conns
+  return contextMenuConfig.value ? [contextMenuConfig.value] : []
+})
+
+// Route one connect per target through the unified entries. Companion kinds
+// still ride the app:connect-* window events (App owns the launcher wiring);
+// plain connects emit to App with ctrl/meta = keep the start tab open.
+function onCtxConnect(targets: ConnectionConfig[], kind: 'file' | 'wsl-file' | 'monitor' | undefined, event?: MouseEvent) {
+  for (const c of targets) {
+    if (kind === 'file') window.dispatchEvent(new CustomEvent('app:connect-sftp', { detail: c }))
+    else if (kind === 'monitor') window.dispatchEvent(new CustomEvent('app:connect-monitor', { detail: c }))
+    else if (kind === 'wsl-file') window.dispatchEvent(new CustomEvent('app:connect-wsl-file', { detail: c }))
+    else emit('connect', c, event ? !!(event.ctrlKey || event.metaKey) : false)
+  }
+}
+
+function onCtxConnectToWorkspace(targets: ConnectionConfig[], workspaceId: string) {
+  emit('connect-to-workspace', { configs: targets, workspaceId })
+}
+
+function onCtxChangeGroup(targets: ConnectionConfig[]) {
+  emit('change-group-ids', targets.map(c => c.id))
+}
+
+function onCtxDelete(targets: ConnectionConfig[]) {
+  connectionStore.removeMany(targets.map(c => c.id))
+  selectedIds.value = new Set()
+}
+
+function onRenameGroupConfirm(name: string) {
+  if (!groupContextTarget.value) return
+  connectionStore.renameGroup(groupContextTarget.value.id, name)
+}
+
+function onAddGroupConfirm(name: string, parentId: string | undefined) {
+  connectionStore.addGroup(name, parentId)
+}
+
 function doEditConnection(config: ConnectionConfig | null) {
   if (!config) return
   closeContextMenu()
   emit('edit-connection', config)
 }
 
-function doChangeGroupBulk() {
-  const ids = getSelectedConnectionIds()
-  if (ids.length === 0) return
-  closeContextMenu()
-  emit('change-group-ids', ids)
-}
 
-async function doDeleteBulk() {
-  const ids = getSelectedConnectionIds()
-  if (ids.length === 0) return
-  closeContextMenu()
-  try {
-    await ElMessageBox.confirm(
-      t('sidebar.deleteConfirm', { count: ids.length }),
-      '',
-      { confirmButtonText: t('sidebar.delete'), cancelButtonText: 'Cancel', type: 'warning' }
-    )
-  } catch {
-    return
-  }
-  await connectionStore.removeMany(ids)
-  selectedIds.value = new Set()
-}
 
-function doChangeGroup(config: ConnectionConfig | null) {
-  if (!config) return
-  closeContextMenu()
-  emit('change-group', config)
-}
-
-function doToggleFavorite(config: ConnectionConfig | null) {
-  if (!config) return
-  closeContextMenu()
-  favoriteStore.toggle(config.id)
-}
-
-function doDuplicate(config: ConnectionConfig | null) {
-  if (!config) return
-  closeContextMenu()
-  const newConfig = { ...config, id: '', name: config.name + ' (Copy)' }
-  connectionStore.add(newConfig)
-}
-async function doDelete(config: ConnectionConfig | null) {
-  if (!config) return
-  closeContextMenu()
-  try {
-    await ElMessageBox.confirm(
-      `${t('sidebar.deleteConfirm', { count: 1 })}`,
-      '',
-      { confirmButtonText: t('sidebar.delete'), cancelButtonText: 'Cancel', type: 'warning' }
-    )
-    connectionStore.remove(config.id)
-  } catch { /* cancelled */ }
-}
 </script>
 
 <style scoped>

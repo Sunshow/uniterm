@@ -13,7 +13,7 @@
         <button class="db-tab" :class="{ active: tab === 'yaml' }" @click="tab = 'yaml'">YAML</button>
       </div>
 
-      <div v-show="tab === 'struct'" class="detail-body" @contextmenu="copyMenu.onContextMenu">
+      <div v-show="tab === 'struct'" class="detail-body" @contextmenu="onCopyContextMenu">
         <div v-for="sec in sections" :key="sec.label" class="detail-section">
           <div class="detail-section-title">{{ sec.label }}</div>
           <div v-for="f in sec.fields" :key="f.label" class="detail-row">
@@ -44,7 +44,7 @@
             <el-button size="small" @click="cancelEdit">{{ t('common.cancel') }}</el-button>
           </template>
         </div>
-        <pre v-if="!editing" class="k8s-yaml-drawer-body" @contextmenu="copyMenu.onContextMenu">{{ yamlText }}</pre>
+        <pre v-if="!editing" class="k8s-yaml-drawer-body" @contextmenu="onCopyContextMenu">{{ yamlText }}</pre>
         <SyntaxEditor v-else v-model="draft" lang="yaml" compact />
         <div v-if="saveError" class="yaml-error">{{ saveError }}</div>
       </div>
