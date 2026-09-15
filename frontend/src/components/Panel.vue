@@ -649,9 +649,15 @@ watch(() => props.panel.outputLog, (val) => {
   background: var(--bg-elevated);
   border-bottom-color: var(--accent);
 }
+/* Match the AI-locked tab treatment (issue #909): a warning-tinted header
+   instead of an edge marker. The border is left alone so the active panel's
+   accent underline stays the sole "which panel is focused" signal. */
 .panel-header.ai-locked {
-  border-left: 0.1875rem solid var(--warning);
-  box-shadow: inset 0 0 0.75rem var(--warning-subtle);
+  background: var(--warning-tab);
+}
+.panel-active .panel-header.ai-locked {
+  background: var(--warning-tab-active);
+  border-bottom-color: var(--accent);
 }
 .panel-title {
   font-size: 0.75rem;

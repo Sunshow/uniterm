@@ -623,13 +623,20 @@ onMounted(async () => {
   color: var(--text-primary);
   box-shadow: inset 0 0 0 1px var(--accent);
 }
+/* AI-locked tabs carry a warning-tinted background, not an edge marker, so the
+   state reads at a glance (issue #909). The border is left alone: the accent
+   ring stays the sole "which tab is selected" signal. */
 .tab-item.ai-locked {
-  box-shadow: inset 0.125rem 0 0 var(--warning), inset 0 0 0.75rem var(--warning-subtle);
+  background: var(--warning-tab);
+  color: var(--text-primary);
+}
+.tab-item.ai-locked:hover {
+  background: var(--warning-tab-hover);
 }
 .tab-item.active.ai-locked {
-  background: var(--bg-hover);
+  background: var(--warning-tab-active);
   color: var(--text-primary);
-  box-shadow: inset 0 0 0 1px var(--accent), inset 0.125rem 0 0 var(--warning), inset 0 0 0.75rem var(--warning-subtle);
+  box-shadow: inset 0 0 0 1px var(--accent);
 }
 .tab-name {
   font-size: 0.75rem;
