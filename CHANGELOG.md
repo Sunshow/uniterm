@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.9.3-alpha
+## v1.9.3
 
 ### What's Changed
 
@@ -10,6 +10,8 @@
 - SCP: a new SCP protocol transfer type; SSH connections can set their file-transfer protocol to SFTP or SCP, compatible with hosts without an SFTP subsystem (embedded devices, minimal systems, etc.).
 - SFTP overhaul:
   - File panes: back / forward / up navigation history, Explorer-style rubber-band selection (Ctrl-drag adds to the selection), a selection stats bar, a grouped flat toolbar, and copy-path context-menu actions.
+  - Open with: a context-menu action that hands the file to the OS file-association picker; remote files reuse the external editor's temp copy and auto-upload watcher, so saves made in the picked app push back to the remote path.
+  - Built-in editor: search/replace with match count, regex / case / whole-word toggles and `$N` group replacement, undo/redo, font size adjustment, and a toolbar (cut/copy/paste, wrap toggle).
   - Transfers: unified transfer tasks with retry (already-completed files are skipped), expandable per-file detail for directory transfers, dismiss, failed tasks marked on disconnect, auto-show on new tasks and a collapsible panel bar; SCP recursive transfers reach full parity.
   - Sidebar: a follow-terminal-path toggle — the file sidebar follows the active SSH/WSL terminal's cwd, reported via OSC-7.
   - Symbolic links: create links from the context menu, navigate directory links to their targets (SFTP / SCP / WSL).
@@ -21,6 +23,7 @@
 - Monitor: new Services, Hardware Devices and IPMI tabs; the system info tab gains a clock section showing host clock skew.
 - Auto-update: in-app updates with GitHub/Gitee dual-source failover, streaming download progress, SHA256 verification and one-click install; the update source is selectable in Settings → About; release notes render as localized markdown. (@Sunshow)
 - UI: a major display overhaul, especially on macOS — the entire interface now scales on a rem baseline, with a new "UI font size" setting that takes effect immediately (platform-aware defaults; the macOS baseline is raised to 14px), and the forced grayscale font smoothing is removed. This fixes text rendering too small and looking blurry on macOS.
+- Zmodem: a default download directory setting, so received files land there without asking each time.
 
 **Improvements**
 - Connection form: RDP smart sizing defaults to off, the shell resets when switching local/WSL, credentials clear when switching auth type, identity auth is listed first, and validation errors surface instead of being swallowed.
@@ -35,6 +38,10 @@
 - Panel headers gain a right-click menu aligned with the tab menu (reconnect, copy address, AI lock, broadcast, close).
 - AI: the syncable AI config is split into a dedicated `ai.json` (model catalog and agent turn limit); app personalization settings (theme, paths, shells, keybindings, etc.) are now device-local and no longer participate in cloud sync.
 - Session logs: improved file naming, and charset escape sequences no longer pollute the log. (@windtear)
+- UI: a connection locked by AI now tints the whole tab body and panel header with a warning colour, instead of a thin edge marker that competed with the selection ring. (@surenwuyuwuqiu)
+- SFTP: the footer status bar is always visible (selection stats replace the entry count while a selection exists), select-all (Ctrl/Cmd+A) and Ctrl/Cmd+X/C/V clipboard shortcuts are added, and file-list column widths now follow the designed per-column sizes with single-line headers.
+- Tunnels: starting a tunnel whose exit SSH connection has no saved credentials now prompts for them instead of failing the handshake.
+- K8s: the inline kubeconfig field is now revealed on demand (like the private-key text field), and kubeconfig can be imported from file.
 
 **Bug Fixes**
 - macOS IME: committed keystrokes are delivered directly to the terminal (no more dropped or duplicated characters under fast typing), duplicate input is prevented, and an IME-committed Enter no longer triggers app shortcuts (AI send, search jump, dialog confirm, ~25 handlers). (@surenwuyuwuqiu)
@@ -48,12 +55,17 @@
 - AI: markdown rendering escapes quotes and closes an XSS vector in slash-separated attributes. (@kxn)
 - Shortcuts: rebinding no longer fires runtime handlers mid-capture; digit-shortcut conflicts between tabs and panels are resolved with fixed platform bindings. (@kxn)
 - File transfer: fixed recursive directory retry, SCP fetch completion and the zmodem cancel path; file panels auto-reconnect when a refresh hits a dead session.
+- File transfers: fixed transfer task lists breaking on terminal switches — background transfers now keep updating (no more frozen progress or un-cancellable tasks), and terminal tabs show a transfer indicator while their companion file panel has active transfers.
 - Sync / update: automatic update check logic fixed; OSC-7 payloads terminate at the first terminator so crafted output can't pollute cwd reporting.
+- Zmodem: the shell prompt returns on its own after an rz/sz transfer (no more pressing Enter), cancelling an in-flight sz download recovers cleanly instead of leaving the terminal swallowing all subsequent output, and stalled rz/sz transfers are prevented. (@windtear)
+- macOS IME: fixed uppercase letters being dropped when the IME swallows the keypress (e.g. Doubao in English mode). (@surenwuyuwuqiu)
+- AI: the model dropdown populated by "Fetch Models" now shows each model's display name but stores the actual model ID — previously the display name itself was saved as the model, so requests used the wrong model name. (@feuvan)
+- UI: the "download to" overwrite/rename conflict prompt works again, and the AI sidebar search highlight no longer throws on every keystroke.
 
 **Notes**
 - As this open-source software has not purchased a code-signing certificate, the unsigned executable may trigger false positives in some antivirus engines (e.g. Windows Defender). This is a known issue with Go/Wails applications (see [wailsapp/wails#3308](https://github.com/wailsapp/wails/issues/3308)). You can add an exclusion rule in your antivirus to allow it. Please download only from the official open-source channels — GitHub and Gitee. If you are still concerned about malware, you can download the source code and build and run it locally yourself.
 
-Thanks to @windtear, @kxn, @surenwuyuwuqiu, @boltomli, and @Sunshow for their contributions to this release.
+Thanks to @windtear, @kxn, @surenwuyuwuqiu, @boltomli, @Sunshow, and @feuvan for their contributions to this release.
 
 ### 更新内容
 
@@ -63,6 +75,8 @@ Thanks to @windtear, @kxn, @surenwuyuwuqiu, @boltomli, and @Sunshow for their co
 - SCP：新增 SCP 协议传输类型；SSH 连接可将文件传输协议配置为 sftp 或 scp，兼容无 SFTP 子系统的主机（嵌入式设备、精简系统等）。
 - SFTP 全面改版：
   - 文件面板：新增 后退 / 前进 / 上级 导航历史、资源管理器式橡皮筋框选（Ctrl 拖拽为追加选择）、选中统计条、分组式扁平工具栏与复制路径右键菜单。
+  - 打开方式：右键菜单项调用系统文件关联选择器打开文件；远程文件复用外部编辑器的临时副本与自动回传监听，在所选应用中保存后自动推回远端路径。
+  - 内置编辑器：新增 查找/替换（匹配计数、正则 / 忽略大小写 / 全字匹配、`$N` 分组替换）、撤销/重做、字号调节与工具栏（剪切/复制/粘贴、换行开关）。
   - 传输：统一的传输任务支持失败重试（自动跳过已完成文件）、目录传输可展开查看每个文件明细、可移除、断线时任务标记失败、新任务自动展开、面板条可折叠；SCP 递归传输能力对齐 SFTP。
   - 文件边栏：新增「跟随终端路径」开关——跟随当前 SSH/WSL 终端的 cwd（通过 OSC-7 上报）。
   - 符号链接：右键菜单可创建链接，目录链接可点入并落到真实目标（SFTP / SCP / WSL）。
@@ -74,6 +88,7 @@ Thanks to @windtear, @kxn, @surenwuyuwuqiu, @boltomli, and @Sunshow for their co
 - 监控：新增 服务、硬件设备、IPMI 三个标签页；系统信息新增时钟区，展示主机时钟与本机偏差。
 - 自动更新：应用内更新，GitHub/Gitee 双源自动切换，流式下载进度、SHA256 校验与一键安装；设置 → 关于中可选择更新源；更新说明按语言渲染为 Markdown。（@Sunshow）
 - 界面：界面显示整体优化（重点针对 macOS）——整个界面改为基于 rem 基准缩放，新增「界面字号」设置（即时生效，默认值随平台；macOS 默认基准字号提升为 14px），并移除强制灰度字体平滑，解决 macOS 下文本偏小、字体发虚的问题。
+- Zmodem：新增默认下载目录设置，接收的文件直接保存到该目录，不再每次询问。
 
 **改进**
 - 连接表单：RDP 智能缩放默认关闭；切换 本地/WSL 时重置 Shell；切换认证方式时清除凭据；身份认证排到认证方式首位；表单校验错误如实提示不再吞掉。
@@ -88,6 +103,10 @@ Thanks to @windtear, @kxn, @surenwuyuwuqiu, @boltomli, and @Sunshow for their co
 - 面板标题栏新增右键菜单，与标签右键菜单保持一致（重连、复制地址、AI 锁定、广播、关闭）。
 - AI：AI 配置拆分为独立的 `ai.json`（模型目录与 agent 轮次上限，跨设备同步）；应用个性化配置（主题、路径、Shell、快捷键等）改为仅本机生效，不再参与云同步。
 - 会话日志：文件名更规范，不再混入字符集转义序列。（@windtear）
+- 界面：AI 锁定的连接现在将整个标签与面板标题栏染上警示色背景，取代原先与选中高亮相互竞争的细边框标记。（@surenwuyuwuqiu）
+- SFTP：底部状态栏常驻显示（有选中时改为显示选中统计与总大小）；新增全选（Ctrl/Cmd+A）与 Ctrl/Cmd+X/C/V 剪贴板快捷键；文件列表列宽按设计值生效，表头与排序箭头不再折行。
+- 隧道：启动出口 SSH 连接未保存凭据的隧道时，改为提示输入凭据，而不是直接握手失败。
+- K8s：内联 kubeconfig 改为按需展开显示（与私钥文本一致），并支持从文件导入。
 
 **Bug 修复**
 - macOS 输入法：提交后的按键直接送达终端（快速输入不再丢字/重复）、不再产生重复输入；输入法回车上屏不再触发应用快捷键（AI 发送、搜索跳转、对话框确认等约 25 处）。（@surenwuyuwuqiu）
@@ -100,11 +119,16 @@ Thanks to @windtear, @kxn, @surenwuyuwuqiu, @boltomli, and @Sunshow for their co
 - AI：Markdown 渲染转义引号，修复斜杠分隔属性处的 XSS 注入。（@kxn）
 - 快捷键：录制改绑时不再误触发运行时快捷键；数字键在标签/面板间的冲突以固定平台绑定方式解决。（@kxn）
 - 文件传输：修复递归目录重试、SCP 拉取完成判断与 zmodem 取消路径；刷新遇到已断开会话时自动重连。
+- 文件传输：修复切换终端后传输任务列表失效的问题——后台传输继续更新（进度不再冻结、任务不再无法取消）；终端标签页在其文件面板有进行中的传输时显示传输指示。
+- Zmodem：rz/sz 传输完成后 shell 提示符自动恢复，不再需要手动按回车；取消进行中的 sz 下载后终端干净恢复，不再吞掉后续所有输出；并防止 rz/sz 传输停滞。（@windtear）
+- macOS 输入法：修复输入法吞掉按键时大写字母丢失的问题（如豆包英文模式）。（@surenwuyuwuqiu）
+- AI：「拉取模型列表」后的模型下拉框改为显示模型展示名、保存真实模型 ID——此前会把展示名当作模型值保存，导致请求时模型名不正确。（@feuvan）
+- 界面：恢复「下载到」覆盖/重命名冲突提示；修复 AI 边栏搜索高亮每次按键报错的问题。
 
 **说明**
 - 由于本开源软件未购买代码签名证书，未签名的可执行文件可能被部分杀毒引擎（如 Windows Defender）误报拦截。这是 Go/Wails 应用的已知问题（参见 [wailsapp/wails#3308](https://github.com/wailsapp/wails/issues/3308)）。可在杀毒软件中为其添加排除规则以放行。请务必从 GitHub、Gitee 官方开源渠道下载软件。如仍担心存在病毒，可自行下载源代码在本地构建运行。
 
-感谢 @windtear、@kxn、@surenwuyuwuqiu、@boltomli 和 @Sunshow 对本版本的贡献。
+感谢 @windtear、@kxn、@surenwuyuwuqiu、@boltomli、@Sunshow 和 @feuvan 对本版本的贡献。
 
 ## v1.9.2
 
