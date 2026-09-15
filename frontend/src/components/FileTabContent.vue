@@ -349,8 +349,8 @@ const localPanel = useFilePanel({
   dialogs: fileDialogs,
   transferTasks: () => transferTasks,
   openEditor: (path, title) => fileEditorRef.value?.open(path, title, 'local') ?? Promise.resolve(),
-  openExternal: (sid, path, cmd) => OpenExternalEditorLocal(path, cmd),
-  openWithSystem: (sid, path) => OpenWithSystemLocal(path),
+  openExternal: (_sid, path, cmd) => OpenExternalEditorLocal(path, cmd),
+  openWithSystem: (_sid, path) => OpenWithSystemLocal(path),
   bookmarkMode: 'local',
 })
 const {

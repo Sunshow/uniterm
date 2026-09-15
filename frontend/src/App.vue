@@ -12,7 +12,7 @@
       @tab-dragstart="onTabDragStart"
     />
     <div class="main-content">
-      <Sidebar ref="sidebarRef" :visible="sidebarVisible" @toggle="sidebarVisible = !sidebarVisible" @connect="onConnect" @connect-to-workspace="({ config, workspaceId }: any) => onConnect(config, undefined, undefined, true, workspaceId)" @connect-only="onConnectOnly" @connect-serial="showSerialDialog = true" @connect-sftp="(c: any) => { const p = tabStore.activeTab; onConnectSftp(c, p?.type === 'start' ? p : undefined) }" @connect-wsl-file="(c: any) => { const p = tabStore.activeTab; onConnectWslFile(c, p?.type === 'start' ? p : undefined) }" @connect-ftp="(c: any) => { const p = tabStore.activeTab; onConnectFtp(c, p?.type === 'start' ? p : undefined) }" @connect-smb="(c: any) => { const p = tabStore.activeTab; onConnectSmb(c, p?.type === 'start' ? p : undefined) }" @connect-webdav="(c: any) => { const p = tabStore.activeTab; onConnectWebdav(c, p?.type === 'start' ? p : undefined) }" @connect-s3="(c: any) => { const p = tabStore.activeTab; onConnectS3(c, p?.type === 'start' ? p : undefined) }" @connect-rdp="(c: any) => { const p = tabStore.activeTab; onConnectRDP(c, p?.type === 'start' ? p : undefined) }" @connect-vnc="(c: any) => { const p = tabStore.activeTab; onConnectVNC(c, p?.type === 'start' ? p : undefined) }" @connect-spice="(c: any) => { const p = tabStore.activeTab; onConnectSPICE(c, p?.type === 'start' ? p : undefined) }" @connect-x11-desktop="(c: any) => { const p = tabStore.activeTab; onConnectX11Desktop(c, p?.type === 'start' ? p : undefined) }" @connect-d-b="(c: any) => { const p = tabStore.activeTab; onConnectDB(c, p?.type === 'start' ? p : undefined) }" @connect-monitor="(c: any) => { const p = tabStore.activeTab; onConnectMonitor(c, p?.type === 'start' ? p : undefined) }" @connect-k8s="(c: any) => { const p = tabStore.activeTab; onConnectK8s(c, p?.type === 'start' ? p : undefined) }" />
+      <Sidebar ref="sidebarRef" :visible="sidebarVisible" @toggle="sidebarVisible = !sidebarVisible" @connect="onSidebarConnect" @connect-to-workspace="({ config, workspaceId }: any) => onConnect(config, undefined, undefined, true, workspaceId)" @connect-only="onConnectOnly" />
       <div class="tab-area">
         <template v-if="activeTab">
           <KeepAlive>
@@ -107,6 +107,7 @@
               :key="activeTab.id"
               :tab="activeTab"
               @connect="onConnect"
+              @connect-to-workspace="({ configs, workspaceId }: any) => { for (const c of configs) onConnect(c, undefined, undefined, true, workspaceId) }"
               @new-connection="onNewConnectionFromStart"
               @local-terminal="createLocalTerminalWithShell"
               @close-self="(tabId: string) => closeTab(tabId)"
@@ -215,14 +216,14 @@ import { useDuplicateSession } from './composables/useDuplicateSession'
 import type { ShortcutAction } from './types/settings'
 import { useI18n } from './i18n'
 import { CreateSession, CloseSession, RDPHide, RDPShow, RDPInvalidate, RDPSnapshot, RDPSetPosition, RecordRecentConnection, GetPlatform, GetBackgroundImage, SessionStart, RelaunchApp } from '../bindings/github.com/ys-ll/uniterm/app'
-import { getTerminalSize, waitForTerminalSize } from './services/terminalManager'
+import { waitForTerminalSize } from './services/terminalManager'
 import { msg } from './services/message'
 import type { ConnectionConfig } from './types/session'
 import { Application, Clipboard, Events } from '@wailsio/runtime'
 import { parseQuickConnect } from './utils/quickConnect'
-import { getShellLabel as getShellLabelBase } from './utils/shellLabel'
-import { fileTransferProto } from './utils/fileTransferUtils'
+import { getShellLabel as getShellLabelBase, parseWslFromShell } from './utils/shellLabel'
 import { reconnectFileTransferPanel } from './composables/usePanelReconnect'
+import { launchConnection, launchFileBrowser, launchMonitor, launchWslFileBrowser, persistConnection, configureLauncher } from './composables/connectionLauncher'
 
 const bgDataUrl = ref('')
 
@@ -551,12 +552,6 @@ function needsCredentialCheck(config: ConnectionConfig): boolean {
   return !config.user || !config.password
 }
 
-function getMissingFields(config: ConnectionConfig): ('user' | 'password')[] {
-  const fields: ('user' | 'password')[] = []
-  if (!config.user) fields.push('user')
-  if (!config.password) fields.push('password')
-  return fields
-}
 
 async function ensureCredentials(config: ConnectionConfig): Promise<ConnectionConfig | null> {
   // 1. Check SSH tunnel connection first
@@ -914,47 +909,47 @@ onMounted(async () => {
 
   // Panel/Tab/StartTab menu actions
   window.addEventListener('app:connect-sftp', ((e: CustomEvent) => {
-    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; onConnectSftp(c, prev?.type === 'start' ? prev : undefined) }
+    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; openFileBrowser(c, prev?.type === 'start' ? prev : undefined) }
   }) as EventListener)
   window.addEventListener('app:connect-wsl-file', ((e: CustomEvent) => {
-    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; onConnectWslFile(c, prev?.type === 'start' ? prev : undefined) }
+    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; launchWslFileBrowser(c, { prevStart: prev?.type === 'start' ? prev : undefined }) }
   }) as EventListener)
   window.addEventListener('app:connect-monitor', ((e: CustomEvent) => {
-    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; onConnectMonitor(c, prev?.type === 'start' ? prev : undefined) }
+    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; openMonitorPanel(c, prev?.type === 'start' ? prev : undefined) }
   }) as EventListener)
   window.addEventListener('app:connect-rdp', ((e: CustomEvent) => {
-    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; onConnectRDP(c, prev?.type === 'start' ? prev : undefined) }
+    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; launchConnection(c, { prevStart: prev?.type === 'start' ? prev : undefined }) }
   }) as EventListener)
   window.addEventListener('app:connect-vnc', ((e: CustomEvent) => {
-    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; onConnectVNC(c, prev?.type === 'start' ? prev : undefined) }
+    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; launchConnection(c, { prevStart: prev?.type === 'start' ? prev : undefined }) }
   }) as EventListener)
   window.addEventListener('app:connect-spice', ((e: CustomEvent) => {
-    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; onConnectSPICE(c, prev?.type === 'start' ? prev : undefined) }
+    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; launchConnection(c, { prevStart: prev?.type === 'start' ? prev : undefined }) }
   }) as EventListener)
   window.addEventListener('app:connect-x11-desktop', ((e: CustomEvent) => {
-    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; onConnectX11Desktop(c, prev?.type === 'start' ? prev : undefined) }
+    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; launchConnection(c, { prevStart: prev?.type === 'start' ? prev : undefined }) }
   }) as EventListener)
   window.addEventListener('app:connect-db', ((e: CustomEvent) => {
-    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; onConnectDB(c, prev?.type === 'start' ? prev : undefined) }
+    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; launchConnection(c, { prevStart: prev?.type === 'start' ? prev : undefined }) }
   }) as EventListener)
   window.addEventListener('app:connect-k8s', ((e: CustomEvent) => {
-    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; onConnectK8s(c, prev?.type === 'start' ? prev : undefined) }
+    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; launchConnection(c, { prevStart: prev?.type === 'start' ? prev : undefined }) }
   }) as EventListener)
   window.addEventListener('app:connect-ftp', ((e: CustomEvent) => {
-    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; onConnectFtp(c, prev?.type === 'start' ? prev : undefined) }
+    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; launchConnection(c, { prevStart: prev?.type === 'start' ? prev : undefined }) }
   }) as EventListener)
   window.addEventListener('app:connect-smb', ((e: CustomEvent) => {
-    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; onConnectSmb(c, prev?.type === 'start' ? prev : undefined) }
+    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; launchConnection(c, { prevStart: prev?.type === 'start' ? prev : undefined }) }
   }) as EventListener)
   window.addEventListener('app:connect-webdav', ((e: CustomEvent) => {
-    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; onConnectWebdav(c, prev?.type === 'start' ? prev : undefined) }
+    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; launchConnection(c, { prevStart: prev?.type === 'start' ? prev : undefined }) }
   }) as EventListener)
   window.addEventListener('app:connect-s3', ((e: CustomEvent) => {
-    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; onConnectS3(c, prev?.type === 'start' ? prev : undefined) }
+    const d = e.detail; const c = d?.config || d; if (c) { const prev = tabStore.activeTab; launchConnection(c, { prevStart: prev?.type === 'start' ? prev : undefined }) }
   }) as EventListener)
 
-  // DB/Redis/Mongo tabs create their connection in App.vue (onConnectDB), not in
-  // a content component, so their right-click 「重连」(Reconnect) is handled here.
+  // DB/Redis/Mongo tabs create their connection via connectionLauncher (runSpec),
+  // not in a content component, so their right-click 「重连」(Reconnect) is handled here.
   // Terminal and desktop-protocol panels handle the same event themselves.
   window.addEventListener('panel:reconnect', onPanelReconnectEvent)
 
@@ -1120,8 +1115,6 @@ onUnmounted(() => {
   unsubRdpMoveResizeStart?.()
   unsubRdpMoveResizeEnd?.()
   rdpAreaObserver?.disconnect()
-  // Tear down store-level EventsOn registrations (FE-03)
-  aiStore.dispose?.()
   settingsStore.dispose?.()
   connectionStore.dispose?.()
   syncStore.dispose?.()
@@ -1138,7 +1131,7 @@ function openSettings(category?: string) {
   } else {
     const panel = panelStore.createPanel(null, 'settings')
     panelStore.updateTitle(panel.id, t('settings.title'))
-    const tab = tabStore.createSettingsTab(t('settings.title'), panel.id)
+    const tab = tabStore.createTab('settings', t('settings.title'), panel.id)
     panelStore.movePanelToTab(panel.id, tab.id)
   }
   // Jump to the requested category (e.g. ai / identities / proxies)
@@ -1355,13 +1348,9 @@ function k8sConnectionForTab(tab: any): ConnectionConfig {
   } as ConnectionConfig)
 }
 
-function onSaveOnly(config: ConnectionConfig) {
-  if (editConfig.value?.id) {
-    connectionStore.update(config.id, config)
-  } else {
-    connectionStore.add(config)
-  }
-  RecordRecentConnection(config.id)
+function onSaveOnly(saveOnlyConfig: ConnectionConfig) {
+  persistConnection(saveOnlyConfig, !!editConfig.value?.id)
+  RecordRecentConnection(saveOnlyConfig.id)
 }
 
 // Transient connection ("connect only"): connect a new form config without
@@ -1369,6 +1358,26 @@ function onSaveOnly(config: ConnectionConfig) {
 function onConnectOnly(config: ConnectionConfig) {
   editConfig.value = null
   onConnect(config, undefined, false, false)
+}
+
+// Companion entries that force a spec regardless of config.type (used by the
+// sidebar's `kind` routing and the app:connect-sftp / app:connect-monitor
+// window events).
+function onSidebarConnect(config: ConnectionConfig, kind?: 'file' | 'wsl-file' | 'monitor') {
+  const prev = tabStore.activeTab
+  const prevStart = prev?.type === 'start' ? prev : undefined
+  if (kind === 'file') return void openFileBrowser(config, prevStart)
+  if (kind === 'monitor') return void openMonitorPanel(config, prevStart)
+  if (kind === 'wsl-file') return void launchWslFileBrowser(config, { prevStart })
+  return onConnect(config)
+}
+
+function openFileBrowser(config: ConnectionConfig, prevStart?: any) {
+  return launchFileBrowser(config, { prevStart })
+}
+
+function openMonitorPanel(config: ConnectionConfig, prevStart?: any) {
+  return launchMonitor(config, { prevStart })
 }
 
 // Atomically remove a start tab and place a newly-created tab in its position.
@@ -1385,39 +1394,23 @@ function closeStartAndReposition(prevTab: any): (newTabId: string) => void {
   }
 }
 
+configureLauncher({ ensureCredentials, closeStartAndReposition })
+
 async function onConnect(config: ConnectionConfig, keepOpen?: boolean, wasEdit?: boolean, persist = true, targetWorkspaceId?: string) {
   const prev = tabStore.activeTab
   const prevStart = (prev?.type === 'start' && !keepOpen) ? prev : undefined
-  // Persist form changes BEFORE dispatching by type. The type-specific
-  // handlers below only call connectionStore.add(), which is a silent
-  // no-op for existing ids and would otherwise drop edits made in the
-  // "Save & Connect" flow. When persist=false (transient "connect only"
-  // session) skip both the store write and the recent-connection entry.
-  if (persist) {
-    if (wasEdit) {
-      connectionStore.update(config.id, config)
-    } else {
-      connectionStore.add(config)
-    }
-  } else if (!config.id) {
-    // Give the transient session a stable id for panel/tab wiring even
-    // though it will not be persisted to the connection list.
-    config.id = `conn-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
-  }
-  if (config.type === 'sftp') { await onConnectSftp(config, prevStart, persist); return }
-  if (config.type === 'scp') { await onConnectScp(config, prevStart, persist); return }
-  if (config.type === 'ftp') { await onConnectFtp(config, prevStart, persist); return }
-  if (config.type === 'smb') { await onConnectSmb(config, prevStart, persist); return }
-  if (config.type === 'webdav') { await onConnectWebdav(config, prevStart, persist); return }
-  if (config.type === 's3') { await onConnectS3(config, prevStart, persist); return }
-  if (config.type === 'rdp') { await onConnectRDP(config, prevStart, persist); return }
-  if (config.type === 'vnc') { await onConnectVNC(config, prevStart, persist); return }
-  if (config.type === 'spice') { await onConnectSPICE(config, prevStart, persist); return }
-  if (config.type === 'x11-desktop') { await onConnectX11Desktop(config, prevStart, persist); return }
-  if (config.type === 'database') { await onConnectDB(config, prevStart, persist); return }
-  if (config.type === 'k8s') { await onConnectK8s(config, prevStart, persist); return }
-  if (config.type === 'container') { onConnectContainer(config, prevStart, persist); return }
+  await launchConnection(config, {
+    persist,
+    wasEdit,
+    prevStart,
+    connectTerminal: (c, p) => connectTerminalSession(c, p, prev, targetWorkspaceId),
+  })
+}
 
+// Generic terminal connect path (ssh/telnet/mosh/local/wsl/tcp/serial).
+// Persistence bookkeeping happened in launchConnection. The type-specific
+// non-terminal specs live in connectionLauncher.ts.
+async function connectTerminalSession(config: ConnectionConfig, persist: boolean, prev: any, targetWorkspaceId?: string) {
   // Credential check
   const resolved = await ensureCredentials(config)
   if (!resolved) return
@@ -1487,6 +1480,82 @@ async function onConnect(config: ConnectionConfig, keepOpen?: boolean, wasEdit?:
   }
 }
 
+// Force-reconnect a database-family panel (database/redis/mongodb/
+// elasticsearch) from the tab's right-click 「重连」(Reconnect) menu. These
+// sessions are created in connectionLauncher (runSpec), so — unlike terminal/
+// desktop panels — no content component owns the lifecycle: close the old
+// session, then create a fresh one and rebind the same panel.
+async function reconnectDatabasePanel(panel: { id: string; sessionId: string | null; config: ConnectionConfig | null }) {
+  const oldId = panel.sessionId
+  if (oldId) {
+    try { await CloseSession(oldId) } catch (_) {}
+  }
+  const cfg = panel.config
+  if (!cfg) return
+  // Standalone NoSQL types carry their session type in config.type; the SQL
+  // family stays on the generic 'database' session.
+  const sessionType = cfg.type === 'redis' || cfg.type === 'mongodb' || cfg.type === 'elasticsearch'
+    ? cfg.type
+    : 'database'
+  try {
+    const info = await CreateSession(sessionType, cfg)
+    panelStore.bindSession(panel.id, info.id)
+    sessionStore.initSession(info.id)
+  } catch (e: any) {
+    panelStore.updateStatus(panel.id, 'error')
+    msg.error(`${t('db.connectFailed')}: ${e?.message || String(e)}`)
+  }
+}
+
+// Force-reconnect a monitor panel. The session is created in
+// connectionLauncher (runSpec), so it's re-initiated here like the database panels.
+async function reconnectMonitorPanel(panel: { id: string; sessionId: string | null; config: ConnectionConfig | null }) {
+  const oldId = panel.sessionId
+  if (oldId) {
+    try { await CloseSession(oldId) } catch (_) {}
+  }
+  const cfg = panel.config
+  if (!cfg) return
+  try {
+    const info = await CreateSession('monitor', cfg)
+    panelStore.bindSession(panel.id, info.id)
+    sessionStore.initSession(info.id)
+  } catch (e: any) {
+    panelStore.updateStatus(panel.id, 'error')
+    msg.error(`${t('tab.reconnectFailed')}: ${e?.message || String(e)}`)
+  }
+}
+
+// Force-reconnect a file-transfer panel (sftp/ftp/smb/webdav/s3). The actual
+// close→create→rebind orchestration lives in usePanelReconnect, shared with
+// the refresh-triggered auto-reconnect in the file tab content.
+async function reconnectSftpPanel(panel: { id: string; sessionId: string | null; config: ConnectionConfig | null }) {
+  try {
+    const newId = await reconnectFileTransferPanel(panel.id)
+    if (!newId) panelStore.updateStatus(panel.id, 'error')
+  } catch (e: any) {
+    panelStore.updateStatus(panel.id, 'error')
+    msg.error(`${t('tab.reconnectFailed')}: ${e?.message || String(e)}`)
+  }
+}
+
+// Panel kinds whose sessions are created in connectionLauncher's database
+// family spec (shared 'database' panel type + own session kind).
+const DB_FAMILY_PANEL_TYPES = ['database', 'redis', 'mongodb', 'elasticsearch']
+
+function onPanelReconnectEvent(e: Event) {
+  const panelId = (e as CustomEvent)?.detail?.panelId
+  if (!panelId) return
+  const panel = panelStore.getPanel(panelId)
+  if (!panel) return
+  // These session types are created in connectionLauncher (not in a content
+  // component), so their right-click 「重连」(Reconnect) is handled here.
+  // Terminal and desktop-protocol panels handle the same event themselves.
+  if (DB_FAMILY_PANEL_TYPES.includes(panel.type)) reconnectDatabasePanel(panel)
+  else if (panel.type === 'monitor') reconnectMonitorPanel(panel)
+  else if (panel.type === 'sftp') reconnectSftpPanel(panel)
+}
+
 function getShellLabel(path: string): string {
   return getShellLabelBase(path, 'Local')
 }
@@ -1497,15 +1566,6 @@ async function createLocalTerminalWithShell(shellPath: string, keepOpen?: boolea
   const distro = parseWslFromShell(shellPath)
   if (distro) return createWslTerminal(distro, keepOpen)
   await createLocalTerminal(shellPath, keepOpen)
-}
-
-/** Parses the distro name from a `wsl://<distro>` shell path, else null. */
-function parseWslFromShell(shellPath?: string): string | null {
-  if (shellPath && shellPath.toLowerCase().startsWith('wsl://')) {
-    const distro = shellPath.slice(6)
-    return distro || null
-  }
-  return null
 }
 
 const pendingGroupId = ref<string | undefined>(undefined)
@@ -1658,474 +1718,6 @@ async function createWslTerminal(distro: string, keepOpen?: boolean) {
     panelStore.removePanel(panel.id)
   }
 }
-
-async function onConnectSftp(config: ConnectionConfig, prevStart?: any) {
-  connectionStore.add(config)
-
-  const resolved = await ensureCredentials(config)
-  if (!resolved) return
-  config = resolved
-
-  const panel = panelStore.createPanel(config, 'sftp')
-  const displayTitle = config.name || `${config.user}@${config.host}`
-  panelStore.updateTitle(panel.id, displayTitle)
-  const reposition = prevStart ? closeStartAndReposition(prevStart) : null
-  const tab = tabStore.createSFPTab(displayTitle, panel.id)
-  if (reposition) reposition(tab.id)
-  panelStore.movePanelToTab(panel.id, tab.id)
-  RecordRecentConnection(config.id)
-
-  try {
-    // Honor the connection's file-transfer protocol preference ('scp' for
-    // hosts without an SFTP subsystem); the panel/tab stay type 'sftp' since
-    // the file browser UI is protocol-agnostic.
-    const proto = fileTransferProto(config)
-    const info = await CreateSession(proto, config)
-    panelStore.bindSession(panel.id, info.id)
-  } catch (e) {
-    console.error('Failed to create SFTP session:', e)
-    tabStore.closeTab(tab.id)
-    panelStore.removePanel(panel.id)
-  }
-}
-
-// Standalone file tab for a WSL distro opened from the file sidebar. The file
-// browser UI is protocol-agnostic (same two-pane layout as SFTP); the backing
-// session is a wsl-file session over //wsl.localhost that auto-connects on
-// CreateSession, so the tab just lists once it reports connected.
-async function onConnectWslFile(config: ConnectionConfig, prevStart?: any) {
-  const fileConfig: ConnectionConfig = { ...config, type: 'wsl-file' as any }
-  const panel = panelStore.createPanel(fileConfig, 'sftp')
-  const displayTitle = config.name || `WSL ${parseWslFromShell(config.shellPath) || ''}`
-  panelStore.updateTitle(panel.id, displayTitle)
-  const reposition = prevStart ? closeStartAndReposition(prevStart) : null
-  const tab = tabStore.createSFPTab(displayTitle, panel.id)
-  if (reposition) reposition(tab.id)
-  panelStore.movePanelToTab(panel.id, tab.id)
-  try {
-    const info = await CreateSession('wsl-file', fileConfig)
-    panelStore.bindSession(panel.id, info.id)
-  } catch (e) {
-    console.error('Failed to create WSL file session:', e)
-    tabStore.closeTab(tab.id)
-    panelStore.removePanel(panel.id)
-  }
-}
-
-async function onConnectScp(config: ConnectionConfig, prevStart?: any, persist = true) {
-  if (persist) connectionStore.add(config)
-
-  const resolved = await ensureCredentials(config)
-  if (!resolved) return
-  config = resolved
-  const panel = panelStore.createPanel(config, 'sftp')
-  const displayTitle = config.name || `${config.user}@${config.host}`
-  panelStore.updateTitle(panel.id, displayTitle)
-  const reposition = prevStart ? closeStartAndReposition(prevStart) : null
-  const tab = tabStore.createFtpTab(displayTitle, panel.id)
-  if (reposition) reposition(tab.id)
-  panelStore.movePanelToTab(panel.id, tab.id)
-  if (persist) RecordRecentConnection(config.id)
-
-  try {
-    const info = await CreateSession('scp', config)
-    panelStore.bindSession(panel.id, info.id)
-  } catch (e) {
-    console.error('Failed to create SCP session:', e)
-    tabStore.closeTab(tab.id)
-    panelStore.removePanel(panel.id)
-  }
-}
-
-async function onConnectFtp(config: ConnectionConfig, prevStart?: any, persist = true) {
-  if (persist) connectionStore.add(config)
-
-  const resolved = await ensureCredentials(config)
-  if (!resolved) return
-  config = resolved
-  const panel = panelStore.createPanel(config, 'sftp')
-  const displayTitle = config.name || `${config.user}@${config.host}`
-  panelStore.updateTitle(panel.id, displayTitle)
-  const reposition = prevStart ? closeStartAndReposition(prevStart) : null
-  const tab = tabStore.createFtpTab(displayTitle, panel.id)
-  if (reposition) reposition(tab.id)
-  panelStore.movePanelToTab(panel.id, tab.id)
-  if (persist) RecordRecentConnection(config.id)
-
-  try {
-    const info = await CreateSession('ftp', config)
-    panelStore.bindSession(panel.id, info.id)
-  } catch (e) {
-    console.error('Failed to create FTP session:', e)
-    tabStore.closeTab(tab.id)
-    panelStore.removePanel(panel.id)
-  }
-}
-
-async function onConnectSmb(config: ConnectionConfig, prevStart?: any, persist = true) {
-  if (persist) connectionStore.add(config)
-
-  const resolved = await ensureCredentials(config)
-  if (!resolved) return
-  config = resolved
-  const panel = panelStore.createPanel(config, 'sftp')
-  const displayTitle = config.name || `${config.user}@${config.host}`
-  panelStore.updateTitle(panel.id, displayTitle)
-  const reposition = prevStart ? closeStartAndReposition(prevStart) : null
-  const tab = tabStore.createFtpTab(displayTitle, panel.id)
-  if (reposition) reposition(tab.id)
-  panelStore.movePanelToTab(panel.id, tab.id)
-  if (persist) RecordRecentConnection(config.id)
-
-  try {
-    const info = await CreateSession('smb', config)
-    panelStore.bindSession(panel.id, info.id)
-  } catch (e) {
-    console.error('Failed to create SMB session:', e)
-    tabStore.closeTab(tab.id)
-    panelStore.removePanel(panel.id)
-  }
-}
-
-async function onConnectWebdav(config: ConnectionConfig, prevStart?: any, persist = true) {
-  if (persist) connectionStore.add(config)
-
-  const resolved = await ensureCredentials(config)
-  if (!resolved) return
-  config = resolved
-  const panel = panelStore.createPanel(config, 'sftp')
-  const displayTitle = config.name || `${config.user}@${config.host}`
-  panelStore.updateTitle(panel.id, displayTitle)
-  const reposition = prevStart ? closeStartAndReposition(prevStart) : null
-  const tab = tabStore.createFtpTab(displayTitle, panel.id)
-  if (reposition) reposition(tab.id)
-  panelStore.movePanelToTab(panel.id, tab.id)
-  if (persist) RecordRecentConnection(config.id)
-
-  try {
-    const info = await CreateSession('webdav', config)
-    panelStore.bindSession(panel.id, info.id)
-  } catch (e) {
-    console.error('Failed to create WebDAV session:', e)
-    tabStore.closeTab(tab.id)
-    panelStore.removePanel(panel.id)
-  }
-}
-
-async function onConnectS3(config: ConnectionConfig, prevStart?: any, persist = true) {
-  if (persist) connectionStore.add(config)
-
-  const panel = panelStore.createPanel(config, 'sftp')
-  const displayTitle = config.name || (config.s3Bucket ? `s3://${config.s3Bucket}` : config.host)
-  panelStore.updateTitle(panel.id, displayTitle)
-  const reposition = prevStart ? closeStartAndReposition(prevStart) : null
-  const tab = tabStore.createFtpTab(displayTitle, panel.id)
-  if (reposition) reposition(tab.id)
-  panelStore.movePanelToTab(panel.id, tab.id)
-  if (persist) RecordRecentConnection(config.id)
-
-  try {
-    const info = await CreateSession('s3', config)
-    panelStore.bindSession(panel.id, info.id)
-  } catch (e) {
-    console.error('Failed to create S3 session:', e)
-    tabStore.closeTab(tab.id)
-    panelStore.removePanel(panel.id)
-  }
-}
-
-async function onConnectRDP(config: ConnectionConfig, prevStart?: any, persist = true) {
-  if (persist) connectionStore.add(config)
-
-  const resolved = await ensureCredentials(config)
-  if (!resolved) return
-  config = resolved
-
-  const displayTitle = config.name || `${config.user}@${config.host}`
-
-  const panel = panelStore.createPanel(config, 'rdp')
-  panelStore.updateTitle(panel.id, displayTitle)
-  const reposition = prevStart ? closeStartAndReposition(prevStart) : null
-  const tab = tabStore.createRDPTab(displayTitle, panel.id)
-  if (reposition) reposition(tab.id)
-  panelStore.movePanelToTab(panel.id, tab.id)
-  if (persist) RecordRecentConnection(config.id)
-
-  try {
-    const info = await CreateSession('rdp', config)
-    panelStore.bindSession(panel.id, info.id)
-    sessionStore.initSession(info.id)
-  } catch (e) {
-    console.error('Failed to create RDP session:', e)
-    tabStore.closeTab(tab.id)
-    panelStore.removePanel(panel.id)
-  }
-}
-
-async function onConnectVNC(config: ConnectionConfig, prevStart?: any, persist = true) {
-  if (persist) connectionStore.add(config)
-
-  const resolved = await ensureCredentials(config)
-  if (!resolved) return
-  config = resolved
-
-  const displayTitle = config.name || config.host
-
-  const panel = panelStore.createPanel(config, 'vnc')
-  panelStore.updateTitle(panel.id, displayTitle)
-  const reposition = prevStart ? closeStartAndReposition(prevStart) : null
-
-  // Create the session BEFORE the tab so VNCTabContent mounts with its
-  // sessionId and proxyAddr already bound. Mounting first and calling
-  // CreateSession from the component created a duplicate session and lost
-  // the session:status 'connected' event (emitted during CreateSession,
-  // before the component set its session id), leaving VNC stuck on
-  // "connecting". Mirrors onConnectLocal.
-  let info
-  try {
-    info = await CreateSession('vnc', config)
-  } catch (e) {
-    console.error('Failed to create VNC session:', e)
-    panelStore.removePanel(panel.id)
-    return
-  }
-  if (info.proxyAddr) panelStore.setProxyAddr(panel.id, info.proxyAddr)
-  panelStore.bindSession(panel.id, info.id)
-  sessionStore.initSession(info.id)
-
-  const tab = tabStore.createVNCTab(displayTitle, panel.id)
-  if (reposition) reposition(tab.id)
-  panelStore.movePanelToTab(panel.id, tab.id)
-  if (persist) RecordRecentConnection(config.id)
-}
-async function onConnectSPICE(config: ConnectionConfig, prevStart?: any, persist = true) {
-  if (persist) connectionStore.add(config)
-
-  const resolved = await ensureCredentials(config)
-  if (!resolved) return
-  config = resolved
-
-  const displayTitle = config.name || config.host
-
-  const panel = panelStore.createPanel(config, 'spice')
-  panelStore.updateTitle(panel.id, displayTitle)
-  const reposition = prevStart ? closeStartAndReposition(prevStart) : null
-
-  // Create the session BEFORE the tab so SPICETabContent mounts with its
-  // sessionId and proxyAddr already bound — same v3 race as VNC.
-  let info
-  try {
-    info = await CreateSession('spice', config)
-  } catch (e) {
-    console.error('Failed to create SPICE session:', e)
-    panelStore.removePanel(panel.id)
-    return
-  }
-  if (info.proxyAddr) panelStore.setProxyAddr(panel.id, info.proxyAddr)
-  panelStore.bindSession(panel.id, info.id)
-  sessionStore.initSession(info.id)
-
-  const tab = tabStore.createSPICETab(displayTitle, panel.id)
-  if (reposition) reposition(tab.id)
-  panelStore.movePanelToTab(panel.id, tab.id)
-  if (persist) RecordRecentConnection(config.id)
-}
-
-async function onConnectX11Desktop(config: ConnectionConfig, prevStart?: any, persist = true) {
-  if (persist) connectionStore.add(config)
-
-  // Ensure the X11 desktop config itself has saved credentials before
-  // handing off to X11DesktopConnect.
-  const resolved = await ensureCredentials(config)
-  if (!resolved) return
-
-  const displayTitle = config.name || config.host || 'X11 Desktop'
-
-  const panel = panelStore.createPanel(config, 'x11-desktop')
-  panelStore.updateTitle(panel.id, displayTitle)
-  const reposition = prevStart ? closeStartAndReposition(prevStart) : null
-  const tab = tabStore.createX11DesktopTab(displayTitle, panel.id)
-  if (reposition) reposition(tab.id)
-  panelStore.movePanelToTab(panel.id, tab.id)
-  if (persist) RecordRecentConnection(config.id)
-
-  // The X11DesktopTabContent owns CreateSession + X11DesktopConnect.
-  // It runs when the tab mounts and has access to the resolved config.
-}
-
-async function onConnectMonitor(config: ConnectionConfig, prevStart?: any) {
-  connectionStore.add(config)
-
-  const resolved = await ensureCredentials(config)
-  if (!resolved) return
-  config = resolved
-
-  const panel = panelStore.createPanel(config, 'monitor')
-  const displayTitle = config.name || `${config.user}@${config.host}`
-  panelStore.updateTitle(panel.id, displayTitle)
-  const reposition = prevStart ? closeStartAndReposition(prevStart) : null
-  const tab = tabStore.createMonitorTab(displayTitle, panel.id)
-  if (reposition) reposition(tab.id)
-  panelStore.movePanelToTab(panel.id, tab.id)
-  RecordRecentConnection(config.id)
-
-  try {
-    const info = await CreateSession('monitor', config)
-    panelStore.bindSession(panel.id, info.id)
-    sessionStore.initSession(info.id)
-  } catch (e) {
-    console.error('Failed to create monitor session:', e)
-    tabStore.closeTab(tab.id)
-    panelStore.removePanel(panel.id)
-  }
-}
-
-async function onConnectDB(config: ConnectionConfig, prevStart?: any, persist = true) {
-  if (persist) connectionStore.add(config)
-
-  const resolved = await ensureCredentials(config)
-  if (!resolved) return
-  config = resolved
-
-  if (!config.dbType) {
-    config.dbType = 'mysql'
-  }
-  const displayTitle = config.name || `${config.dbType}:${config.user}@${config.host}`
-
-  const panel = panelStore.createPanel(config, 'database')
-  panelStore.updateTitle(panel.id, displayTitle)
-  const reposition = prevStart ? closeStartAndReposition(prevStart) : null
-  const tab = tabStore.createDBTab(displayTitle, panel.id)
-  if (reposition) reposition(tab.id)
-  if (config.dbType === 'redis') {
-    tab.type = 'redis'
-  } else if (config.dbType === 'mongodb') {
-    tab.type = 'mongodb'
-  } else if (config.dbType === 'elasticsearch') {
-    tab.type = 'elasticsearch'
-  }
-  panelStore.movePanelToTab(panel.id, tab.id)
-  if (persist) RecordRecentConnection(config.id)
-
-  try {
-    let sessionType: string
-    if (config.dbType === 'redis') {
-      sessionType = 'redis'
-    } else if (config.dbType === 'mongodb') {
-      sessionType = 'mongodb'
-    } else if (config.dbType === 'elasticsearch') {
-      sessionType = 'elasticsearch'
-    } else {
-      sessionType = 'database'
-    }
-    const info = await CreateSession(sessionType, config)
-    panelStore.bindSession(panel.id, info.id)
-    sessionStore.initSession(info.id)
-  } catch (e: any) {
-    const errMsg = e?.message || String(e)
-    console.error('Failed to create database session:', errMsg)
-    panelStore.updateStatus(panel.id, 'error')
-    msg.error(`${t('db.connectFailed')}: ${errMsg}`)
-  }
-}
-
-// Force-reconnect a database/redis/mongodb panel from the tab's right-click
-// 「重连」(Reconnect) menu. These sessions are created in App.vue (onConnectDB),
-// so — unlike terminal/desktop panels — no content component owns the lifecycle:
-// close the old session, then create a fresh one and rebind the same panel.
-async function reconnectDatabasePanel(panel: { id: string; sessionId: string | null; config: ConnectionConfig | null }) {
-  const oldId = panel.sessionId
-  if (oldId) {
-    try { await CloseSession(oldId) } catch (_) {}
-  }
-  const cfg = panel.config
-  if (!cfg) return
-  let sessionType = 'database'
-  if (cfg.dbType === 'redis') sessionType = 'redis'
-  else if (cfg.dbType === 'mongodb') sessionType = 'mongodb'
-  else if (cfg.dbType === 'elasticsearch') sessionType = 'elasticsearch'
-  try {
-    const info = await CreateSession(sessionType, cfg)
-    panelStore.bindSession(panel.id, info.id)
-    sessionStore.initSession(info.id)
-  } catch (e: any) {
-    panelStore.updateStatus(panel.id, 'error')
-    msg.error(`${t('db.connectFailed')}: ${e?.message || String(e)}`)
-  }
-}
-
-// Force-reconnect a monitor panel. The session is created in App.vue
-// (onConnectMonitor), so it's re-initiated here like the database panels.
-async function reconnectMonitorPanel(panel: { id: string; sessionId: string | null; config: ConnectionConfig | null }) {
-  const oldId = panel.sessionId
-  if (oldId) {
-    try { await CloseSession(oldId) } catch (_) {}
-  }
-  const cfg = panel.config
-  if (!cfg) return
-  try {
-    const info = await CreateSession('monitor', cfg)
-    panelStore.bindSession(panel.id, info.id)
-    sessionStore.initSession(info.id)
-  } catch (e: any) {
-    panelStore.updateStatus(panel.id, 'error')
-    msg.error(`${t('tab.reconnectFailed')}: ${e?.message || String(e)}`)
-  }
-}
-
-// Force-reconnect a file-transfer panel (sftp/ftp/smb/webdav/s3). The actual
-// close→create→rebind orchestration lives in usePanelReconnect, shared with
-// the refresh-triggered auto-reconnect in the file tab content.
-async function reconnectSftpPanel(panel: { id: string; sessionId: string | null; config: ConnectionConfig | null }) {
-  try {
-    const newId = await reconnectFileTransferPanel(panel.id)
-    if (!newId) panelStore.updateStatus(panel.id, 'error')
-  } catch (e: any) {
-    panelStore.updateStatus(panel.id, 'error')
-    msg.error(`${t('tab.reconnectFailed')}: ${e?.message || String(e)}`)
-  }
-}
-
-function onPanelReconnectEvent(e: Event) {
-  const panelId = (e as CustomEvent)?.detail?.panelId
-  if (!panelId) return
-  const panel = panelStore.getPanel(panelId)
-  if (!panel) return
-  // These session types are created in App.vue (not in a content component), so
-  // their right-click 「重连」(Reconnect) is handled here. Terminal and desktop-
-  // protocol panels handle the same event themselves.
-  if (panel.type === 'database') reconnectDatabasePanel(panel)
-  else if (panel.type === 'monitor') reconnectMonitorPanel(panel)
-  else if (panel.type === 'sftp') reconnectSftpPanel(panel)
-}
-
-async function onConnectK8s(config: ConnectionConfig, prevStart?: any, persist = true) {
-  if (persist) connectionStore.add(config)
-
-  const displayTitle = config.name || 'K8s'
-  const panel = panelStore.createPanel(config, 'k8s')
-  panelStore.updateTitle(panel.id, displayTitle)
-  const reposition = prevStart ? closeStartAndReposition(prevStart) : null
-  const nsDefault = config.k8sNamespace || 'default'
-  const tab = tabStore.createK8sTab(displayTitle, panel.id, config.id, nsDefault)
-  if (reposition) reposition(tab.id)
-  panelStore.movePanelToTab(panel.id, tab.id)
-  if (persist) RecordRecentConnection(config.id)
-}
-
-function onConnectContainer(config: ConnectionConfig, prevStart?: any, persist = true) {
-  if (persist) connectionStore.add(config)
-
-  const displayTitle = config.name || 'Container'
-  const panel = panelStore.createPanel(config, 'container')
-  panelStore.updateTitle(panel.id, displayTitle)
-  const reposition = prevStart ? closeStartAndReposition(prevStart) : null
-  const tab = tabStore.createContainerTab(displayTitle, panel.id, config.id, config.containerRuntime ?? 'docker')
-  if (reposition) reposition(tab.id)
-  panelStore.movePanelToTab(panel.id, tab.id)
-  if (persist) RecordRecentConnection(config.id)
-}
-
 
 // Show/hide native RDP window on tab switch.
 // Position updates are only sent to the active RDP session (see rdpSyncPosition),

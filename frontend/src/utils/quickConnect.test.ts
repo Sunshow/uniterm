@@ -11,7 +11,7 @@ vi.mock('../../bindings/github.com/ys-ll/uniterm/app', () => ({
   SaveIdentities: vi.fn(async () => {}),
 }))
 
-import { formatConnSubtitle } from './quickConnect'
+import { formatConnSubtitle, parseQuickConnect } from './quickConnect'
 import { useIdentityStore } from '../stores/identityStore'
 import type { ConnectionConfig } from '../types/session'
 
@@ -36,5 +36,52 @@ describe('formatConnSubtitle', () => {
   it('falls back to host-only when the identity no longer exists', () => {
     const cfg = { type: 'ssh', host: 'srv1', port: 22, user: '', authType: 'identity', identityId: 'gone' } as ConnectionConfig
     expect(formatConnSubtitle(cfg)).toBe('ssh srv1')
+  })
+})
+
+describe('parseQuickConnect protocols', () => {
+  // Locks the registry-derived protocol table: every quick-connect prefix
+  // routes to its connection type, aliases included.
+  const cases: [string, string, string | undefined][] = [
+    ['ssh', 'ssh', undefined],
+    ['telnet', 'telnet', undefined],
+    ['mosh', 'mosh', undefined],
+    ['rdp', 'rdp', undefined],
+    ['vnc', 'vnc', undefined],
+    ['spice', 'spice', undefined],
+    ['ftp', 'ftp', undefined],
+    ['sftp', 'sftp', undefined],
+    ['scp', 'scp', undefined],
+    ['smb', 'smb', undefined],
+    ['s3', 's3', undefined],
+    ['webdav', 'webdav', undefined],
+    ['tcp', 'tcp', undefined],
+    ['mysql', 'database', 'mysql'],
+    ['postgres', 'database', 'postgres'],
+    ['postgresql', 'database', 'postgres'],
+    ['oracle', 'database', 'oracle'],
+    ['sqlserver', 'database', 'sqlserver'],
+    ['rqlite', 'database', 'rqlite'],
+    ['redis', 'redis', undefined],
+    ['mongodb', 'mongodb', undefined],
+    ['mongo', 'mongodb', undefined],
+    ['es', 'elasticsearch', undefined],
+    ['elasticsearch', 'elasticsearch', undefined],
+    ['opensearch', 'elasticsearch', undefined],
+    ['http', 'webdav', undefined],
+    ['https', 'webdav', undefined],
+  ]
+  for (const [prefix, type, dbType] of cases) {
+    it(`parses "${prefix}"`, () => {
+      const cfg = parseQuickConnect(`${prefix} user@h:1234`) as any
+      expect(cfg.type).toBe(type)
+      expect(cfg.dbType).toBe(dbType)
+      expect(cfg.port).toBe(1234)
+    })
+  }
+
+  it('falls back to ssh for a bare host', () => {
+    const cfg = parseQuickConnect('h') as any
+    expect(cfg.type).toBe('ssh')
   })
 })

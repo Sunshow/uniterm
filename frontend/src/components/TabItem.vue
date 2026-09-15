@@ -57,7 +57,7 @@
       :class="{ 'tab-close-right-ghost': !hovered || tab.locked }"
       @click.stop="$emit('close', tab.id)"
     ><X /></button>
-    <Menu ref="ctxMenuRef" v-model:visible="ctxMenuVisible" v-slot="{ current }">
+    <Menu ref="ctxMenuRef" v-model:visible="ctxMenuVisible">
       <!-- ① 标签类操作 -->
       <MenuItem v-if="canDuplicate" :shortcut="menuShortcut('duplicateSession')" @click="onDuplicate">
         {{ t('tab.duplicate') }}
@@ -128,13 +128,13 @@ import {
 import { msg } from '../services/message'
 import type { TerminalTab, SettingsTab, SFTPTab, RDPTab, VNCTab, SPICETab, DBTab, MonitorTab, WorkspaceTab } from '../types/workspace'
 import { connectFileMenuKey, fileTransferProto } from '../utils/fileTransferUtils'
-import type { ConnectionConfig } from '../types/session'
+import { connectionTypeIconOfKind } from '../utils/connectionTypes'
 import { useDuplicateSession } from '../composables/useDuplicateSession'
 import Menu from './Menu.vue'
 import MenuItem from './MenuItem.vue'
 import MenuDivider from './MenuDivider.vue'
 import { Clipboard } from '@wailsio/runtime'
-import { SquareTerminal, Laptop, LaptopMinimal, FolderUp, FolderOpen, Folders, FileUp, HardDrive, Cloud, Globe, Monitor, MonitorCloud, MonitorSmartphone, Settings, Database, DatabaseZap, Layers, DatabaseSearch, Activity, Terminal, Zap, X, ArrowDownUp, LayoutDashboard, Cable, SquarePlus, Lock, ShipWheel, Box, Boxes, AppWindow, ArrowLeftRight, Radio } from '@lucide/vue'
+import { SquareTerminal, FolderUp, X, ArrowDownUp, Lock, Radio } from '@lucide/vue'
 
 const props = defineProps<{
   tab: TerminalTab | SettingsTab | SFTPTab | RDPTab | VNCTab | SPICETab | DBTab | MonitorTab | WorkspaceTab
@@ -192,49 +192,22 @@ const editInputRef = ref<HTMLInputElement>()
 
 const tabIcon = computed(() => {
   const t = props.tab
-  if (t.type === 'settings') return Settings
+  // The file browser tab's icon follows the panel's backing config (an SSH
+  // connection's companion panel honors the SFTP/SCP protocol preference),
+  // so it must be resolved before the plain tab-type lookup below.
   if (t.type === 'sftp') {
     const panel = panelStore.getPanel(t.panelId)
     const ct = panel?.config?.type
-    if (ct === 'sftp') return Folders
-    if (ct === 'scp') return FileUp
-    if (ct === 'ftp') return FolderUp
-    if (ct === 'smb') return HardDrive
-    if (ct === 's3') return Cloud
-    if (ct === 'webdav') return Globe
-    if (ct === 'wsl-file') return FolderOpen
-    // SSH-based file panels follow the connection's protocol preference.
-    if (ct === 'ssh') return fileTransferProto(panel?.config) === 'scp' ? FileUp : Folders
-    return FolderUp
+    if (ct === 'ssh') return connectionTypeIconOfKind(fileTransferProto(panel?.config))
+    return connectionTypeIconOfKind(ct) || FolderUp
   }
-  if (t.type === 'rdp') return Monitor
-  if (t.type === 'vnc') return MonitorSmartphone
-  if (t.type === 'spice') return MonitorCloud
-  if (t.type === 'x11-desktop') return AppWindow
-  if (t.type === 'database' || t.type === 'redis' || t.type === 'mongodb' || t.type === 'elasticsearch') {
-    const panel = panelStore.getPanel(t.panelId)
-    if (panel?.config?.dbType === 'redis') return DatabaseZap
-    if (panel?.config?.dbType === 'mongodb') return Layers
-    if (panel?.config?.dbType === 'elasticsearch') return DatabaseSearch
-    return Database
-  }
-  if (t.type === 'monitor') return Activity
-  if (t.type === 'k8s') return ShipWheel
-  if (t.type === 'container') return Boxes
-  if (t.type === 'workspace') return LayoutDashboard
+  // Terminal tabs render the backing panel's session kind (ssh/local/k8s-exec/…).
   if (t.type === 'terminal') {
     const panel = panelStore.getPanel(t.panelId)
-    if (panel?.type === 'k8s-exec' || panel?.type === 'container-exec') return Box
-    if (panel?.type === 'local') return Laptop
-    if (panel?.type === 'wsl') return LaptopMinimal
-    if (panel?.type === 'serial') return Cable
-    if (panel?.type === 'tcp') return ArrowLeftRight
-    if (panel?.type === 'telnet') return Terminal
-    if (panel?.type === 'mosh') return Zap
-    return SquareTerminal
+    return connectionTypeIconOfKind(panel?.type) || SquareTerminal
   }
-  if (t.type === 'start') return SquarePlus
-  return null
+  // Everything else (connection tabs + UI tab kinds) resolves from the registry.
+  return connectionTypeIconOfKind(t.type)
 })
 
 const isAILocked = computed(() => {

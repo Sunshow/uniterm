@@ -41,3 +41,12 @@ export function getShellLabel(path: string, emptyFallback = ''): string {
   if (shellBasename(path).toLowerCase() === 'nu') return 'Nushell'
   return shellBasename(path)
 }
+
+/** Parses the distro name from a `wsl://<distro>` shell path, else null. */
+export function parseWslFromShell(shellPath?: string): string | null {
+  if (shellPath && shellPath.toLowerCase().startsWith('wsl://')) {
+    const distro = shellPath.slice(6)
+    return distro || null
+  }
+  return null
+}

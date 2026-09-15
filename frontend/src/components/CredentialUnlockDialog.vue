@@ -22,7 +22,7 @@ import { ref } from 'vue'
 import { useI18n } from '../i18n'
 import { useCredentialStore } from '../stores/credentialStore'
 
-const props = defineProps<{ visible: boolean }>()
+defineProps<{ visible: boolean }>()
 const emit = defineEmits<{ (e: 'update:visible', v: boolean): void; (e: 'done'): void; (e: 'reset'): void }>()
 
 const { t } = useI18n()

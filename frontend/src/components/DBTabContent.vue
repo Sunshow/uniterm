@@ -237,7 +237,6 @@ const activeTable = computed(() => (activeDoc.value?.kind === 'table' ? activeDo
 const leftWidth = ref(220)
 let resizeStartX = 0
 let resizeStartWidth = 0
-let resizing = false
 
 function nextId(prefix: string) {
   docSeq += 1
@@ -560,7 +559,6 @@ function onObjectRemoved(payload: { dbName: string; tableName?: string; kind: 't
 function onResizeStart(e: MouseEvent) {
   resizeStartX = e.clientX
   resizeStartWidth = leftWidth.value
-  resizing = true
   document.addEventListener('mousemove', onResizeMove)
   document.addEventListener('mouseup', onResizeEnd)
 }
@@ -571,7 +569,6 @@ function onResizeMove(e: MouseEvent) {
 }
 
 function onResizeEnd() {
-  resizing = false
   document.removeEventListener('mousemove', onResizeMove)
   document.removeEventListener('mouseup', onResizeEnd)
 }
