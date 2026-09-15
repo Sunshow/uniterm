@@ -66,11 +66,17 @@ function keydown(
   } as unknown as KeyboardEvent
 }
 
-function insertText(data: string, opts: { isComposing?: boolean } = {}) {
+function insertText(
+  data: string,
+  opts: { isComposing?: boolean; composed?: boolean } = {},
+) {
   return {
     inputType: 'insertText',
     data,
     isComposing: opts.isComposing ?? false,
+    // Real typed input events are composed; the fake must match or the patch
+    // never sees the condition that makes xterm skip its direct path.
+    composed: opts.composed ?? true,
   } as unknown as InputEvent
 }
 
@@ -304,14 +310,14 @@ describe('installImeCompatibilityPatch', () => {
     ])
   })
 
-  it('leaves input untouched without a preceding 229 keydown', () => {
+  it('forces composed input after a non-229 keydown', () => {
     const { core, calls } = makeFakeCore()
     installImeCompatibilityPatch(fakeTerminal(core))
 
     core.textarea.listeners.get('keydown')!(keydown(65))
     core._inputEvent.call(core, insertText('a'))
 
-    expect(calls).toEqual([{ keyDownSeenAtCall: true }])
+    expect(calls).toEqual([{ keyDownSeenAtCall: false }])
   })
 
   it('only forces once per keydown', () => {
@@ -326,6 +332,91 @@ describe('installImeCompatibilityPatch', () => {
       { keyDownSeenAtCall: false },
       { keyDownSeenAtCall: true },
     ])
+  })
+
+  // issue #913: Doubao swallows keypress for Shift+letter without reporting
+  // keyCode 229, so the input event was xterm's only remaining delivery path.
+  it('delivers uppercase Shift input that reports no 229 keydown', () => {
+    const { core, calls } = makeFakeCore()
+    installImeCompatibilityPatch(fakeTerminal(core))
+
+    core.textarea.value = 'ls '
+    core.textarea.listeners.get('keydown')!(keydown(65, { key: 'A', shiftKey: true }))
+    core._inputEvent.call(core, insertText('A'))
+
+    expect(calls).toEqual([{ keyDownSeenAtCall: false }])
+    // No 229 diff was queued, so the textarea must not be rewound.
+    expect(core.textarea.value).toBe('ls A')
+    expect(core._keyDownSeen).toBe(true)
+  })
+
+  it('forces consecutive composed inputs after non-229 keydowns', () => {
+    const { core, calls } = makeFakeCore()
+    installImeCompatibilityPatch(fakeTerminal(core))
+
+    for (const key of 'ABC') {
+      core.textarea.listeners.get('keydown')!(keydown(65, { key, shiftKey: true }))
+      core._inputEvent.call(core, insertText(key))
+    }
+
+    expect(calls).toEqual([
+      { keyDownSeenAtCall: false },
+      { keyDownSeenAtCall: false },
+      { keyDownSeenAtCall: false },
+    ])
+    expect(core.textarea.value).toBe('ABC')
+  })
+
+  it('does not force composed input while composition is active', () => {
+    const { core, calls } = makeFakeCore()
+    installImeCompatibilityPatch(fakeTerminal(core))
+
+    core._compositionHelper._isComposing = true
+    core.textarea.listeners.get('keydown')!(keydown(65))
+    core._inputEvent.call(core, insertText('a'))
+
+    expect(calls).toEqual([{ keyDownSeenAtCall: true }])
+  })
+
+  it('does not force multi-character composed input', () => {
+    const { core, calls } = makeFakeCore()
+    installImeCompatibilityPatch(fakeTerminal(core))
+
+    core.textarea.listeners.get('keydown')!(keydown(65))
+    core._inputEvent.call(core, insertText('ab'))
+
+    expect(calls).toEqual([{ keyDownSeenAtCall: true }])
+  })
+
+  it('leaves non-composed input on xterms own path', () => {
+    const { core, calls } = makeFakeCore()
+    installImeCompatibilityPatch(fakeTerminal(core))
+
+    core.textarea.listeners.get('keydown')!(keydown(65))
+    core._inputEvent.call(core, insertText('a', { composed: false }))
+
+    expect(calls).toEqual([{ keyDownSeenAtCall: true }])
+  })
+
+  // Forcing the gate open cannot double-deliver: xterm's own handler still
+  // bails on _keyPressHandled, so keypress wins whenever it did fire.
+  it('does not double-deliver when keypress already handled the character', () => {
+    const { core } = makeFakeCore()
+    const delivered: string[] = []
+    // Mirror xterm's _inputEvent: the _keyPressHandled guard runs inside the
+    // original handler, after our patch has flipped _keyDownSeen.
+    core._inputEvent = function (this: Record<string, unknown>, ev: InputEvent) {
+      if (this._keyPressHandled) return false
+      if (ev.data) delivered.push(ev.data)
+      return true
+    }
+    core._keyPressHandled = true
+    installImeCompatibilityPatch(fakeTerminal(core))
+
+    core.textarea.listeners.get('keydown')!(keydown(65, { key: 'A', shiftKey: true }))
+    expect(core._inputEvent.call(core, insertText('A'))).toBe(false)
+
+    expect(delivered).toEqual([])
   })
 
   it('leaves real composition untouched', () => {

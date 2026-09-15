@@ -13,6 +13,11 @@ import type { Terminal } from '@xterm/xterm'
 // that input event was already delivered, the late keydown must not inject a
 // fallback. If no usable input event was delivered, the keydown fallback
 // keeps the character from being swallowed.
+//
+// Some IMEs (e.g. Doubao) swallow keypress for Shift+letter without reporting
+// keyCode 229, so uppercase had no delivery path left at all. xterm skips its
+// direct path whenever `composed && _keyDownSeen`, so that is the condition we
+// key off, rather than inferring it from an IME-specific keyCode.
 
 export interface Disposable {
   dispose(): void
@@ -89,6 +94,7 @@ export function installImeCompatibilityPatch(terminal: Terminal): Disposable {
   }
 
   let latestKeydownWas229 = false
+  let forcedSinceKeydown = false
   let textareaValueBefore229Keydown = ''
   const pendingFallbacks: PendingFallback[] = []
   const deliveredInputs: DeliveredInput[] = []
@@ -117,6 +123,7 @@ export function installImeCompatibilityPatch(terminal: Terminal): Disposable {
     pruneLateEventRecords()
 
     latestKeydownWas229 = keyboardEvent.keyCode === 229
+    forcedSinceKeydown = false
     const textareaValueBeforeKeydown = core.textarea?.value ?? ''
     if (latestKeydownWas229) {
       textareaValueBefore229Keydown = textareaValueBeforeKeydown
@@ -217,24 +224,27 @@ export function installImeCompatibilityPatch(terminal: Terminal): Disposable {
     }
 
     const was229 = latestKeydownWas229
-    latestKeydownWas229 = false
     const shouldForceDirectPath =
       ev.inputType === 'insertText' &&
       Boolean(ev.data) &&
+      ev.data!.length === 1 &&
       PRINTABLE_ASCII.test(ev.data!) &&
       !ev.isComposing &&
       !isCompositionActive(helper) &&
-      was229 &&
-      this._keyDownSeen === true
+      this._keyDownSeen === true &&
+      (was229 ? !forcedSinceKeydown : ev.composed)
 
     let result: boolean
     if (shouldForceDirectPath) {
+      forcedSinceKeydown = true
       const savedKeyDownSeen = this._keyDownSeen
       this._keyDownSeen = false
       try {
         result = originalInputEvent!.call(this, ev)
       } finally {
-        if (this.textarea) {
+        // Only the 229 path has a deferred diff to neutralise; rewinding on the
+        // composed path would discard text xterm never queued.
+        if (was229 && this.textarea) {
           this.textarea.value = textareaValueBefore229Keydown
         }
         this._keyDownSeen = savedKeyDownSeen
