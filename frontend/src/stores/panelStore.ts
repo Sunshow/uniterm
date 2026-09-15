@@ -149,6 +149,10 @@ export const usePanelStore = defineStore('panel', () => {
     return panelState.transferTasks.get(panelId)!
   }
 
+  function removeTransferTasks(key: string) {
+    panelState.transferTasks.delete(key)
+  }
+
   function setProxyAddr(panelId: string, addr: string) {
     panelState.proxyAddrs.set(panelId, addr)
   }
@@ -217,6 +221,7 @@ export const usePanelStore = defineStore('panel', () => {
     proxyAddrs: panelState.proxyAddrs,
     vncCaches: panelState.vncCaches,
     getTransferTasks,
+    removeTransferTasks,
     createPanel,
     removePanel,
     getPanel,

@@ -159,9 +159,14 @@ func TestGeneratedBashBootstrapsHaveValidSyntax(t *testing.T) {
 	if !ok {
 		t.Fatal("WSL bash must be supported")
 	}
+	runtimeHook, ok := buildRuntimeCwdHook("/bin/bash")
+	if !ok {
+		t.Fatal("runtime bash hook must be supported")
+	}
 	for name, script := range map[string]string{
-		"ssh": sshFiles["rcfile"],
-		"wsl": wslFiles["rcfile"],
+		"ssh":     sshFiles["rcfile"],
+		"wsl":     wslFiles["rcfile"],
+		"runtime": runtimeHook,
 	} {
 		cmd := exec.Command(bash, "-n")
 		cmd.Stdin = strings.NewReader(script)
@@ -306,6 +311,85 @@ func TestShellIntegrationUnsupportedShell(t *testing.T) {
 		if _, _, ok := buildShellBootstrap(shell); ok {
 			t.Fatalf("shell %q must degrade to a plain shell", shell)
 		}
+	}
+}
+
+func TestRuntimeCwdHook(t *testing.T) {
+	tests := []struct {
+		name      string
+		shell     string
+		wantOK    bool
+		mustHave  []string
+	}{
+		{
+			name:     "bash",
+			shell:    "/bin/bash",
+			wantOK:   true,
+			mustHave: []string{"declare -a", "== *__uniterm_osc7*", "${PROMPT_COMMAND:+"},
+		},
+		{
+			name:     "zsh",
+			shell:    "/usr/bin/zsh",
+			wantOK:   true,
+			mustHave: []string{"(I)__uniterm_osc7", "precmd_functions"},
+		},
+		{
+			name:     "fish",
+			shell:    "/usr/bin/fish",
+			wantOK:   true,
+			mustHave: []string{"if not functions -q __uniterm_osc7"},
+		},
+		{
+			name:   "unsupported ksh",
+			shell:  "/usr/bin/ksh",
+			wantOK: false,
+		},
+		{
+			name:   "empty",
+			shell:  "",
+			wantOK: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, ok := buildRuntimeCwdHook(tt.shell)
+			if ok != tt.wantOK {
+				t.Fatalf("buildRuntimeCwdHook(%q) ok = %v, want %v", tt.shell, ok, tt.wantOK)
+			}
+			if !ok {
+				return
+			}
+			if !strings.HasPrefix(got, " ") || !strings.HasSuffix(got, "\n") {
+				t.Fatalf("snippet must start with a space and end with a newline: %q", got)
+			}
+			if !strings.Contains(got, "__uniterm_osc7") {
+				t.Fatalf("snippet must define the __uniterm_osc7 hook: %q", got)
+			}
+			for _, want := range tt.mustHave {
+				if !strings.Contains(got, want) {
+					t.Fatalf("snippet for %s must contain %q: %q", tt.shell, want, got)
+				}
+			}
+		})
+	}
+}
+
+// The installed-flag short-circuit runs before any network access, so it can
+// be exercised on a bare session: a flagged session returns nil even when
+// disconnected, and an un-flagged disconnected session still reports the
+// connection error (so a later toggle retries).
+func TestSSHSessionInjectCwdHookFlagShortCircuit(t *testing.T) {
+	s := NewSSHSession("test-cwd-hook")
+	if injected, err := s.InjectCwdHook(); err == nil || injected {
+		t.Fatalf("un-flagged disconnected session must report an error, got injected=%v err=%v", injected, err)
+	}
+	s.cwdHookInstalled.Store(true)
+	injected, err := s.InjectCwdHook()
+	if err != nil {
+		t.Fatalf("flagged session must short-circuit to nil, got %v", err)
+	}
+	if injected {
+		t.Fatal("flagged session short-circuit must report injected=false")
 	}
 }
 

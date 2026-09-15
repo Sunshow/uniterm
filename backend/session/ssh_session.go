@@ -80,6 +80,12 @@ type SSHSession struct {
 	// for Microsoft's OpenSSH for Windows, "" otherwise). Set once during
 	// Connect from the server identification string.
 	remoteOS string
+
+	// cwdHookInstalled records that the runtime OSC-7 cwd hook has already
+	// been written to this session's shell, so re-toggling follow does not
+	// re-send the snippet. Session objects are recreated on reconnect, so the
+	// flag resets naturally and the reconnect re-injection still fires.
+	cwdHookInstalled atomic.Bool
 }
 
 func NewSSHSession(id string) *SSHSession {
@@ -630,6 +636,34 @@ func (s *SSHSession) Disconnect() error {
 		s.setStatus(StatusDisconnected)
 	})
 	return nil
+}
+
+// InjectCwdHook installs the OSC-7 cwd reporting hook into the shell that is
+// already running on this session's pty (typed in via stdin). The shell is
+// detected over a separate exec channel, exactly like startup injection. The
+// hook is installed only once per session; a failed attempt stays un-flagged
+// so a later retry re-runs detection. It reports whether the hook was
+// injected NOW (false means it was already installed from an earlier call).
+func (s *SSHSession) InjectCwdHook() (bool, error) {
+	if s.cwdHookInstalled.Load() {
+		return false, nil
+	}
+	if s.client == nil {
+		return false, fmt.Errorf("ssh session not connected")
+	}
+	shell, err := sshRunCommand(s.client, "echo $SHELL", "", sshIntegrationTimeout)
+	if err != nil {
+		return false, fmt.Errorf("detect shell: %w", err)
+	}
+	snippet, ok := buildRuntimeCwdHook(strings.TrimSpace(shell))
+	if !ok {
+		return false, fmt.Errorf("unsupported shell for cwd hook: %s", strings.TrimSpace(shell))
+	}
+	if err := s.Write([]byte(snippet)); err != nil {
+		return false, err
+	}
+	s.cwdHookInstalled.Store(true)
+	return true, nil
 }
 
 func (s *SSHSession) Resize(cols, rows int) error {

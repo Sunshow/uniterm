@@ -6,6 +6,7 @@ import { useSessionStore } from './sessionStore'
 import { useTabStore } from './tabStore'
 import { useConnectionStore } from './connectionStore'
 import { fileTransferProto } from '../utils/fileTransferUtils'
+import { unregisterTransferRoute } from '../services/transferTaskCenter'
 import type { ConnectionConfig } from '../types/session'
 
 export interface CompanionEntry {
@@ -118,10 +119,14 @@ export const useCompanionStore = defineStore('companion', () => {
     return entries.value[pid]?.monitorSessionId ?? null
   })
 
-  const transferKey = computed(() => {
-    const pid = activeFilesPanelId.value
-    return pid ? `${pid}__sftp` : ''
-  })
+  // Companion file-panel transfer lists are stored in panelStore under a key
+  // derived from the owning (SSH/WSL) panel id. Terminal tabs use the same
+  // helper to surface active companion transfers on their tab.
+  function sftpTransferKeyOf(panelId: string): string {
+    return panelId ? `${panelId}__sftp` : ''
+  }
+
+  const transferKey = computed(() => sftpTransferKeyOf(getActiveFilesPanelId() ?? ''))
 
   function ensureEntry(sshPanelId: string): CompanionEntry {
     if (!entries.value[sshPanelId]) {
@@ -175,6 +180,7 @@ export const useCompanionStore = defineStore('companion', () => {
       return entry.sftpSessionId
     }
     if (entry.sftpSessionId) {
+      unregisterTransferRoute(entry.sftpSessionId)
       try { await CloseSession(entry.sftpSessionId) } catch { /* ignore */ }
       entry.sftpSessionId = undefined
     }
@@ -307,6 +313,8 @@ export const useCompanionStore = defineStore('companion', () => {
     delete entries.value[sshPanelId]
     if (sftpId) {
       try { await CloseSession(sftpId) } catch { /* ignore */ }
+      unregisterTransferRoute(sftpId)
+      panelStore.removeTransferTasks(sftpTransferKeyOf(sshPanelId))
     }
     if (monitorId) {
       try { await CloseSession(monitorId) } catch { /* ignore */ }
@@ -356,6 +364,7 @@ export const useCompanionStore = defineStore('companion', () => {
     currentSftpSessionId,
     currentMonitorSessionId,
     transferKey,
+    sftpTransferKeyOf,
     ensureSftp,
     ensureMonitor,
     toggleFiles,

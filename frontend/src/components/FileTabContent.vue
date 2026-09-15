@@ -196,7 +196,8 @@ import { reconnectFileTransferPanel, isPanelReconnecting } from '../composables/
 import { isConnectionLostError, supportsRemoteSymlink } from '../utils/fileTransferUtils'
 import { bindExtEditUploadedToast } from '../composables/useFilePanel'
 import { Events } from '@wailsio/runtime'
-import { useTransferTaskEvents, watchNewTransferTasks } from '../composables/useTransferTasks'
+import { watchNewTransferTasks } from '../composables/useTransferTasks'
+import { registerTransferRoute, unregisterTransferRoute } from '../services/transferTaskCenter'
 
 const props = defineProps<{
   panelId: string
@@ -206,16 +207,6 @@ const panelStore = usePanelStore()
 const settingsStore = useSettingsStore()
 const transferTasks = panelStore.getTransferTasks(props.panelId)
 const transferHeight = ref(130)
-const transferEvents = useTransferTaskEvents(
-  () => transferTasks,
-  () => panel.value?.sessionId,
-  (status, type) => {
-    if (status === 'done') {
-      if (type === 'download') onRefreshLocal()
-      else onRefreshRemote()
-    }
-  },
-)
 const { t } = useI18n()
 bindExtEditUploadedToast()
 const panel = computed(() => panelStore.getPanel(props.panelId))
@@ -416,9 +407,6 @@ onMounted(async () => {
     }
   })
 
-  // Transfer-task bookkeeping is shared with the file sidebar.
-  transferEvents.bind()
-
   // External-editor status events from the backend (started / uploaded / closed)
   unsubscribeExt = Events.On('sftp:extedit', (ev) => {
     const payload = ev?.data as { sessionId?: string; path?: string; status?: string }
@@ -451,6 +439,26 @@ watchNewTransferTasks(
   () => { settingsStore.sftpTransferPanelVisible = true },
 )
 
+// Transfer events are routed app-level by transferTaskCenter keyed by
+// session id, so this tab's list stays current while another tab is
+// active. Re-connects re-route through this watch (the panel's session
+// id changes); the done-refresh is suppressed once the tab is gone.
+let transferRoutingDisposed = false
+// Captured non-reactively so unmount cleanup works even after the panel is
+// removed from panelStore (KeepAlive can defer onUnmounted until long after
+// closeTab, when panel.value is already undefined).
+let boundSessionId: string | null = null
+watch(() => panel.value?.sessionId, (sid, oldSid) => {
+  if (oldSid && oldSid !== sid) unregisterTransferRoute(oldSid)
+  if (!sid) return
+  registerTransferRoute(sid, props.panelId, (status, type) => {
+    if (transferRoutingDisposed || status !== 'done') return
+    if (type === 'download') onRefreshLocal()
+    else onRefreshRemote()
+  })
+  boundSessionId = sid
+}, { immediate: true })
+
 // A fast-connecting session (e.g. S3) can emit session:status 'connected' before
 // this panel binds its sessionId, so the connected-event handler and a mount-time
 // probe that runs while sid is still undefined both miss it. Once we know the id,
@@ -472,6 +480,10 @@ async function probeConnectAndLoad() {
 }
 
 onUnmounted(() => {
+  transferRoutingDisposed = true
+  const sid = boundSessionId
+  if (sid) unregisterTransferRoute(sid)
+  panelStore.removeTransferTasks(props.panelId)
   unsubscribe?.()
   unsubscribeStatus?.()
   unsubscribeExt?.()

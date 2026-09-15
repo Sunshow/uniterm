@@ -218,6 +218,7 @@ import { useI18n } from './i18n'
 import { CreateSession, CloseSession, RDPHide, RDPShow, RDPInvalidate, RDPSnapshot, RDPSetPosition, RecordRecentConnection, GetPlatform, GetBackgroundImage, SessionStart, RelaunchApp } from '../bindings/github.com/ys-ll/uniterm/app'
 import { waitForTerminalSize } from './services/terminalManager'
 import { msg } from './services/message'
+import { unregisterTransferRoute } from './services/transferTaskCenter'
 import type { ConnectionConfig } from './types/session'
 import { Application, Clipboard, Events } from '@wailsio/runtime'
 import { parseQuickConnect } from './utils/quickConnect'
@@ -1267,6 +1268,14 @@ async function closeTab(tabId: string, opts: { skipConfirm?: boolean } = {}) {
   const panelIds = tabStore.closeTab(tabId)
   // Dispose SSH companion sidebars (sftp/monitor) bound to these panels
   companionStore.disposeForPanels(panelIds).catch(() => {})
+  panelIds.forEach(pid => {
+    // Drop transfer-event routing and the panel's task list at close time —
+    // KeepAlive may keep the tab component cached, so its onUnmounted (if any)
+    // can run much later or never.
+    const p = panelStore.getPanel(pid)
+    if (p?.sessionId) unregisterTransferRoute(p.sessionId)
+    panelStore.removeTransferTasks(pid)
+  })
   panelIds.forEach(pid => panelStore.removePanel(pid))
   nextTick(() => {
     if (tabStore.tabs.length === 0) {

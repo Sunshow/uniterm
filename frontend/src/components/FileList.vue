@@ -370,6 +370,44 @@ const itemCountText = computed(() => {
     : base
 })
 
+// --- Header sorting ---------------------------------------------------------
+// Sorting is applied here rather than through el-table's built-in sort: el-table
+// reverses the whole comparison result for descending order, which would drag
+// the '..' parent row to the bottom. Sorting ourselves keeps '..' pinned to the
+// first row no matter the column or direction (sortable="custom" on the columns).
+// NOTE: these declarations MUST stay above `filteredFiles` — the watch on it
+// evaluates the computed once during setup, and its sort comparator reads
+// `sortState` / `columnSorters`. Declared below, that first evaluation hits a
+// TDZ ReferenceError whenever the list mounts with entries already present.
+type SortProp = 'name' | 'type' | 'modTime' | 'size'
+type SortOrder = 'ascending' | 'descending'
+const sortState = ref<{ prop: SortProp; order: SortOrder } | null>(null)
+
+// One shared collator: `String#localeCompare` builds a new collator per call,
+// which dominates sort time on large directories. Default options keep the
+// ordering identical to the previous code. Like `sortState`, this must stay
+// above `filteredFiles` to avoid a TDZ hit on its setup-time evaluation.
+const nameCollator = new Intl.Collator()
+
+function onSortChange({ prop, order }: { prop: SortProp; order: SortOrder | null }) {
+  sortState.value = order ? { prop, order } : null
+}
+
+const columnSorters: Record<SortProp, (a: FileItem, b: FileItem) => number> = {
+  name: (a, b) => nameCollator.compare(a.name, b.name),
+  type: (a, b) => fileTypeLabel(a).toLowerCase().localeCompare(fileTypeLabel(b).toLowerCase()),
+  modTime: (a, b) => {
+    const ta = a.modTime ? new Date(a.modTime).getTime() : 0
+    const tb = b.modTime ? new Date(b.modTime).getTime() : 0
+    return ta - tb
+  },
+  size: (a, b) => {
+    if (a.isDir && !b.isDir) return -1
+    if (!a.isDir && b.isDir) return 1
+    return a.size - b.size
+  },
+}
+
 const filteredFiles = computed(() => {
   let list = [...props.files]
   if (!list.find(f => f.name === '..')) {
@@ -386,7 +424,7 @@ const filteredFiles = computed(() => {
     }
     if (a.isDir && !b.isDir) return -1
     if (!a.isDir && b.isDir) return 1
-    return a.name.localeCompare(b.name)
+    return nameCollator.compare(a.name, b.name)
   })
   if (!showHidden.value) {
     list = list.filter(f => f.name === '..' || (!f.name.startsWith('.') && !f.isHidden))
@@ -566,34 +604,6 @@ function formatDate(ts: string): string {
   if (!ts) return '-'
   const d = new Date(ts)
   return d.toLocaleString()
-}
-
-// --- Header sorting ---------------------------------------------------------
-// Sorting is applied here rather than through el-table's built-in sort: el-table
-// reverses the whole comparison result for descending order, which would drag
-// the '..' parent row to the bottom. Sorting ourselves keeps '..' pinned to the
-// first row no matter the column or direction (sortable="custom" on the columns).
-type SortProp = 'name' | 'type' | 'modTime' | 'size'
-type SortOrder = 'ascending' | 'descending'
-const sortState = ref<{ prop: SortProp; order: SortOrder } | null>(null)
-
-function onSortChange({ prop, order }: { prop: SortProp; order: SortOrder | null }) {
-  sortState.value = order ? { prop, order } : null
-}
-
-const columnSorters: Record<SortProp, (a: FileItem, b: FileItem) => number> = {
-  name: (a, b) => a.name.localeCompare(b.name),
-  type: (a, b) => fileTypeLabel(a).toLowerCase().localeCompare(fileTypeLabel(b).toLowerCase()),
-  modTime: (a, b) => {
-    const ta = a.modTime ? new Date(a.modTime).getTime() : 0
-    const tb = b.modTime ? new Date(b.modTime).getTime() : 0
-    return ta - tb
-  },
-  size: (a, b) => {
-    if (a.isDir && !b.isDir) return -1
-    if (!a.isDir && b.isDir) return 1
-    return a.size - b.size
-  },
 }
 
 function formatSize(bytes: number): string {
