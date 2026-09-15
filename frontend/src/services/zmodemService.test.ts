@@ -109,6 +109,7 @@ function makeDownload(chunks: number[][]) {
     offerHandler?: (offer: any) => void | Promise<void>
     sessionEndHandler?: () => void
     accept?: any
+    offer?: any
     zsession: any
   } = {} as any
   const offer = {
@@ -138,6 +139,7 @@ function makeDownload(chunks: number[][]) {
     abort: vi.fn(),
     close: vi.fn(),
   }
+  state.offer = offer
   state.zsession = zsession
   return state
 }
@@ -304,7 +306,7 @@ describe('startZmodemService', () => {
     startZmodemService({ sessionId: 's1', onComplete, onError })
     sentryInstances[0].on_detect({ confirm: () => u.zsession })
     await sleepTicks()
-    await vi.runOnlyPendingTimersAsync()
+    await vi.advanceTimersByTimeAsync(1500)
     vi.useRealTimers()
 
     expect(u.zsession.abort).toHaveBeenCalled()
@@ -325,7 +327,7 @@ describe('startZmodemService', () => {
     startZmodemService({ sessionId: 's1', onComplete, onError })
     sentryInstances[0].on_detect({ confirm: () => s.zsession })
     await sleepTicks()
-    await vi.runOnlyPendingTimersAsync()
+    await vi.advanceTimersByTimeAsync(1500)
     vi.useRealTimers()
 
     expect(s.zsession.abort).toHaveBeenCalled()
@@ -344,7 +346,7 @@ describe('startZmodemService', () => {
     sentryInstances[0].on_detect({ confirm: () => s.zsession })
     await sleepTicks()
     await vi.advanceTimersByTimeAsync(20_000)
-    await sleepTicks()
+    await vi.advanceTimersByTimeAsync(1500)
     vi.useRealTimers()
 
     expect(onError).toHaveBeenCalledWith('ZMODEM transfer timed out after 20s without activity')
@@ -352,6 +354,7 @@ describe('startZmodemService', () => {
   })
 
   it('finishes local cancellation even when writing the cancel sequence fails', async () => {
+    vi.useFakeTimers()
     const u = makeUpload()
     const registered: Array<() => void> = []
     const onComplete = vi.fn()
@@ -363,10 +366,122 @@ describe('startZmodemService', () => {
     })
     sentryInstances[0].on_detect({ confirm: () => u.zsession })
     registered[0]()
-    await sleepTicks()
+    await vi.advanceTimersByTimeAsync(1500)
+    vi.useRealTimers()
 
     expect(u.zsession.abort).toHaveBeenCalledTimes(1)
     expect(mockSessionEndZmodem).toHaveBeenCalledWith('s1')
+  })
+
+  it('ends binary mode only after the residual binary stream goes quiet after cancel', async () => {
+    vi.useFakeTimers()
+    const s = makeDownload([[1, 2, 3]])
+    const onComplete = vi.fn()
+    const registered: Array<() => void> = []
+    s.offer.accept.mockImplementation(() => new Promise(() => {}))
+    s.zsession.start.mockImplementation(async () => { s.offerHandler?.(s.offer) })
+    s.zsession.abort.mockImplementation(() => { s.sessionEndHandler?.() })
+
+    startZmodemService({
+      sessionId: 's-quiet', onComplete, onRegister: abort => registered.push(abort),
+    })
+    sentryInstances[0].on_detect({ confirm: () => s.zsession })
+    await vi.advanceTimersByTimeAsync(0)
+
+    registered[0]()
+    await vi.advanceTimersByTimeAsync(0)
+
+    // Residual ZDATA keeps flowing after the cancel sequence: sz blocked on a
+    // full SSH send window does not read the CANs until the window drains.
+    // Binary mode must stay on so the residual stays on the ignored binary
+    // path instead of leaking into the text terminal.
+    for (let i = 0; i < 8; i++) {
+      runtimeState.binaryHandler?.({ data: { id: 's-quiet', data: btoa('\x18\x18') } })
+      await vi.advanceTimersByTimeAsync(200)
+      expect(mockSessionEndZmodem).not.toHaveBeenCalled()
+    }
+
+    // Once the stream goes quiet, binary mode is ended and cancel completes.
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(mockSessionEndZmodem).toHaveBeenCalledWith('s-quiet')
+    expect(onComplete).toHaveBeenCalledWith([])
+    vi.useRealTimers()
+  })
+
+  it('disarms terminal restore capture when a download is cancelled mid-transfer', async () => {
+    const s = makeDownload([[1, 2, 3]])
+    const onTerminalRestoreState = vi.fn()
+    const onComplete = vi.fn()
+    const registered: Array<() => void> = []
+    s.offer.accept.mockImplementation(() => new Promise(() => {}))
+    // Real zmodem.js resolves start() after the handshake and fires
+    // session_end only on completion or abort - not one microtask later.
+    s.zsession.start.mockImplementation(async () => { s.offerHandler?.(s.offer) })
+    // zmodem.js fires session_end synchronously inside abort(); mirror that.
+    s.zsession.abort.mockImplementation(() => { s.sessionEndHandler?.() })
+
+    startZmodemService({
+      sessionId: 's-cancel-dl', onComplete, onTerminalRestoreState,
+      onRegister: abort => registered.push(abort),
+    })
+    sentryInstances[0].on_detect({ confirm: () => s.zsession })
+    vi.useFakeTimers()
+    await vi.advanceTimersByTimeAsync(0)
+    expect(onTerminalRestoreState).not.toHaveBeenCalled()
+
+    registered[0]()
+    await vi.advanceTimersByTimeAsync(1500)
+    vi.useRealTimers()
+
+    expect(mockSessionEndZmodem).toHaveBeenCalledWith('s-cancel-dl')
+    expect(onComplete).toHaveBeenCalledWith([])
+    const states = onTerminalRestoreState.mock.calls.map(call => call[0])
+    expect(states).toContain(true)
+    // The restore state must end disarmed, or the terminal keeps swallowing
+    // all subsequent output forever.
+    expect(states[states.length - 1]).toBe(false)
+  })
+
+  it('does not report an error when trailing bytes arrive after cancellation', async () => {
+    const s = makeDownload([[1, 2, 3]])
+    const onError = vi.fn()
+    const onComplete = vi.fn()
+    const registered: Array<() => void> = []
+    s.offer.accept.mockImplementation(() => new Promise(() => {}))
+    s.zsession.abort.mockImplementation(() => { s.sessionEndHandler?.() })
+    // Hold the backend-mode end open so the completion is not yet reported
+    // when the remote's residual output arrives.
+    let releaseEnd: () => void = () => {}
+    mockSessionEndZmodem.mockImplementation(
+      () => new Promise<void>(resolve => { releaseEnd = resolve }),
+    )
+
+    startZmodemService({
+      sessionId: 's-cancel-dl2', onError, onComplete, onRegister: abort => registered.push(abort),
+    })
+    sentryInstances[0].on_detect({ confirm: () => s.zsession })
+    vi.useFakeTimers()
+    await vi.advanceTimersByTimeAsync(0)
+
+    // The stream is quiet, so cancel reaches endBackendMode, which hangs.
+    registered[0]()
+    await vi.advanceTimersByTimeAsync(1500)
+    expect(mockSessionEndZmodem).toHaveBeenCalledTimes(1)
+    expect(onComplete).not.toHaveBeenCalled()
+
+    // Residual remote output after the cancel sequence reaches the aborted
+    // session while cleanup is still in flight; it must be swallowed
+    // silently, not reported as an error.
+    runtimeState.consumeError = new Error('already_aborted')
+    runtimeState.binaryHandler?.({ data: { id: 's-cancel-dl2', data: btoa('\x18\x18') } })
+    await vi.advanceTimersByTimeAsync(0)
+
+    expect(onError).not.toHaveBeenCalled()
+
+    releaseEnd()
+    await vi.advanceTimersByTimeAsync(0)
+    vi.useRealTimers()
+    expect(onComplete).toHaveBeenCalledTimes(1)
   })
 
   it('propagates protocol bridge write failures and restores terminal mode', async () => {
@@ -383,9 +498,9 @@ describe('startZmodemService', () => {
 
     startZmodemService({ sessionId: 's1', onError })
     sentryInstances[0].on_detect({ confirm: () => u.zsession })
-    for (let i = 0; i < 20 && onError.mock.calls.length === 0; i++) {
-      await new Promise(resolve => setTimeout(resolve, 0))
-    }
+    vi.useFakeTimers()
+    await vi.advanceTimersByTimeAsync(1500)
+    vi.useRealTimers()
     expect(onError).toHaveBeenCalledWith('bridge closed')
     expect(mockSessionEndZmodem).toHaveBeenCalledWith('s1')
   })
@@ -564,9 +679,9 @@ describe('startZmodemService', () => {
     runtimeState.consumeError = new Error('bad frame')
 
     runtimeState.binaryHandler?.({ data: { id: 's1', data: 'AQ==' } })
-    for (let i = 0; i < 20 && onError.mock.calls.length === 0; i++) {
-      await new Promise(resolve => setTimeout(resolve, 0))
-    }
+    vi.useFakeTimers()
+    await vi.advanceTimersByTimeAsync(1500)
+    vi.useRealTimers()
 
     expect(events).toEqual(['end', 'error'])
   })
@@ -581,11 +696,13 @@ describe('startZmodemService', () => {
 
     service.start('**\x18B0000000000')
     registered[0]()
-    await sleepTicks()
+    vi.useFakeTimers()
+    await vi.advanceTimersByTimeAsync(1500)
     expect(mockSessionEndZmodem).not.toHaveBeenCalled()
 
     resolveStart()
-    await sleepTicks()
+    await vi.advanceTimersByTimeAsync(0)
+    vi.useRealTimers()
     expect(mockSessionStartZmodem).toHaveBeenCalledWith('s1')
     expect(mockSessionEndZmodem).toHaveBeenCalledWith('s1')
   })
@@ -606,6 +723,7 @@ describe('startZmodemService', () => {
   })
 
   it('retries backend mode cleanup and reports a persistent failure', async () => {
+    vi.useFakeTimers()
     const onError = vi.fn()
     const registered: Array<() => void> = []
     mockSessionEndZmodem.mockRejectedValue(new Error('end bridge closed'))
@@ -614,7 +732,8 @@ describe('startZmodemService', () => {
     })
 
     registered[0]()
-    await sleepTicks()
+    await vi.advanceTimersByTimeAsync(1500)
+    vi.useRealTimers()
 
     expect(mockSessionEndZmodem).toHaveBeenCalledTimes(3)
     expect(onError).toHaveBeenCalledWith('end bridge closed')
@@ -844,9 +963,9 @@ describe('startZmodemService', () => {
 
     startZmodemService({ sessionId: 's-path', onError })
     handlers[0].on_detect({ confirm: () => s.zsession })
-    for (let i = 0; i < 20 && onError.mock.calls.length === 0; i++) {
-      await new Promise(resolve => setTimeout(resolve, 0))
-    }
+    vi.useFakeTimers()
+    await vi.advanceTimersByTimeAsync(1500)
+    vi.useRealTimers()
 
     expect(onError).toHaveBeenCalledWith('Unsafe ZMODEM filename: "..\\\\evil.txt"')
     expect(mockAppendFileBase64).not.toHaveBeenCalled()
