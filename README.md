@@ -288,6 +288,7 @@ Thanks to the following people for contributing code and improvements, and to ev
 - [@kxn](https://github.com/kxn)
 - [@windtear](https://github.com/windtear)
 - [@Sunshow](https://github.com/Sunshow)
+- [@feuvan](https://github.com/feuvan)
 
 ## License
 

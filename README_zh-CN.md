@@ -288,6 +288,7 @@ uniTerm/
 - [@kxn](https://github.com/kxn)
 - [@windtear](https://github.com/windtear)
 - [@Sunshow](https://github.com/Sunshow)
+- [@feuvan](https://github.com/feuvan)
 
 ## 开源协议
 
