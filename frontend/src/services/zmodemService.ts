@@ -17,9 +17,14 @@ import { queuedSessionWrite } from './sessionWriter'
 const dialogLocks = new Set<string>()
 const TRANSFER_TIMEOUT_MS = 20_000
 const CANCEL_WRITE_TIMEOUT_MS = 2_000
+const TRAILING_OUTPUT_GRACE_MS = 75
+const MAX_TRAILING_OUTPUT_BYTES = 64 * 1024
 const END_MODE_ATTEMPTS = 3
+const PEER_ABORT_BEFORE_OFFER = 'peer_aborted_before_offer'
+const CAN = 0x18
+const PEER_ABORT_CAN_COUNT = 5
 const CANCEL_SEQUENCE = new Uint8Array([
-  0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18,
+  CAN, CAN, CAN, CAN, CAN, CAN, CAN, CAN, CAN, CAN,
   0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08,
 ])
 
@@ -60,10 +65,26 @@ export function startZmodemService(options: ZmodemServiceOptions) {
   let startSessionPromise: Promise<void> | null = null
   let endSessionPromise: Promise<void> | null = null
   let captureTrailingOutput = false
+  let captureLateTrailingOutput = false
+  let receivedFileOffer = false
   const trailingOutput: number[] = []
+  const lateTrailingOutput: number[] = []
   const { sessionId } = options
   const abortCtl = createTransferControl()
   const watchdog = createActivityWatchdog(TRANSFER_TIMEOUT_MS)
+
+  function appendTrailingOutput(bytes: ArrayLike<number>, start = 0, end = bytes.length) {
+    const target = captureLateTrailingOutput ? lateTrailingOutput : trailingOutput
+    if (end <= start) return
+    if (end - start >= MAX_TRAILING_OUTPUT_BYTES) {
+      target.length = 0
+      start = end - MAX_TRAILING_OUTPUT_BYTES
+    } else {
+      const overflow = target.length + end - start - MAX_TRAILING_OUTPUT_BYTES
+      if (overflow > 0) target.splice(0, overflow)
+    }
+    for (let i = start; i < end; i++) target.push(bytes[i])
+  }
 
   const notifyComplete = (files: string[], hint?: string) => {
     if (notified) return
@@ -179,12 +200,168 @@ export function startZmodemService(options: ZmodemServiceOptions) {
     }
   }
 
+  function recoverMissingOverAndOut(error: unknown): boolean {
+    if (!errorMessage(error).startsWith('PROTOCOL: Only thing after ZFIN should be')) return false
+
+    const session = currentZsession as any
+    if (session?.type !== 'receive' || !session._got_ZFIN || !Array.isArray(session._input_buffer)) {
+      return false
+    }
+
+    // Some sz implementations restore the shell immediately after ZFIN and
+    // omit the expected "OO" terminator. zmodem.js treats the prompt already
+    // buffered after ZFIN as fatal; finish the otherwise complete session and
+    // preserve those bytes as ordinary terminal output instead.
+    const trailing = session._input_buffer.slice()
+    if (trailing.length === 0 || typeof session._on_session_end !== 'function') return false
+    session._input_buffer.length = 0
+    session._bytes_after_OO = trailing.slice()
+    session._on_session_end()
+    if (captureTrailingOutput) appendTrailingOutput(trailing)
+    return true
+  }
+
+  function tolerateUnexpectedZack(error: unknown): boolean {
+    if (errorMessage(error) !== 'Unhandled header: ZACK') return false
+
+    const session = currentZsession as any
+    if (session?.type !== 'send') return false
+
+    // zmodem.js sends periodic ZSINIT keepalives while the file picker is
+    // open. More than one delayed ZACK can arrive after send_offer() has
+    // replaced the keepalive handler with the ZRPOS/ZSKIP handler. The
+    // library has already consumed the duplicate header before throwing, so
+    // retain the active handler and wait for the receiver's actual response.
+    session._got_ZSINIT_ZACK = true
+    if (Array.isArray(session._input_buffer) && session._input_buffer.length > 0
+      && typeof session._consume_first === 'function') {
+      while (session._input_buffer.length > 0) {
+        const previousLength = session._input_buffer.length
+        try {
+          session._consume_first()
+          break
+        } catch (resumeError) {
+          if (errorMessage(resumeError) !== 'Unhandled header: ZACK'
+            || session._input_buffer.length >= previousLength) {
+            void fail(resumeError)
+            break
+          }
+          session._got_ZSINIT_ZACK = true
+        }
+      }
+    }
+    return true
+  }
+
+  function recoverPeerAbortBeforeOffer(error: unknown): boolean {
+    if (errorMessage(error) !== 'Peer aborted session') return false
+
+    const session = currentZsession as any
+    if (session?.type !== 'receive' || receivedFileOffer) return false
+
+    // lsz sends CANs when it cannot open the requested file. zmodem.js drops
+    // everything through the first five CANs, including useful stderr that
+    // preceded them. Recover text around the cancel sequence and discard the
+    // remaining CAN/backspace padding before restoring normal terminal mode.
+    const consumed = Array.isArray(session._bytes_being_consumed)
+      ? session._bytes_being_consumed
+      : []
+    const abortAt = findAbortSequence(consumed)
+    if (abortAt >= 0) {
+      appendTrailingOutput(consumed, 0, abortAt)
+      let trailingAt = abortAt + PEER_ABORT_CAN_COUNT
+      while (consumed[trailingAt] === CAN || consumed[trailingAt] === 0x08) trailingAt++
+      appendTrailingOutput(consumed, trailingAt)
+    }
+    abortCtl.abort(new Error(PEER_ABORT_BEFORE_OFFER))
+    return true
+  }
+
+  function consumeIncoming(data: Uint8Array) {
+    try {
+      sentry.consume(data)
+    } catch (error) {
+      if (!recoverMissingOverAndOut(error)
+        && !tolerateUnexpectedZack(error)
+        && !recoverPeerAbortBeforeOffer(error)) {
+        void fail(error)
+      }
+    }
+  }
+
+  function beginTerminalRestore() {
+    if (captureTrailingOutput) return
+    captureTrailingOutput = true
+    options.onTerminalRestoreState?.(true)
+  }
+
+  async function finishTransfer(files: string[], hint?: string) {
+    try {
+      // session_end can fire before the bridge promise for the final response
+      // has settled. Wait until that response (normally our final ZFIN) has
+      // reached the remote sz before leaving binary mode; otherwise the end
+      // call can overtake it and the remote shell will not print its next
+      // prompt until the user presses Enter.
+      await drainWrites()
+
+      // lsz can restore the tty and print the shell prompt in the SSH read
+      // immediately after the chunk containing OO. Keep binary routing alive
+      // briefly so Sentry can forward that separate trailing chunk instead of
+      // losing it during the service teardown.
+      const session = currentZsession as any
+      if (trailingOutput.length === 0 && session?.type === 'send') {
+        await delay(TRAILING_OUTPUT_GRACE_MS)
+      } else if (trailingOutput.length === 0
+        && session?.type === 'receive'
+        && typeof session.get_trailing_bytes === 'function') {
+        let trailingBytes: number[] = []
+        try { trailingBytes = session.get_trailing_bytes() } catch (_) {}
+        if (trailingBytes.length === 0) await delay(TRAILING_OUTPUT_GRACE_MS)
+      }
+
+      // Start the ordered backend handoff, but report completion before its
+      // trailing terminal event is emitted. This keeps the restored shell
+      // prompt below our status message. Reporting after the awaited handoff
+      // can print the status below an already-rendered prompt, leaving the
+      // cursor on a blank line until the user presses Enter.
+      captureLateTrailingOutput = true
+      const ending = endBackendMode(Uint8Array.from(trailingOutput))
+      dialogLocks.delete(sessionId)
+      notifyComplete(files, hint)
+      await ending
+      // A binary event already queued before EndZmodem may be delivered while
+      // the bridge call is in flight. Emit only those newly captured bytes;
+      // later SSH reads are already routed through the normal text path.
+      if (lateTrailingOutput.length > 0) {
+        await SessionEndZmodemWithTrailing(
+          sessionId,
+          arrayBufferToBase64(Uint8Array.from(lateTrailingOutput)),
+        )
+      }
+      trailingOutput.length = 0
+      lateTrailingOutput.length = 0
+    } catch (error) {
+      // The transfer itself has completed. Failure to restore trailing shell
+      // output must not send a cancel sequence or Ctrl+C to the restored shell.
+      // Still leave binary mode so the terminal returns to text output instead
+      // of waiting for the backend's minutes-long zmodem safety timeout; this
+      // is idempotent when endBackendMode already ran before the failure.
+      try { await endBackendMode() } catch (_) {}
+      dialogLocks.delete(sessionId)
+      notifyComplete(files, hint)
+      options.onWarning?.(`Shell output restore failed: ${errorMessage(error)}`)
+    } finally {
+      captureLateTrailingOutput = false
+      options.onTerminalRestoreState?.(false)
+    }
+  }
+
   const sentry = new Zmodem.Sentry({
     // A receive session can deliver the final "OO" and the restored shell
     // prompt in one chunk. zmodem.js strips OO and forwards the remaining
     // bytes here; retain them until the completion message has been shown.
     to_terminal: (octets: number[]) => {
-      if (captureTrailingOutput && octets.length > 0) trailingOutput.push(...octets)
+      if (captureTrailingOutput) appendTrailingOutput(octets)
     },
     sender,
     on_detect: (detection: import('zmodem.js/src/zmodem_browser').Detection) => {
@@ -192,6 +369,15 @@ export function startZmodemService(options: ZmodemServiceOptions) {
       const zsession = detection.confirm()
       currentZsession = zsession
       dialogLocks.add(sessionId)
+      if (zsession.type === 'send') {
+        // zmodem.js discards trailing input after a send session ends. Start
+        // capturing before Sentry finishes consuming the ZFIN chunk so a
+        // prompt in that chunk, or in the immediately following one, is
+        // restored after our completion message.
+        zsession.on('session_end', () => {
+          if ((zsession as any)._sent_OO) beginTerminalRestore()
+        })
+      }
 
       const run = async () => {
         if (zsession.type === 'send') {
@@ -210,48 +396,37 @@ export function startZmodemService(options: ZmodemServiceOptions) {
           }
           watchdog.start()
           const result = await handleSend(zsession, sessionId, paths, drainWrites, () => aborted, abortCtl, watchdog)
-          await endBackendMode()
-          dialogLocks.delete(sessionId)
-          notifyComplete(result.files, result.hint)
+          await finishTransfer(result.files, result.hint)
         } else {
-          const configuredDir = options.getDefaultDownloadDir?.() || ''
-          const saveDir: string = configuredDir.trim() ? configuredDir : await abortable(
-            OpenDirectoryDialog().catch((err: unknown) => dialogCancelToEmpty<string>(err, '')),
-            abortCtl,
-          )
-          if (!saveDir) {
-            await cancel()
-            notifyComplete([])
-            return
+          let saveDirPromise: Promise<string> | null = null
+          const getSaveDir = () => {
+            if (!saveDirPromise) {
+              const configuredDir = options.getDefaultDownloadDir?.() || ''
+              saveDirPromise = configuredDir.trim()
+                ? Promise.resolve(configuredDir)
+                : abortable(
+                  OpenDirectoryDialog().catch((err: unknown) => dialogCancelToEmpty<string>(err, '')),
+                  abortCtl,
+                )
+            }
+            return saveDirPromise
           }
           watchdog.start()
           const files = await handleReceive(
-            zsession, sessionId, saveDir, () => aborted, abortCtl, watchdog,
-            () => {
-              captureTrailingOutput = true
-              options.onTerminalRestoreState?.(true)
-            },
+            zsession, sessionId, getSaveDir, () => aborted, abortCtl, watchdog,
+            beginTerminalRestore,
+            () => { receivedFileOffer = true },
           )
-          try {
-            await endBackendMode(Uint8Array.from(trailingOutput))
-            trailingOutput.length = 0
-            dialogLocks.delete(sessionId)
-            notifyComplete(files)
-          } catch (error) {
-            // The transfer itself has completed. Failure to restore trailing
-            // shell output must not enter fail()/cancel(), which would send a
-            // ZMODEM cancel sequence and Ctrl+C to the restored shell.
-            dialogLocks.delete(sessionId)
-            notifyComplete(files)
-            options.onWarning?.(`Shell output restore failed: ${errorMessage(error)}`)
-          } finally {
-            options.onTerminalRestoreState?.(false)
-          }
+          await finishTransfer(files)
         }
       }
 
       run().catch(async (err: unknown) => {
         if (disposed) return
+        if (errorMessage(err) === PEER_ABORT_BEFORE_OFFER) {
+          await finishTransfer([], 'Remote ZMODEM sender stopped before offering a file')
+          return
+        }
         if (errorMessage(err) === 'aborted') {
           try {
             await cancel()
@@ -274,11 +449,7 @@ export function startZmodemService(options: ZmodemServiceOptions) {
     const payload: { id: string; data: string } = ev.data
     if (payload.id !== sessionId || disposed) return
     watchdog.touch()
-    try {
-      sentry.consume(base64ToUint8Array(payload.data))
-    } catch (err) {
-      void fail(err)
-    }
+    consumeIncoming(base64ToUint8Array(payload.data))
   })
 
   const svc = {
@@ -290,11 +461,7 @@ export function startZmodemService(options: ZmodemServiceOptions) {
     consume: (data: string) => {
       if (disposed) return
       watchdog.touch()
-      try {
-        sentry.consume(new TextEncoder().encode(data))
-      } catch (err) {
-        void fail(err)
-      }
+      consumeIncoming(new TextEncoder().encode(data))
     },
     dispose: async () => {
       if (disposed) return
@@ -409,19 +576,18 @@ async function sendFileChunks(
 async function handleReceive(
   zsession: import('zmodem.js/src/zmodem_browser').Session,
   sessionId: string,
-  saveDir: string,
+  getSaveDir: () => Promise<string>,
   isAborted: () => boolean,
   abortCtl: TransferControl,
   watchdog: ActivityWatchdog,
   onSessionEnd: () => void,
+  onOffer: () => void,
 ): Promise<string[]> {
   const store = useZmodemStore()
   const files: string[] = []
   const activeOffers = new Set<Promise<void>>()
   let offerCount = 0
   let offerFailure: unknown = null
-  const windowsPath = /^[a-zA-Z]:[\\/]/.test(saveDir) || saveDir.startsWith('\\\\')
-  const sep = windowsPath ? '\\' : '/'
   let endSession!: () => void
   const sessionEnded = new Promise<void>(resolve => { endSession = resolve })
   zsession.on('session_end', () => {
@@ -434,7 +600,14 @@ async function handleReceive(
       try { offer.skip() } catch (_) {}
       return
     }
-    const task = receiveOffer(offer, saveDir, sep, sessionId, offerCount++, store, watchdog, files)
+    const task = (async () => {
+      const saveDir = await getSaveDir()
+      if (!saveDir) throw new Error('aborted')
+      onOffer()
+      const windowsPath = /^[a-zA-Z]:[\\/]/.test(saveDir) || saveDir.startsWith('\\\\')
+      const sep = windowsPath ? '\\' : '/'
+      await receiveOffer(offer, saveDir, sep, sessionId, offerCount++, store, watchdog, files)
+    })()
     activeOffers.add(task)
     task.catch(err => {
       offerFailure = offerFailure || err
@@ -573,6 +746,19 @@ function dialogCancelToEmpty<T>(err: unknown, empty: T): T {
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error)
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+function findAbortSequence(bytes: number[]): number {
+  let runLength = 0
+  for (let i = 0; i < bytes.length; i++) {
+    runLength = bytes[i] === CAN ? runLength + 1 : 0
+    if (runLength === PEER_ABORT_CAN_COUNT) return i - PEER_ABORT_CAN_COUNT + 1
+  }
+  return -1
 }
 
 function safeDownloadFilename(value: unknown, windowsPath: boolean): string {

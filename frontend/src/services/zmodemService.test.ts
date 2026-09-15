@@ -42,7 +42,9 @@ vi.mock('zmodem.js/src/zmodem_browser', () => ({
     Sentry: vi.fn(function (this: any, options) {
       sentryInstances.push(options)
       this.consume = vi.fn(() => {
-        if (runtimeState.consumeError) throw runtimeState.consumeError
+        const error = runtimeState.consumeError
+        runtimeState.consumeError = null
+        if (error) throw error
       })
     }),
   },
@@ -142,7 +144,7 @@ function makeDownload(chunks: number[][]) {
 
 // Builds a fake zmodem 'send' session (the local side of an rz upload).
 function makeUpload() {
-  const zsession = {
+  const zsession: any = {
     type: 'send',
     on: vi.fn(),
     abort: vi.fn(),
@@ -388,6 +390,147 @@ describe('startZmodemService', () => {
     expect(mockSessionEndZmodem).toHaveBeenCalledWith('s1')
   })
 
+  it('ignores a delayed keepalive ZACK while rz is waiting for ZRPOS', async () => {
+    const u = makeUpload()
+    const onError = vi.fn()
+    const expectedZrpos = vi.fn()
+    const nextHeaderHandler = { ZRPOS: expectedZrpos }
+    Object.assign(u.zsession, {
+      _last_header_name: 'ZRINIT',
+      _next_header_handler: nextHeaderHandler,
+      _got_ZSINIT_ZACK: false,
+      _input_buffer: [1],
+      _consume_first: vi.fn(() => nextHeaderHandler.ZRPOS({})),
+    })
+    mockOpenMultipleFilesDialog.mockImplementation(() => new Promise<string[]>(() => {}))
+
+    const service = startZmodemService({ sessionId: 's1', onError })
+    sentryInstances[0].on_detect({ confirm: () => u.zsession })
+    await sleepTicks()
+
+    // Mirror zmodem.js: _consume_header removes the parsed header, then throws
+    // without clearing the handler when that handler does not accept it.
+    runtimeState.consumeError = new Error('Unhandled header: ZACK')
+    runtimeState.binaryHandler?.({ data: { id: 's1', data: 'AQ==' } })
+    await sleepTicks()
+
+    expect(onError).not.toHaveBeenCalled()
+    expect(u.zsession.abort).not.toHaveBeenCalled()
+    expect(u.zsession._next_header_handler).toBe(nextHeaderHandler)
+    expect(u.zsession._got_ZSINIT_ZACK).toBe(true)
+    expect(u.zsession._consume_first).toHaveBeenCalledTimes(1)
+    expect(expectedZrpos).toHaveBeenCalledTimes(1)
+    await service.dispose()
+  })
+
+  it('restores the shell prompt after a completed rz upload', async () => {
+    const u = makeUpload()
+    const handlers: Record<string, () => void> = {}
+    const prompt = Array.from(new TextEncoder().encode('root@debian13:~# '))
+    const xfer = {
+      send: vi.fn(),
+      end: vi.fn().mockResolvedValue(undefined),
+    }
+    u.zsession.on.mockImplementation((event: string, handler: () => void) => {
+      handlers[event] = handler
+    })
+    u.zsession.send_offer.mockResolvedValue(xfer)
+    u.zsession.close.mockImplementation(async () => {
+      u.zsession._sent_OO = true
+      handlers.session_end?.()
+      setTimeout(() => sentryInstances[0].to_terminal(prompt), 10)
+    })
+    mockOpenMultipleFilesDialog.mockResolvedValue(['/tmp/a.bin'])
+    const onComplete = vi.fn()
+
+    startZmodemService({ sessionId: 's1', onComplete })
+    sentryInstances[0].on_detect({ confirm: () => u.zsession })
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    expect(mockSessionEndZmodemWithTrailing).toHaveBeenCalledWith(
+      's1',
+      btoa('root@debian13:~# '),
+    )
+    expect(onComplete).toHaveBeenCalledWith(['a.bin'])
+  })
+
+  it('restores an rz prompt arriving while backend mode is ending', async () => {
+    const u = makeUpload()
+    const handlers: Record<string, () => void> = {}
+    const prompt = Array.from(new TextEncoder().encode('root@host:~# '))
+    const xfer = {
+      send: vi.fn(),
+      end: vi.fn().mockResolvedValue(undefined),
+    }
+    let resolveEnd!: () => void
+    mockSessionEndZmodem.mockImplementation(() => new Promise<void>(resolve => {
+      resolveEnd = resolve
+    }))
+    u.zsession.on.mockImplementation((event: string, handler: () => void) => {
+      handlers[event] = handler
+    })
+    u.zsession.send_offer.mockResolvedValue(xfer)
+    u.zsession.close.mockImplementation(async () => {
+      u.zsession._sent_OO = true
+      handlers.session_end?.()
+    })
+    mockOpenMultipleFilesDialog.mockResolvedValue(['/tmp/a.bin'])
+    const onComplete = vi.fn()
+
+    startZmodemService({ sessionId: 's1', onComplete })
+    sentryInstances[0].on_detect({ confirm: () => u.zsession })
+    await new Promise(resolve => setTimeout(resolve, 90))
+    expect(mockSessionEndZmodem).toHaveBeenCalledWith('s1')
+
+    sentryInstances[0].to_terminal(prompt)
+    resolveEnd()
+    await sleepTicks()
+
+    expect(mockSessionEndZmodemWithTrailing).toHaveBeenCalledWith(
+      's1',
+      btoa('root@host:~# '),
+    )
+    expect(onComplete).toHaveBeenCalledWith(['a.bin'])
+  })
+
+  it('restores remote sz errors instead of reporting peer abort before an offer', async () => {
+    const s = makeDownload([])
+    const onComplete = vi.fn()
+    const onError = vi.fn()
+    const remoteError = Array.from(new TextEncoder().encode(
+      "sz: can't open missing-file.txt\r\n",
+    ))
+    s.zsession.start.mockImplementation(() => new Promise<void>(() => {}))
+    Object.assign(s.zsession, {
+      _bytes_being_consumed: [
+        ...remoteError,
+        ...Array(8).fill(0x18),
+        ...Array(10).fill(0x08),
+      ],
+    })
+
+    startZmodemService({ sessionId: 's1', onComplete, onError })
+    sentryInstances[0].on_detect({ confirm: () => s.zsession })
+    await sleepTicks()
+    s.sessionEndHandler?.()
+    runtimeState.consumeError = new Error('Peer aborted session')
+    runtimeState.binaryHandler?.({ data: { id: 's1', data: 'AQ==' } })
+    await sleepTicks()
+
+    expect(onError).not.toHaveBeenCalled()
+    expect(s.zsession.abort).not.toHaveBeenCalled()
+    expect(mockOpenDirectoryDialog).not.toHaveBeenCalled()
+    expect(mockSessionWriteBinary).not.toHaveBeenCalled()
+    expect(mockSessionEndZmodemWithTrailing).toHaveBeenCalledWith(
+      's1',
+      btoa(String.fromCharCode(...remoteError)),
+    )
+    expect(onComplete).toHaveBeenCalledWith(
+      [],
+      'Remote ZMODEM sender stopped before offering a file',
+    )
+  })
+
   it('sends one complete cancel sequence in protocol order', async () => {
     const u = makeUpload()
     const registered: Array<() => void> = []
@@ -546,6 +689,113 @@ describe('startZmodemService', () => {
       's1',
       btoa('root@host:~# '),
     )
+  })
+
+  it('restores a shell prompt arriving in the binary chunk after OO', async () => {
+    const s = makeDownload([[1, 2, 3]])
+    const prompt = Array.from(new TextEncoder().encode('root@debian13:~# '))
+    const onComplete = vi.fn()
+    s.zsession.get_trailing_bytes = vi.fn(() => [])
+    s.zsession.start.mockImplementation(() => {
+      const task = s.offerHandler?.({
+        get_details: () => ({ name: 'a.bin', size: 3 }),
+        accept: vi.fn(async ({ on_input }: any) => on_input([1, 2, 3])),
+        skip: vi.fn(),
+      })
+      return Promise.resolve(task).then(() => {
+        s.sessionEndHandler?.()
+        setTimeout(() => sentryInstances[0].to_terminal(prompt), 10)
+      })
+    })
+
+    startZmodemService({ sessionId: 's1', onComplete })
+    sentryInstances[0].on_detect({ confirm: () => s.zsession })
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    expect(mockSessionEndZmodemWithTrailing).toHaveBeenCalledWith(
+      's1',
+      btoa('root@debian13:~# '),
+    )
+    expect(onComplete).toHaveBeenCalledWith(['C:\\Downloads\\a.bin'])
+  })
+
+  it('flushes the final receive response before leaving backend binary mode', async () => {
+    const s = makeDownload([[1, 2, 3]])
+    let resolveFinalWrite!: () => void
+    const events: string[] = []
+    const onComplete = vi.fn(() => events.push('complete'))
+    mockSessionWriteBinary.mockImplementation(() => new Promise<void>(resolve => {
+      events.push('write:start')
+      resolveFinalWrite = () => {
+        events.push('write:end')
+        resolve()
+      }
+    }))
+    mockSessionEndZmodem.mockImplementation(async () => { events.push('end') })
+    s.zsession.start.mockImplementation(() => {
+      const task = s.offerHandler?.({
+        get_details: () => ({ name: 'a.bin', size: 3 }),
+        accept: vi.fn(async ({ on_input }: any) => on_input([1, 2, 3])),
+        skip: vi.fn(),
+      })
+      return Promise.resolve(task).then(() => {
+        // zmodem.js queues its final response immediately before session_end.
+        sentryInstances[0].sender([0x2a])
+        s.sessionEndHandler?.()
+      })
+    })
+
+    startZmodemService({ sessionId: 's1', onComplete })
+    sentryInstances[0].on_detect({ confirm: () => s.zsession })
+    await sleepTicks()
+
+    expect(events).toEqual(['write:start'])
+    expect(mockSessionEndZmodem).not.toHaveBeenCalled()
+    expect(onComplete).not.toHaveBeenCalled()
+
+    resolveFinalWrite()
+    await sleepTicks()
+
+    expect(events).toEqual(['write:start', 'write:end', 'complete', 'end'])
+    expect(mockSessionEndZmodem).toHaveBeenCalledWith('s1')
+  })
+
+  it('accepts shell output immediately after ZFIN when sz omits OO', async () => {
+    const s = makeDownload([[1, 2, 3]])
+    const onComplete = vi.fn()
+    const onError = vi.fn()
+    const prompt = Array.from(new TextEncoder().encode('\x1b[?2004hroot@host:~# '))
+    s.zsession.start.mockImplementation(() => {
+      const task = s.offerHandler?.({
+        get_details: () => ({ name: 'large.bin', size: 3 }),
+        accept: vi.fn(async ({ on_input }: any) => on_input([1, 2, 3])),
+        skip: vi.fn(),
+      })
+      return Promise.resolve(task)
+    })
+    Object.assign(s.zsession, {
+      _got_ZFIN: true,
+      _input_buffer: prompt.slice(),
+      _on_session_end: () => s.sessionEndHandler?.(),
+    })
+    runtimeState.consumeError = new Error(
+      `PROTOCOL: Only thing after ZFIN should be “OO” (79,79), not: ${prompt.join()}`,
+    )
+
+    startZmodemService({ sessionId: 's1', onComplete, onError })
+    sentryInstances[0].on_detect({ confirm: () => s.zsession })
+    await sleepTicks()
+    runtimeState.binaryHandler?.({ data: { id: 's1', data: btoa(String.fromCharCode(...prompt)) } })
+    await sleepTicks()
+
+    expect(onError).not.toHaveBeenCalled()
+    expect(s.zsession.abort).not.toHaveBeenCalled()
+    expect(mockSessionWriteBinary).not.toHaveBeenCalled()
+    expect(mockSessionEndZmodemWithTrailing).toHaveBeenCalledWith(
+      's1',
+      btoa(String.fromCharCode(...prompt)),
+    )
+    expect(onComplete).toHaveBeenCalledWith(['C:\\Downloads\\large.bin'])
   })
 
   it('warns without cancelling a completed transfer if restoring shell output fails', async () => {
