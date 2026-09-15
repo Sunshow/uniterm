@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -103,6 +104,19 @@ func detectExternalEditors() []ExternalEditorOption {
 // applyRoundedCorners is a no-op on Linux: window corners are handled by the
 // platform (the Windows build asks DWM for Win11 rounded corners instead).
 func applyRoundedCorners(unsafe.Pointer) {}
+
+// openWithSystem opens the file with its default associated application via
+// xdg-open. Linux has no scriptable cross-desktop "open with" picker, so the
+// degrading behaviour from the issue discussion applies: no chooser, the file
+// simply opens in whatever the desktop currently associates with the extension.
+func (a *App) openWithSystem(p string) error {
+	cmd := exec.Command("xdg-open", p)
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("failed to open %s: %w", p, err)
+	}
+	go cmd.Wait()
+	return nil
+}
 
 // systemPrefersDark reports whether the Linux desktop prefers a dark colour
 // scheme, queried from the freedesktop colour-scheme setting — the same value

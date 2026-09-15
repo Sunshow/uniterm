@@ -154,6 +154,7 @@
         <template v-if="menuType === 'file'">
           <MenuItem @click="doEdit">{{ t('sftp.edit') }}</MenuItem>
           <MenuItem @click="doEditExternal">{{ t('sftp.editExternal') }}</MenuItem>
+          <MenuItem @click="doOpenWithSystem">{{ t('sftp.openWithSystem') }}</MenuItem>
           <MenuItem @click="doNewFile">{{ t('sftp.newFile') }}</MenuItem>
           <MenuItem @click="doMkdir">{{ t('sftp.newDirectory') }}</MenuItem>
           <MenuItem v-if="supportsSymlink" @click="doSymlink">{{ t('sftp.newLink') }}</MenuItem>
@@ -309,6 +310,7 @@ const emit = defineEmits<{
   cancelPaste: []
   edit: [item: FileItem]
   editExternal: [item: FileItem]
+  openWithSystem: [item: FileItem]
   newFile: []
   copyToClipboard: [items: FileItem[]]
   cutToClipboard: [items: FileItem[]]
@@ -721,6 +723,7 @@ function doDelete() { emit('delete', [...selectedItems.value]); ctxMenuVisible.v
 function doChmod() { emit('chmod', selectedItems.value[0]); ctxMenuVisible.value = false }
 function doEdit() { emit('edit', selectedItems.value[0]); ctxMenuVisible.value = false }
 function doEditExternal() { emit('editExternal', selectedItems.value[0]); ctxMenuVisible.value = false }
+function doOpenWithSystem() { emit('openWithSystem', selectedItems.value[0]); ctxMenuVisible.value = false }
 function doNewFile() { emit('newFile'); ctxMenuVisible.value = false; moreMenuVisible.value = false }
 function doMkdir() { emit('mkdir'); ctxMenuVisible.value = false; moreMenuVisible.value = false }
 function doSymlink() { emit('symlink'); ctxMenuVisible.value = false; moreMenuVisible.value = false }

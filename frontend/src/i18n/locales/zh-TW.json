@@ -1531,6 +1531,8 @@
   "sftp.editExternalStart": "正在外部編輯器中編輯 {path}",
   "sftp.editExternalUploaded": "已自動上傳至遠端：{path}",
   "sftp.editExternalNotConfigured": "尚未設定外部編輯器，請在設定中設定。",
+  "sftp.openWithSystem": "系統開啟方式…",
+  "sftp.openWithSystemStart": "正在使用系統關聯程式開啟 {path}",
   "settings.externalEditor": "外部編輯器",
   "settings.externalEditorDesc": "外部編輯器命令，暫存檔路徑自動附加。含空格的路徑需用雙引號包裹。",
   "sftp.edit.saveClose": "儲存並關閉",

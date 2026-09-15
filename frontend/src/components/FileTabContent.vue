@@ -36,6 +36,7 @@
           @mkdir="onLocalMkdir"
           @edit="onLocalEditFile"
           @edit-external="onLocalEditExternal"
+          @open-with-system="onLocalOpenWithSystem"
           @new-file="onLocalNewFile"
           @copy-to-clipboard="onLocalCopyToClipboard"
           @cut-to-clipboard="onLocalCutToClipboard"
@@ -90,6 +91,7 @@
           @download-to="onDownloadTo"
           @edit="onEditFile"
           @edit-external="onEditExternal"
+          @open-with-system="onOpenWithSystem"
           @new-file="onNewFile"
           @copy-to-clipboard="onCopyToClipboard"
           @cut-to-clipboard="onCutToClipboard"
@@ -175,6 +177,7 @@ import {
   SftpListRemote, SftpListLocal, SftpListLocalDrives,
   SftpChangeRemoteDir, SftpChangeLocalDir,
   SftpOpenExternalEditor, OpenExternalEditorLocal, ListSessions,
+  SftpOpenWithSystem, OpenWithSystemLocal,
 } from '../../bindings/github.com/ys-ll/uniterm/app'
 
 import FileList from './FileList.vue'
@@ -333,6 +336,7 @@ const remotePanel = useFilePanel({
   transferTasks: () => transferTasks,
   openEditor: (path, title) => fileEditorRef.value?.open(path, title, 'remote') ?? Promise.resolve(),
   openExternal: (sid, path, cmd) => SftpOpenExternalEditor(sid, path, cmd),
+  openWithSystem: (sid, path) => SftpOpenWithSystem(sid, path),
   bookmarkMode: 'remote',
 })
 const localPanel = useFilePanel({
@@ -346,6 +350,7 @@ const localPanel = useFilePanel({
   transferTasks: () => transferTasks,
   openEditor: (path, title) => fileEditorRef.value?.open(path, title, 'local') ?? Promise.resolve(),
   openExternal: (sid, path, cmd) => OpenExternalEditorLocal(path, cmd),
+  openWithSystem: (sid, path) => OpenWithSystemLocal(path),
   bookmarkMode: 'local',
 })
 const {
@@ -353,7 +358,7 @@ const {
   onCopyToClipboard, onCutToClipboard, onClearClipboard, onCancelPaste, onPaste,
   onRename, onDelete, onMkdir, onNewFile, onSymlink,
   onUpload, onDownloadTo,
-  onEditFile, onEditExternal,
+  onEditFile, onEditExternal, onOpenWithSystem,
   onCancelTransfer, onPauseTransfer, onResumeTransfer, onRetryTransfer, clearFinishedTransfers,
   onSaveBookmark, onRemoveBookmark,
   uploadPaths,
@@ -365,7 +370,7 @@ const {
   onClearClipboard: onLocalClearClipboard, onCancelPaste: onLocalCancelPaste,
   onPaste: onLocalPaste, onRename: onLocalRename, onDelete: onLocalDelete,
   onMkdir: onLocalMkdir, onNewFile: onLocalNewFile,
-  onEditFile: onLocalEditFile, onEditExternal: onLocalEditExternal,
+  onEditFile: onLocalEditFile, onEditExternal: onLocalEditExternal, onOpenWithSystem: onLocalOpenWithSystem,
   onSaveBookmark: onLocalSaveBookmark, onRemoveBookmark: onLocalRemoveBookmark,
 } = localPanel
 

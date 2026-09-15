@@ -1531,6 +1531,8 @@
   "sftp.editExternalStart": "Modification de {path} dans un éditeur externe",
   "sftp.editExternalUploaded": "Téléversé automatiquement vers le distant : {path}",
   "sftp.editExternalNotConfigured": "Aucun éditeur externe configuré. Configurez-en un dans les paramètres.",
+  "sftp.openWithSystem": "Ouvrir avec…",
+  "sftp.openWithSystemStart": "Ouverture de {path} avec l'application associée…",
   "settings.externalEditor": "Éditeur externe",
   "settings.externalEditorDesc": "Commande de l'éditeur externe ; le chemin du fichier temporaire est ajouté automatiquement. Les chemins avec espaces doivent être entre guillemets doubles.",
   "sftp.edit.saveClose": "Enregistrer et fermer",

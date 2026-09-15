@@ -295,6 +295,8 @@ export interface FilePanelOptions {
   openEditor?: (path: string, title: string) => Promise<void>
   /** Launch the external editor; remote panels upload on save, local edits in place. */
   openExternal?: (sid: string, path: string, editorCmd: string) => Promise<unknown>
+  /** Open via the OS "open with" flow (system picker on Windows, default handler elsewhere). */
+  openWithSystem?: (sid: string, path: string) => Promise<unknown>
   /** Which bookmark list this panel's paths belong to. */
   bookmarkMode: 'local' | 'remote'
 }
@@ -635,6 +637,26 @@ export function useFilePanel(opts: FilePanelOptions) {
     }
   }
 
+  // Opens via the OS "open with" flow (Windows pops the association picker).
+  // No editor binding required: like onEditExternal this shares the extedit
+  // pipeline, so saves made in the picked application auto-upload to remote.
+  async function onOpenWithSystem(item: FileItem) {
+    if (item.isDir) return
+    if (item.size > EDIT_FILE_MAX_SIZE) {
+      msg.warning(t('sftp.edit.fileTooLarge'))
+      return
+    }
+    const id = sid()
+    if (!id) return
+    const path = joinPath(cwd.value, item.name)
+    try {
+      await opts.openWithSystem?.(id, path)
+      msg.info(t('sftp.openWithSystemStart', { path }))
+    } catch (e: any) {
+      msg.error(e?.toString() || 'Failed to open with system')
+    }
+  }
+
   // --- Transfer panel actions -------------------------------------------------
 
   async function onCancelTransfer(taskId: string) {
@@ -733,7 +755,7 @@ export function useFilePanel(opts: FilePanelOptions) {
     // file actions
     onRename, onDelete, onMkdir, onNewFile, onSymlink,
     onUpload, onDownloadTo,
-    onEditFile, onEditExternal,
+    onEditFile, onEditExternal, onOpenWithSystem,
     // transfer panel
     onCancelTransfer, onPauseTransfer, onResumeTransfer,
     onRetryTransfer, onDismissTask, clearFinishedTransfers,
