@@ -17,6 +17,11 @@ import { queuedSessionWrite } from './sessionWriter'
 const dialogLocks = new Set<string>()
 const TRANSFER_TIMEOUT_MS = 20_000
 const CANCEL_WRITE_TIMEOUT_MS = 2_000
+// After the cancel sequence, wait for the residual binary stream to drain
+// before leaving binary mode. See waitBinaryQuiet.
+const CANCEL_QUIET_MS = 400
+const CANCEL_QUIET_CAP_MS = 8_000
+const CANCEL_QUIET_POLL_MS = 80
 const TRAILING_OUTPUT_GRACE_MS = 75
 const MAX_TRAILING_OUTPUT_BYTES = 64 * 1024
 const END_MODE_ATTEMPTS = 3
@@ -67,6 +72,7 @@ export function startZmodemService(options: ZmodemServiceOptions) {
   let captureTrailingOutput = false
   let captureLateTrailingOutput = false
   let receivedFileOffer = false
+  let lastBinaryAt = 0
   const trailingOutput: number[] = []
   const lateTrailingOutput: number[] = []
   const { sessionId } = options
@@ -163,6 +169,28 @@ export function startZmodemService(options: ZmodemServiceOptions) {
     return endSessionPromise
   }
 
+  // The SSH channel still holds ZDATA frames sz pushed before it noticed the
+  // CANs; while its send window is full sz does not read input at all, so it
+  // can keep sending well past the cancel click. Keep binary mode alive until
+  // the binary stream goes quiet so the residual frames stay on the ignored
+  // binary path instead of leaking into the text terminal as garbage. The cap
+  // bounds the wait when the peer ignores the cancel entirely.
+  function waitBinaryQuiet(): Promise<void> {
+    lastBinaryAt = Date.now()
+    const deadline = Date.now() + CANCEL_QUIET_CAP_MS
+    return new Promise(resolve => {
+      const poll = () => {
+        const now = Date.now()
+        if (now - lastBinaryAt >= CANCEL_QUIET_MS || now >= deadline) {
+          resolve()
+          return
+        }
+        setTimeout(poll, CANCEL_QUIET_POLL_MS)
+      }
+      setTimeout(poll, CANCEL_QUIET_POLL_MS)
+    })
+  }
+
   function cancel(reason = new Error('aborted')): Promise<void> {
     if (cancelPromise) return cancelPromise
     aborted = true
@@ -184,7 +212,9 @@ export function startZmodemService(options: ZmodemServiceOptions) {
         // Local cleanup below must run even if the session bridge is broken.
       } finally {
         queuedSessionWrite(sessionId, '\x03')
+        await waitBinaryQuiet()
         await endBackendMode()
+        disarmTerminalRestore()
       }
     })()
     return cancelPromise
@@ -281,6 +311,10 @@ export function startZmodemService(options: ZmodemServiceOptions) {
     try {
       sentry.consume(data)
     } catch (error) {
+      // Residual remote output after our cancel sequence (e.g. sz's own
+      // abort reply) hits the already-aborted session; it is cleanup noise,
+      // not a transfer failure.
+      if (aborted) return
       if (!recoverMissingOverAndOut(error)
         && !tolerateUnexpectedZack(error)
         && !recoverPeerAbortBeforeOffer(error)) {
@@ -293,6 +327,20 @@ export function startZmodemService(options: ZmodemServiceOptions) {
     if (captureTrailingOutput) return
     captureTrailingOutput = true
     options.onTerminalRestoreState?.(true)
+  }
+
+  // The receive session's `session_end` handler arms terminal-restore capture,
+  // and zmodem.js fires session_end synchronously inside abort(). finishTransfer
+  // is the only place that normally disarms it, but cancellation never goes
+  // through finishTransfer — leaving the terminal swallowing all subsequent
+  // output forever. Disarm here so the normal text path resumes and the
+  // completion/error handler can recycle the service.
+  function disarmTerminalRestore() {
+    captureTrailingOutput = false
+    captureLateTrailingOutput = false
+    trailingOutput.length = 0
+    lateTrailingOutput.length = 0
+    options.onTerminalRestoreState?.(false)
   }
 
   async function finishTransfer(files: string[], hint?: string) {
@@ -448,6 +496,7 @@ export function startZmodemService(options: ZmodemServiceOptions) {
   binaryUnsub = Events.On('session:binary', (ev) => {
     const payload: { id: string; data: string } = ev.data
     if (payload.id !== sessionId || disposed) return
+    lastBinaryAt = Date.now()
     watchdog.touch()
     consumeIncoming(base64ToUint8Array(payload.data))
   })
