@@ -21,7 +21,7 @@ Supports **PowerShell / CMD / Git Bash / WSL** local terminals, as well as **ser
 
 #### File Transfer
 
-Built-in **SFTP / FTP / FTPS / SMB / WebDAV / S3** dual-pane file browser, with **Zmodem** (`rz`/`sz`) support for transferring files directly within SSH terminals.
+Built-in **SFTP / SCP / FTP / FTPS / SMB / WebDAV / S3** dual-pane file browser, with **Zmodem** (`rz`/`sz`) support for transferring files directly within SSH terminals.
 
 ![SFTP](/imgs/sftp_light.webp)
 

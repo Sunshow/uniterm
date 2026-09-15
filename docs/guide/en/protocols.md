@@ -33,6 +33,7 @@ uniTerm supports 30+ connection protocols, covering remote terminals, remote des
 | Protocol | Default Port | Description |
 |------|----------|------|
 | SFTP | 22 (SSH) | SSH-based secure file transfer |
+| SCP | 22 (SSH) | SSH-based file transfer for servers without an SFTP subsystem |
 | FTP / FTPS | 21 | Traditional file transfer and its encrypted version |
 | SMB | 445 | Windows file sharing |
 | WebDAV | 80 / 443 | HTTP-based file management |

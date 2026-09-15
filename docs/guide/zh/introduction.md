@@ -21,7 +21,7 @@ uniTerm 是一款轻量级全能终端模拟器，支持 **30+** 种连接协议
 
 #### 文件传输
 
-内置 **SFTP / FTP / FTPS / SMB / WebDAV / S3** 双栏文件浏览器，支持 **Zmodem**（`rz`/`sz`）在 SSH 终端中直接传输文件。
+内置 **SFTP / SCP / FTP / FTPS / SMB / WebDAV / S3** 双栏文件浏览器，支持 **Zmodem**（`rz`/`sz`）在 SSH 终端中直接传输文件。
 
 ![SFTP](/imgs/sftp_light.webp)
 
