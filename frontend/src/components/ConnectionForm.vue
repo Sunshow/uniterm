@@ -158,6 +158,11 @@
                       <el-icon><FolderOpen :size="'1rem'" /></el-icon>
                     </el-button>
                   </el-tooltip>
+                  <el-tooltip :content="t('conn.useDefaultKey')" placement="top">
+                    <el-button :aria-label="t('conn.useDefaultKey')" @click="useDefaultKeyPath">
+                      <el-icon><KeyRound :size="16" /></el-icon>
+                    </el-button>
+                  </el-tooltip>
                 </template>
               </el-input>
             </el-form-item>
@@ -695,10 +700,10 @@ import { useIdentityStore } from '../stores/identityStore'
 import { useProxyStore } from '../stores/proxyStore'
 import { useI18n } from '../i18n'
 import type { ConnectionConfig, PostLoginExpectStep } from '../types/session'
-import { OpenFileDialog, OpenPrivateKeyFile, OpenKubeconfigFile, GetPlatform, ListSerialPorts, TestConnection } from '../../bindings/github.com/ys-ll/uniterm/app'
+import { OpenFileDialog, OpenPrivateKeyFile, OpenKubeconfigFile, GetPlatform, ListSerialPorts, TestConnection, GetDefaultSSHKeyPath } from '../../bindings/github.com/ys-ll/uniterm/app'
 import { ElInput } from 'element-plus'
 import { msg } from '../services/message'
-import { Plus, Trash2, ChevronRight, FolderOpen, Eye, EyeOff, RefreshCw, CircleCheck, CircleX } from '@lucide/vue'
+import { Plus, Trash2, ChevronRight, FolderOpen, Eye, EyeOff, RefreshCw, CircleCheck, CircleX, KeyRound } from '@lucide/vue'
 import { listContexts } from '../services/k8sClient'
 import SyntaxEditor from './SyntaxEditor.vue'
 import type { K8sContextInfo } from '../types/k8s'
@@ -1461,6 +1466,18 @@ async function selectKeyFile() {
     if (selected) form.keyPath = selected
   } catch (e) {
     console.error('select key file:', e)
+  }
+}
+
+// Fill the key path with the local default private key (~/.ssh/id_ed25519 or
+// ~/.ssh/id_rsa, etc.). The backend resolves the home directory and prefers an
+// existing standard key so one click covers the common case.
+async function useDefaultKeyPath() {
+  try {
+    const p = await GetDefaultSSHKeyPath()
+    if (p) form.keyPath = p
+  } catch (e) {
+    console.error('default key path:', e)
   }
 }
 
