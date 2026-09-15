@@ -183,6 +183,9 @@ type ConnectionConfig struct {
 	// (the equivalent of OpenSSH's -A option). The private keys remain in the
 	// local agent; only signing requests are forwarded.
 	AgentForwarding bool `json:"agentForwarding,omitempty"`
+	// ShellIntegration injects OSC-7 cwd reporting into supported remote SSH
+	// shells. It changes shell startup, so it is opt-in and defaults to false.
+	ShellIntegration bool `json:"shellIntegration,omitempty"`
 	// Backspace key byte sequence for terminal-stream types (ssh/telnet/serial).
 	// The translation happens on the frontend in applyBackspaceKey before the
 	// byte hits SessionWrite, so the backend does not read this field — it is

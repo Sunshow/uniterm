@@ -12,20 +12,17 @@ import (
 	"github.com/ys-ll/uniterm/backend/log"
 )
 
-// TerminalCwdSink, when installed, receives each cwd reported by an injected
-// shell integration (OSC-7) so the App layer can forward it to the frontend
-// as a Wails event. Installed once in NewApp, next to TransferEventSink.
+// TerminalCwdSink, when installed, receives each cwd reported through OSC-7
+// so the App layer can forward it to the frontend as a Wails event. Installed
+// once in NewApp, next to TransferEventSink.
 var TerminalCwdSink func(sessionID, cwd string)
 
 const (
-	osc7Prefix = "\x1b]7;"
-	osc7BEL    = "\x07"
-	osc7ST     = "\x1b\\"
-
-	// sshIntegrationTimeout bounds every one-shot exec round-trip of the SSH
-	// integration (shell detection, temp file writes). On any timeout or
-	// error the session silently degrades to a plain shell.
+	osc7Prefix            = "\x1b]7;"
+	osc7BEL               = "\x07"
+	osc7ST                = "\x1b\\"
 	sshIntegrationTimeout = 5 * time.Second
+	sshCleanupGracePeriod = 500 * time.Millisecond
 
 	// maxOSCPending caps how long an unterminated OSC-7 payload may buffer
 	// display output before it is dropped as garbage. Without this a program
@@ -134,20 +131,30 @@ func decodeOSC7Payload(raw string) string {
 	return raw
 }
 
-// buildShellBootstrap returns the temp files to materialize remotely and the
-// argument list for starting the shell with integration injected. The user's
+// buildShellBootstrap returns the temporary files and arguments used to start
+// an SSH shell with integration injected. The user's
 // own rc files are sourced FIRST; our hook is chained (prepended/appended),
 // never overwriting user hooks. ok=false for unsupported/unknown shells.
 //
-// The <rcfile>/<dir> placeholders in startArgs are replaced by the real
-// remote temp paths at start time (injectShellIntegration / wslShellIntegration).
+// The <rcfile>/<dir> placeholders in startArgs are replaced by real temporary
+// paths when starting SSH shell integration.
 func buildShellBootstrap(shell string) (files map[string]string, startArgs []string, ok bool) {
 	base := shellBasename(shell)
 	const oscFn = `__uniterm_osc7() { printf '\033]7;file://%s\033\\' "$PWD" 2>/dev/null; }`
 	switch {
-	case base == "bash" || base == "sh":
-		rc := "[ -f \"$HOME/.bashrc\" ] && . \"$HOME/.bashrc\"\n" +
-			"[ -f \"$HOME/.bash_profile\" ] && . \"$HOME/.bash_profile\"\n" +
+	case base == "bash":
+		// Bash ignores --rcfile in login mode and login_shell is immutable, so
+		// the injected shell cannot be a literal login shell. Reproduce its
+		// startup-file order instead. User profiles commonly source ~/.bashrc
+		// themselves; sourcing it here too would execute it twice.
+		rc := "[ -r /etc/profile ] && . /etc/profile\n" +
+			"if [ -r \"$HOME/.bash_profile\" ]; then\n" +
+			"  . \"$HOME/.bash_profile\"\n" +
+			"elif [ -r \"$HOME/.bash_login\" ]; then\n" +
+			"  . \"$HOME/.bash_login\"\n" +
+			"elif [ -r \"$HOME/.profile\" ]; then\n" +
+			"  . \"$HOME/.profile\"\n" +
+			"fi\n" +
 			oscFn + "\n" +
 			"case \"$(declare -p PROMPT_COMMAND 2>/dev/null)\" in\n" +
 			"  \"declare -a\"*) PROMPT_COMMAND=(\"__uniterm_osc7\" \"${PROMPT_COMMAND[@]}\") ;;\n" +
@@ -161,18 +168,45 @@ func buildShellBootstrap(shell string) (files map[string]string, startArgs []str
 		// zsh always sources $ZDOTDIR/.zshenv; ours chains the user's own
 		// ~/.zshenv so nothing the user relies on is lost.
 		env := "[ -f \"$HOME/.zshenv\" ] && . \"$HOME/.zshenv\"\n"
-		// Login shell (-l) reads .zprofile; ZDOTDIR override means we must
-		// supply one that chains the user's original so Homebrew PATH and
-		// other login-time setup is not lost.
 		profile := "[ -f \"$HOME/.zprofile\" ] && . \"$HOME/.zprofile\"\n"
-		return map[string]string{".zshrc": rc, ".zshenv": env, ".zprofile": profile}, []string{"ZDOTDIR=<dir>"}, true
+		login := "[ -f \"$HOME/.zlogin\" ] && . \"$HOME/.zlogin\"\n"
+		logout := "[ -f \"$HOME/.zlogout\" ] && . \"$HOME/.zlogout\"\n"
+		return map[string]string{
+			".zshrc": rc, ".zshenv": env, ".zprofile": profile,
+			".zlogin": login, ".zlogout": logout,
+		}, []string{"ZDOTDIR=<dir>"}, true
 	case base == "fish":
 		cmd := "functions -c fish_prompt __uniterm_orig_prompt; " +
 			"function fish_prompt; __uniterm_osc7; __uniterm_orig_prompt; end; " +
 			"function __uniterm_osc7; printf '\\e]7;file://%s\\e\\\\' $PWD; end"
-		return nil, []string{"-C", cmd}, true
+		return nil, []string{"-l", "-C", cmd}, true
 	}
 	return nil, nil, false
+}
+
+// buildWSLShellBootstrap preserves the existing WSL startup behavior. SSH and
+// WSL use different launch mechanisms, so changes made to approximate SSH
+// login-shell semantics must not silently alter WSL initialization.
+func buildWSLShellBootstrap(shell string) (files map[string]string, ok bool) {
+	base := shellBasename(shell)
+	const oscFn = `__uniterm_osc7() { printf '\033]7;file://%s\033\\' "$PWD" 2>/dev/null; }`
+	switch base {
+	case "bash":
+		rc := "[ -f \"$HOME/.bashrc\" ] && . \"$HOME/.bashrc\"\n" +
+			"[ -f \"$HOME/.bash_profile\" ] && . \"$HOME/.bash_profile\"\n" +
+			oscFn + "\n" +
+			"case \"$(declare -p PROMPT_COMMAND 2>/dev/null)\" in\n" +
+			"  \"declare -a\"*) PROMPT_COMMAND=(\"__uniterm_osc7\" \"${PROMPT_COMMAND[@]}\") ;;\n" +
+			"  *) PROMPT_COMMAND=\"__uniterm_osc7${PROMPT_COMMAND:+;$PROMPT_COMMAND}\" ;;\n" +
+			"esac\n"
+		return map[string]string{"rcfile": rc}, true
+	case "zsh":
+		rc := "[ -f \"$HOME/.zshrc\" ] && . \"$HOME/.zshrc\"\n" +
+			oscFn + "\nprecmd_functions+=(__uniterm_osc7)\n"
+		env := "[ -f \"$HOME/.zshenv\" ] && . \"$HOME/.zshenv\"\n"
+		return map[string]string{".zshrc": rc, ".zshenv": env}, true
+	}
+	return nil, false
 }
 
 // shellBasename returns the basename of a shell path ("/usr/bin/zsh" →
@@ -184,111 +218,137 @@ func shellBasename(shell string) string {
 	return shell
 }
 
-// injectShellIntegration tries to start the SSH session's shell with an
-// OSC-7 hook injected. It returns the command to pass to session.Start, or
-// "" when integration is unavailable (unknown shell, or any detection/write
-// step failed) — the caller then starts a plain shell instead. It never
-// fails the connection.
-func injectShellIntegration(client *ssh.Client) string {
+func injectShellIntegration(client *ssh.Client) (command, tempPath string) {
 	if client == nil {
-		return ""
+		return "", ""
 	}
 	shell, err := sshRunCommand(client, "echo $SHELL", "", sshIntegrationTimeout)
 	if err != nil {
 		log.Writef("ssh: shell integration skipped (detect shell: %v)", err)
-		return ""
+		return "", ""
 	}
 	shell = strings.TrimSpace(shell)
-	log.Writef("ssh: shell integration detected remote shell %q", shell)
 	files, args, ok := buildShellBootstrap(shell)
 	if !ok {
-		log.Writef("ssh: shell integration unsupported shell %q", shell)
-		return ""
+		return "", ""
 	}
 	switch shellBasename(shell) {
 	case "bash":
-		content, ok := files["rcfile"]
-		if !ok {
-			return ""
-		}
-		path, err := sshWriteRemoteFile(client, content)
+		path, err := sshWriteRemoteFile(client, files["rcfile"])
 		if err != nil {
 			log.Writef("ssh: shell integration skipped (write rcfile: %v)", err)
-			return ""
+			return "", ""
 		}
-		return "exec bash --rcfile " + path
+		return bashIntegrationCommand(path), path
 	case "zsh":
-		dir, err := sshWriteRemoteFiles(client, files, []string{".zshrc", ".zshenv", ".zprofile"})
+		dir, err := sshWriteRemoteFiles(client, files, []string{".zshrc", ".zshenv", ".zprofile", ".zlogin", ".zlogout"})
 		if err != nil {
 			log.Writef("ssh: shell integration skipped (write zsh dir: %v)", err)
-			return ""
+			return "", ""
 		}
-		return "exec env ZDOTDIR=" + dir + " zsh -l"
+		return "exec env ZDOTDIR=" + dir + " zsh -l", dir
 	case "fish":
-		// The exec request is parsed by the user's login shell, which for a
-		// fish user is fish itself — quote the -C argument with fish rules.
-		if len(args) < 2 {
-			return ""
+		if len(args) >= 3 {
+			return "exec fish -l -C " + fishSingleQuote(args[2]), ""
 		}
-		return "exec fish -C " + fishSingleQuote(args[1])
 	}
-	return ""
+	return "", ""
 }
 
-// sshRunCommand runs a one-shot command on an existing SSH client with a
-// timeout, optionally feeding stdin, and returns stdout.
 func sshRunCommand(client *ssh.Client, cmd, stdin string, timeout time.Duration) (string, error) {
-	sess, err := client.NewSession()
-	if err != nil {
-		return "", err
+	// Start the timeout before opening the channel so the caller always returns
+	// within its budget. x/crypto/ssh cannot cancel one pending channel-open;
+	// if the peer never replies, this goroutine exits when the client closes.
+	timer := time.NewTimer(timeout)
+	defer timer.Stop()
+	type sessionResult struct {
+		sess *ssh.Session
+		err  error
 	}
-	defer sess.Close()
+	sessionReady := make(chan sessionResult)
+	cancelOpen := make(chan struct{})
+	defer close(cancelOpen)
+	go func() {
+		sess, err := client.NewSession()
+		select {
+		case sessionReady <- sessionResult{sess, err}:
+		case <-cancelOpen:
+			if sess != nil {
+				_ = sess.Close()
+			}
+		}
+	}()
+
+	var sess *ssh.Session
+	select {
+	case opened := <-sessionReady:
+		if opened.err != nil {
+			return "", opened.err
+		}
+		sess = opened.sess
+	case <-timer.C:
+		return "", fmt.Errorf("command timed out opening SSH session after %s", timeout)
+	}
 	if stdin != "" {
 		sess.Stdin = strings.NewReader(stdin)
 	}
-	type sshCmdResult struct {
+	type result struct {
 		out []byte
 		err error
 	}
-	done := make(chan sshCmdResult, 1)
+	done := make(chan result, 1)
 	go func() {
 		out, err := sess.Output(cmd)
-		done <- sshCmdResult{out, err}
+		done <- result{out, err}
 	}()
 	select {
 	case r := <-done:
-		if r.err != nil {
-			return "", r.err
-		}
-		return string(r.out), nil
-	case <-time.After(timeout):
-		// Close the channel so the goroutine's Output returns; the buffered
-		// result channel keeps it from leaking.
-		sess.Close()
+		closeSSHSessionAsync(sess)
+		return string(r.out), r.err
+	case <-timer.C:
+		// Session.Close writes a channel-close packet and can itself block when
+		// the transport is wedged. Do it asynchronously so the timeout remains
+		// a bound on this function; closing the client will eventually release it.
+		closeSSHSessionAsync(sess)
 		return "", fmt.Errorf("command timed out after %s", timeout)
 	}
 }
 
-// sshWriteRemoteFile materializes content in a remote temp file (created via
-// mktemp so the path is space-free) and returns the path.
+func closeSSHSessionAsync(sess *ssh.Session) {
+	if sess != nil {
+		go func() { _ = sess.Close() }()
+	}
+}
+
+// bashIntegrationCommand runs the injected interactive shell and then mirrors
+// login bash's logout behavior. Keeping logout outside the child avoids
+// replacing an EXIT trap installed by the user's profile.
+func bashIntegrationCommand(rcfile string) string {
+	return "bash --rcfile " + rcfile +
+		"; __uniterm_status=$?; bash -c '[ -r \"$HOME/.bash_logout\" ] && . \"$HOME/.bash_logout\"'; exit $__uniterm_status"
+}
+
 func sshWriteRemoteFile(client *ssh.Client, content string) (string, error) {
 	out, err := sshRunCommand(client,
-		`f=$(mktemp /tmp/uniterm-XXXXXX); cat > "$f"; printf '%s' "$f"`,
+		`f=$(mktemp /tmp/uniterm-XXXXXX) || exit; printf '%s\n' "$f"; cat > "$f"`,
 		content, sshIntegrationTimeout)
 	if err != nil {
+		if path, pathErr := cleanRemoteTempPath(out); pathErr == nil {
+			sshRemoveRemoteTemp(client, path)
+		}
 		return "", err
 	}
 	return cleanRemoteTempPath(out)
 }
 
-// sshWriteRemoteFiles materializes multiple named files inside a fresh
-// remote temp directory and returns the directory path (used for zsh's
-// ZDOTDIR redirection).
 func sshWriteRemoteFiles(client *ssh.Client, files map[string]string, names []string) (string, error) {
 	out, err := sshRunCommand(client,
-		`d=$(mktemp -d /tmp/uniterm-XXXXXX); printf '%s' "$d"`,
+		`d=$(mktemp -d /tmp/uniterm-XXXXXX) || exit; printf '%s\n' "$d"`,
 		"", sshIntegrationTimeout)
 	if err != nil {
+		if dir, pathErr := cleanRemoteTempPath(out); pathErr == nil {
+			sshRemoveRemoteTemp(client, dir)
+		}
 		return "", err
 	}
 	dir, err := cleanRemoteTempPath(out)
@@ -298,29 +358,79 @@ func sshWriteRemoteFiles(client *ssh.Client, files map[string]string, names []st
 	for _, name := range names {
 		content, ok := files[name]
 		if !ok {
+			sshRemoveRemoteTemp(client, dir)
 			return "", fmt.Errorf("missing bootstrap file %q", name)
 		}
 		if _, err := sshRunCommand(client, "cat > '"+dir+"/"+name+"'", content, sshIntegrationTimeout); err != nil {
+			sshRemoveRemoteTemp(client, dir)
 			return "", err
 		}
 	}
 	return dir, nil
 }
 
-// cleanRemoteTempPath validates a path captured from mktemp output: it must
-// be non-empty and free of whitespace and quotes so it can be embedded in
-// shell commands unquoted.
+func sshRemoveRemoteTemp(client *ssh.Client, path string) {
+	if client == nil || !isSSHIntegrationTempPath(path) {
+		return
+	}
+	if _, err := sshRunCommand(client, "rm -rf -- '"+path+"'", "", sshIntegrationTimeout); err != nil {
+		log.Writef("ssh: shell integration temp cleanup failed for %s: %v", path, err)
+	}
+}
+
+func isSSHIntegrationTempPath(path string) bool {
+	const prefix = "/tmp/uniterm-"
+	if !strings.HasPrefix(path, prefix) || len(path) != len(prefix)+6 {
+		return false
+	}
+	for _, ch := range path[len(prefix):] {
+		if !((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9')) {
+			return false
+		}
+	}
+	return true
+}
+
+// sshCleanupRemoteTemp waits briefly for best-effort cleanup. If opening a new
+// SSH channel stalls on a broken transport, the caller can close the client
+// after this bounded grace period instead of blocking Disconnect indefinitely.
+func sshCleanupRemoteTemp(client *ssh.Client, path string) {
+	if client == nil || !isSSHIntegrationTempPath(path) {
+		return
+	}
+	done := make(chan struct{})
+	go func() {
+		sshRemoveRemoteTemp(client, path)
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-time.After(sshCleanupGracePeriod):
+		log.Writef("ssh: shell integration temp cleanup timed out for %s", path)
+	}
+}
+
+// cleanRemoteTempPath extracts exactly one standalone, strictly validated
+// mktemp path. Login banners or shell startup messages may surround the path,
+// but zero or multiple candidates are rejected so cleanup is never ambiguous.
 func cleanRemoteTempPath(out string) (string, error) {
-	path := strings.TrimSpace(out)
-	if path == "" || strings.ContainsAny(path, " \t\"'\\\r\n") {
-		return "", fmt.Errorf("unexpected remote temp path %q", path)
+	var path string
+	for _, line := range strings.Split(out, "\n") {
+		line = strings.TrimSuffix(line, "\r")
+		if !isSSHIntegrationTempPath(line) {
+			continue
+		}
+		if path != "" {
+			return "", fmt.Errorf("multiple remote temp paths in output %q", out)
+		}
+		path = line
+	}
+	if path == "" {
+		return "", fmt.Errorf("remote temp path not found in output %q", out)
 	}
 	return path, nil
 }
 
-// fishSingleQuote quotes s for fish's single-quote rules (inside single
-// quotes only backslash and single quote are escapable), used when the SSH
-// exec request is parsed by a fish login shell.
 func fishSingleQuote(s string) string {
 	s = strings.ReplaceAll(s, `\`, `\\`)
 	s = strings.ReplaceAll(s, `'`, `\'`)
