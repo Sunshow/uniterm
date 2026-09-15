@@ -1535,6 +1535,8 @@
   "sftp.editExternalStart": "正在外部编辑器中编辑 {path}",
   "sftp.editExternalUploaded": "已自动上传到远程：{path}",
   "sftp.editExternalNotConfigured": "尚未配置外部编辑器，请在设置中配置。",
+  "sftp.openWithSystem": "系统打开方式…",
+  "sftp.openWithSystemStart": "正在使用系统关联程序打开 {path}",
   "settings.externalEditor": "外部编辑器",
   "settings.externalEditorDesc": "外部编辑器命令，临时文件路径自动追加。含空格的路径需用双引号包裹。",
   "sftp.edit.saveClose": "保存并关闭",

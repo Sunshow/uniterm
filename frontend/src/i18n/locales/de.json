@@ -1534,6 +1534,8 @@
   "sftp.editExternalStart": "Bearbeite {path} im externen Editor",
   "sftp.editExternalUploaded": "Automatisch auf Remote hochgeladen: {path}",
   "sftp.editExternalNotConfigured": "Kein externer Editor konfiguriert. Bitte in den Einstellungen festlegen.",
+  "sftp.openWithSystem": "Öffnen mit…",
+  "sftp.openWithSystemStart": "{path} wird mit der zugeordneten Anwendung geöffnet…",
   "settings.externalEditor": "Externer Editor",
   "settings.externalEditorDesc": "Externer-Editor-Befehl; der Pfad der temporären Datei wird angehängt. Pfade mit Leerzeichen in doppelte Anführungszeichen setzen.",
   "sftp.edit.saveClose": "Speichern und schließen",

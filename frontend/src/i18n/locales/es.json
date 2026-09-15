@@ -1534,6 +1534,8 @@
   "sftp.editExternalStart": "Editando {path} en editor externo",
   "sftp.editExternalUploaded": "Subido automáticamente al remoto: {path}",
   "sftp.editExternalNotConfigured": "No hay editor externo configurado. Configúralo en Ajustes.",
+  "sftp.openWithSystem": "Abrir con…",
+  "sftp.openWithSystemStart": "Abriendo {path} con la aplicación asociada…",
   "settings.externalEditor": "Editor externo",
   "settings.externalEditorDesc": "Comando del editor externo; la ruta del archivo temporal se añade automáticamente. Las rutas con espacios deben ir entre comillas dobles.",
   "sftp.edit.saveClose": "Guardar y cerrar",

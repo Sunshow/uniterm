@@ -1534,6 +1534,8 @@
   "sftp.editExternalStart": "외부 편집기에서 {path} 편집 중",
   "sftp.editExternalUploaded": "원격으로 자동 업로드됨: {path}",
   "sftp.editExternalNotConfigured": "외부 편집기가 구성되지 않았습니다. 설정에서 지정하세요.",
+  "sftp.openWithSystem": "앱으로 열기…",
+  "sftp.openWithSystemStart": "연결된 앱으로 {path}을(를) 여는 중…",
   "settings.externalEditor": "외부 편집기",
   "settings.externalEditorDesc": "외부 편집기 명령. 임시 파일 경로가 자동으로 추가됩니다. 공백이 포함된 경로는 큰따옴표로 감싸세요.",
   "sftp.edit.saveClose": "저장 후 닫기",

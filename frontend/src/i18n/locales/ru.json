@@ -1534,6 +1534,8 @@
   "sftp.editExternalStart": "Редактирование {path} во внешнем редакторе",
   "sftp.editExternalUploaded": "Автоматически загружено на удалённый сервер: {path}",
   "sftp.editExternalNotConfigured": "Внешний редактор не настроен. Укажите его в настройках.",
+  "sftp.openWithSystem": "Открыть с помощью…",
+  "sftp.openWithSystemStart": "Открытие {path} связанным приложением…",
   "settings.externalEditor": "Внешний редактор",
   "settings.externalEditorDesc": "Команда внешнего редактора; путь временного файла добавляется автоматически. Пути с пробелами заключайте в двойные кавычки.",
   "sftp.edit.saveClose": "Сохранить и закрыть",

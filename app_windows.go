@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -401,6 +402,51 @@ func hideProcWindow(cmd *exec.Cmd) {
 	if ext == ".cmd" || ext == ".bat" {
 		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	}
+}
+
+// openAsInfo mirrors the shell32 OPENASINFO structure for SHOpenWithDialog.
+type openAsInfo struct {
+	file  uintptr // PCSZW: file to open
+	class uintptr // PCSZW: optional ProgID hint (unused)
+	flags uint32
+}
+
+const (
+	oaifAllowRegistration   = 0x00000001 // offer the "always use this app" checkbox
+	oaifExec                = 0x00000004 // execute the picked application
+	coinitApartmentThreaded = 0x2        // COINIT_APARTMENTTHREADED
+)
+
+// openWithSystem pops the system "open with" dialog for the file and executes
+// the application the user picks (owned by the main window, so it stays on
+// top). It calls the documented SHOpenWithDialog API directly: the legacy
+// rundll32 shell32.dll,OpenAs_RunDLLW entry was tried first, but its
+// dialog-to-app hand-off corrupts the path on Win10 — the picked app received
+// mojibake instead of the file (reproduced with Notepad). The call blocks
+// until the dialog closes; cancelling it counts as success.
+func (a *App) openWithSystem(p string) error {
+	p16, err := windows.UTF16PtrFromString(p)
+	if err != nil {
+		return err
+	}
+	// SHOpenWithDialog requires COM (STA) on the calling thread. S_OK (0)
+	// means this call initialized it and must pair an uninitialize; S_FALSE
+	// (1, already initialized) must not.
+	ole32 := windows.NewLazySystemDLL("ole32.dll")
+	if r, _, _ := ole32.NewProc("CoInitializeEx").Call(0, coinitApartmentThreaded); r == 0 {
+		defer ole32.NewProc("CoUninitialize").Call()
+	}
+	info := openAsInfo{file: uintptr(unsafe.Pointer(p16)), flags: oaifAllowRegistration | oaifExec}
+	shell32 := windows.NewLazySystemDLL("shell32.dll")
+	r1, _, callErr := shell32.NewProc("SHOpenWithDialog").Call(a.findMainWindow(), uintptr(unsafe.Pointer(&info)))
+	if r1 != 0 {
+		return nil
+	}
+	// User closed the dialog without choosing an app — not an error.
+	if errno, ok := callErr.(windows.Errno); ok && errno == windows.ERROR_CANCELLED {
+		return nil
+	}
+	return fmt.Errorf("open-with dialog failed: %w", callErr)
 }
 
 // detectExternalEditors scans for text editors installed on this Windows host

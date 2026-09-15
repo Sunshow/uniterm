@@ -54,6 +54,7 @@
           @send-to-other="onDownloadTo"
           @edit="onEditFile"
           @edit-external="onEditExternal"
+          @open-with-system="onOpenWithSystem"
           @new-file="onNewFile"
           @copy-to-clipboard="onCopyToClipboard"
           @cut-to-clipboard="onCutToClipboard"
@@ -155,7 +156,7 @@ import { useCompanionStore } from '../stores/companionStore'
 import { usePanelStore } from '../stores/panelStore'
 import { useSettingsStore } from '../stores/settingsStore'
 import {
-  SftpListRemote, SftpChangeRemoteDir, SftpOpenExternalEditor, ListSessions,
+  SftpListRemote, SftpChangeRemoteDir, SftpOpenExternalEditor, SftpOpenWithSystem, ListSessions,
 } from '../../bindings/github.com/ys-ll/uniterm/app'
 import {
   useFilePanel, useConflictDialog, useFileDialogs, useFileListing, useChmodDialog,
@@ -371,7 +372,7 @@ const {
   onCopyToClipboard, onCutToClipboard, onClearClipboard, onCancelPaste, onPaste,
   onRename, onDelete, onMkdir, onNewFile, onSymlink,
   onUpload, onDownloadTo,
-  onEditFile, onEditExternal,
+  onEditFile, onEditExternal, onOpenWithSystem,
   onCancelTransfer, onPauseTransfer, onResumeTransfer, onRetryTransfer, clearFinishedTransfers,
   onSaveBookmark, onRemoveBookmark,
   uploadPaths,
@@ -387,6 +388,7 @@ const {
   transferTasks: () => transferTasks.value,
   openEditor: (path, title) => editor.openEditor(path, title, 'remote'),
   openExternal: (sid, path, cmd) => SftpOpenExternalEditor(sid, path, cmd),
+  openWithSystem: (sid, path) => SftpOpenWithSystem(sid, path),
 })
 
 let unsubStatus: (() => void) | null = null

@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -125,6 +126,17 @@ const macBundleID = "com.wails.uniTerm"
 // The setting is written once (only when not already disabled) and persists
 // across runs, so it is a no-op on subsequent launches. It runs asynchronously
 // to avoid adding latency to startup.
+// openWithSystem opens the file with its default associated application via
+// `open`. macOS has no scriptable "open with" picker, so the degrading
+// behaviour from the issue discussion applies: no chooser, the file simply
+// opens in whatever the desktop currently associates with the extension.
+func (a *App) openWithSystem(p string) error {
+	if err := exec.Command("open", p).Start(); err != nil {
+		return fmt.Errorf("failed to open %s: %w", p, err)
+	}
+	return nil
+}
+
 func (a *App) configureMacKeyRepeat() {
 	go func() {
 		// Skip the write if it's already disabled to avoid churning the
