@@ -157,6 +157,7 @@ import { usePanelStore } from '../stores/panelStore'
 import { useSettingsStore } from '../stores/settingsStore'
 import {
   SftpListRemote, SftpChangeRemoteDir, SftpOpenExternalEditor, SftpOpenWithSystem, ListSessions,
+  SessionInjectCwdHook,
 } from '../../bindings/github.com/ys-ll/uniterm/app'
 import {
   useFilePanel, useConflictDialog, useFileDialogs, useFileListing, useChmodDialog,
@@ -171,7 +172,8 @@ import FileEditorDialog from './FileEditorDialog.vue'
 import FileGenericDialog from './FileGenericDialog.vue'
 import FileConflictDialog from './FileConflictDialog.vue'
 import { Events } from '@wailsio/runtime'
-import { useTransferTaskEvents, watchNewTransferTasks } from '../composables/useTransferTasks'
+import { watchNewTransferTasks } from '../composables/useTransferTasks'
+import { registerTransferRoute } from '../services/transferTaskCenter'
 import { queuedSessionWrite } from '../services/sessionWriter'
 
 const { t } = useI18n()
@@ -187,6 +189,9 @@ const transferHeight = ref(130)
 // The transfer panel starts COLLAPSED (only its button bar shows) and a new
 // transfer expands it — the user can always re-collapse via the bar's toggle.
 const sidebarTransferCollapsed = ref(true)
+// Set on unmount so late transfer-done callbacks (routes outlive the
+// sidebar's v-if) don't refresh an unmounted component.
+let sidebarDisposed = false
 
 let refreshTimer: ReturnType<typeof setTimeout> | null = null
 let refreshDebounce: ReturnType<typeof setTimeout> | null = null
@@ -200,11 +205,6 @@ const transferKey = computed(() => companionStore.transferKey || 'companion-sftp
 const transferTasks = computed(() => panelStore.getTransferTasks(transferKey.value))
 // Auto-expand the collapsed panel whenever a NEW transfer task appears.
 watchNewTransferTasks(() => transferTasks.value, () => { sidebarTransferCollapsed.value = false })
-const transferEvents = useTransferTaskEvents(
-  () => transferTasks.value,
-  () => sessionId.value,
-  (status) => { if (status === 'done') scheduleRefresh(400) },
-)
 const LIST_TIMEOUT_MS = 20000
 
 function scheduleRefreshRetry() {
@@ -307,10 +307,28 @@ const followActive = computed(() => {
 // terminal:cwd with POSIX paths).
 const followSupported = computed(() => !!companionStore.activeFilesPanelId)
 
-function toggleFollow() {
+async function toggleFollow() {
   const pid = companionStore.activeFilesPanelId
   if (!pid) return
+  const wasOn = companionStore.followPathByPanel[pid] === true
   companionStore.toggleFollowPath(pid)
+  // Enabling follow without startup shell integration: type the OSC-7 hook
+  // into the running shell so cwd reporting starts at the next prompt.
+  // SSH only: WSL panels already inject the hook unconditionally at startup.
+  if (wasOn) return
+  const panel = panelStore.getPanel(pid)
+  if (panel?.config?.type !== 'ssh') return
+  if (!panel.sessionId) return
+  if (panel.config?.shellIntegration === true) return // startup injection active
+  try {
+    const injected = await SessionInjectCwdHook(panel.sessionId)
+    // injected=false means the hook was already installed on this session —
+    // no toast, to avoid rewarding a mere re-toggle.
+    if (injected) msg.success(t('sftp.followInjectOk'))
+  } catch {
+    // Follow itself is harmless without the hook; keep it enabled.
+    msg.warning(t('sftp.followInjectFailed'))
+  }
 }
 
 let followTimer: ReturnType<typeof setTimeout> | null = null
@@ -415,6 +433,21 @@ function bindListeners() {
     if (payload.id !== sessionId.value) return
     if (payload.status === 'connected') {
       onRefresh()
+      // Reconnect: re-install the runtime cwd hook if follow was enabled and
+      // startup shell integration is not active. SSH panels only (WSL injects
+      // at startup); skip connections with post-login automation so the hook
+      // command cannot interleave with that automation's keystrokes. Best
+      // effort, never blocks the refresh above.
+      const pid = companionStore.activeFilesPanelId
+      const panel = pid ? panelStore.getPanel(pid) : null
+      if (pid && panel?.sessionId === payload.id &&
+          panel.config?.type === 'ssh' &&
+          companionStore.followPathByPanel[pid] === true &&
+          panel.config?.shellIntegration !== true &&
+          !panel.config?.postLoginScript &&
+          !(panel.config?.postLoginExpectSteps?.length)) {
+        SessionInjectCwdHook(panel.sessionId).catch(() => {})
+      }
     } else if (payload.status === 'error') {
       markTransferTasksDisconnected()
       connectError.value = t('sftp.connectError')
@@ -442,17 +475,44 @@ function bindListeners() {
     }
   })
 
-  // Transfer tasks (start/progress/complete) are tracked by the shared composable.
-  transferEvents.bind()
+  // Transfer events are routed app-level by transferTaskCenter keyed by
+  // session id. Registering here on every session change keeps one route
+  // per (session, list key); earlier routes stay registered so transfers
+  // keep updating their list while another terminal is active or the
+  // sidebar view is hidden. Routes are dropped when the panel is disposed
+  // (companionStore.disposeForPanel).
+  const sid = sessionId.value
+  const key = companionStore.transferKey
+  const pid = companionStore.activeFilesPanelId
+  if (sid && key) {
+    registerTransferRoute(sid, key, (status) => {
+      if (sidebarDisposed || status !== 'done') return
+      // Routes outlive panel switches; only refresh when this route's own
+      // panel is the one the sidebar is currently showing.
+      if (companionStore.activeFilesPanelId !== pid) return
+      scheduleRefresh(400)
+    })
+  }
 }
 
 /** Restore this panel's cached listing; returns true if a non-empty cache existed. */
 function restoreCache(): boolean {
   const pid = companionStore.activeFilesPanelId
+  const sid = sessionId.value
   const cached = pid ? companionStore.getFileViewCache(pid) : null
   if (!cached || !cached.files.length) return false
-  cwd.value = cached.cwd
-  files.value = cached.files as FileItem[]
+  // Defer the (possibly huge) reactive assignment to a macrotask (setTimeout
+  // 0) so the tab switch paints first. `requestAnimationFrame` is not enough
+  // here: rAF callbacks run before the next frame's paint, so the restore
+  // would still jank the switch frame itself. setTimeout runs post-paint —
+  // the browser paints the switched tab between tasks, then the sidebar pays
+  // the reactivity + sort cost. Guarded: if the user switched panels before
+  // the callback fires, the stale restore is dropped.
+  setTimeout(() => {
+    if (companionStore.activeFilesPanelId !== pid || sessionId.value !== sid) return
+    cwd.value = cached.cwd
+    files.value = cached.files as FileItem[]
+  }, 0)
   return true
 }
 
@@ -511,6 +571,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  sidebarDisposed = true
   unsubStatus?.()
   unsubData?.()
   unsubExtEdit?.()

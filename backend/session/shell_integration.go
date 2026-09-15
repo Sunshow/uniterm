@@ -209,6 +209,38 @@ func buildWSLShellBootstrap(shell string) (files map[string]string, ok bool) {
 	return nil, false
 }
 
+// buildRuntimeCwdHook returns a one-line snippet that installs the OSC-7 cwd
+// hook into an ALREADY-RUNNING interactive shell (the startup injection in
+// buildShellBootstrap can only change how the shell starts). The snippet is
+// written to the session's stdin like a typed command: leading space keeps it
+// out of bash history (HISTCONTROL=ignorespace), the trailing newline executes
+// it. Re-injection is guarded so hooks are never chained twice. ok=false for
+// unsupported shells.
+func buildRuntimeCwdHook(shell string) (string, bool) {
+	base := shellBasename(shell)
+	const oscFn = `__uniterm_osc7() { printf '\033]7;file://%s\033\\' "$PWD" 2>/dev/null; }`
+	switch base {
+	case "bash":
+		return " " + oscFn + "; " +
+			`case "$(declare -p PROMPT_COMMAND 2>/dev/null)" in` + " " +
+			`"declare -a"*) [[ "${PROMPT_COMMAND[*]}" == *__uniterm_osc7* ]] || PROMPT_COMMAND+=("__uniterm_osc7") ;;` + " " +
+			// ${PROMPT_COMMAND-} keeps the guard from erroring under set -u
+			// when the variable is unset.
+			`*) [[ "${PROMPT_COMMAND-}" == *__uniterm_osc7* ]] || PROMPT_COMMAND="__uniterm_osc7${PROMPT_COMMAND:+;$PROMPT_COMMAND}" ;;` + " " +
+			"esac\n", true
+	case "zsh":
+		return " " + oscFn + "; " +
+			// -0 default guards against set -u when precmd_functions is unset.
+			`(( ${precmd_functions[(I)__uniterm_osc7]-0} )) || precmd_functions+=(__uniterm_osc7)` + "\n", true
+	case "fish":
+		return " if not functions -q __uniterm_osc7; " +
+			"functions -c fish_prompt __uniterm_orig_prompt; " +
+			"function fish_prompt; __uniterm_osc7; __uniterm_orig_prompt; end; " +
+			`function __uniterm_osc7; printf '\e]7;file://%s\e\\' $PWD; end; end` + "\n", true
+	}
+	return "", false
+}
+
 // shellBasename returns the basename of a shell path ("/usr/bin/zsh" →
 // "zsh").
 func shellBasename(shell string) string {

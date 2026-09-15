@@ -113,6 +113,7 @@ import { useTabStore } from '../stores/tabStore'
 import { usePanelStore } from '../stores/panelStore'
 import { useSessionStore } from '../stores/sessionStore'
 import { useSettingsStore } from '../stores/settingsStore'
+import { useCompanionStore } from '../stores/companionStore'
 import { formatKeyBinding, tabDigitShortcutPrefix, formatDigitShortcut } from '../composables/useKeyboardShortcuts'
 import type { ShortcutAction } from '../types/settings'
 import { useK8sStore } from '../stores/k8sStore'
@@ -157,6 +158,7 @@ const sessionStore = useSessionStore()
 const k8sStore = useK8sStore()
 const containerStore = useContainerStore()
 const settingsStore = useSettingsStore()
+const companionStore = useCompanionStore()
 const { duplicateSession } = useDuplicateSession()
 const { t } = useI18n()
 
@@ -252,8 +254,14 @@ const showBroadcastIcon = computed(() =>
 
 const hasActiveTransfers = computed(() => {
   if (props.tab.type === 'workspace') return false
-  const tasks = panelStore.getTransferTasks(props.tab.panelId)
-  return tasks.some(t => t.status === 'running' || t.status === 'paused')
+  const keys = [props.tab.panelId]
+  // Terminal tabs also surface their companion file panel's transfers.
+  if (props.tab.type === 'terminal') {
+    const companionKey = companionStore.sftpTransferKeyOf(props.tab.panelId)
+    if (companionKey) keys.push(companionKey)
+  }
+  return keys.some(k =>
+    panelStore.getTransferTasks(k).some(t => t.status === 'running' || t.status === 'paused'))
 })
 
 const isDisconnected = computed(() => {
